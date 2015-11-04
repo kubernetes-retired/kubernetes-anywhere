@@ -2,14 +2,14 @@ FROM gcr.io/google_containers/hyperkube:v1.0.7
 LABEL works.weave.role=system
 
 ENV CLOUD_PROVIDER=vagrant
-ENV ETCD_CLUSER="http://172.17.8.101:4001"
+ENV ETCD_CLUSTER="http://etcd.weave.local:4001"
 CMD weave_ip=`hostname -i` ; \
     /hyperkube apiserver \
       --insecure-bind-address=$weave_ip \
       --advertise-address=$weave_ip \
       --external-hostname=kube-apiserver.weave.local \
       --port=8080 \
-      --etcd-servers=$ETCD_CLUSER \
+      --etcd-servers=$ETCD_CLUSTER \
       --service-cluster-ip-range=10.16.0.0/12 \
       --cloud-provider=$CLOUD_PROVIDER \
       --logtostderr=true
