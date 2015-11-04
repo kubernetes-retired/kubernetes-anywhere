@@ -1,3 +1,5 @@
+./weave launch-router
+./weave launch-proxy --rewrite-inspect
 IMG="weaveworks/kubernetes-anywhere"
 
 docker run -d --name=etcd gcr.io/google_containers/etcd:2.0.13 \
