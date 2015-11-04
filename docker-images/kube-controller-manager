@@ -1,0 +1,6 @@
+FROM gcr.io/google_containers/hyperkube:v1.0.7
+LABEL works.weave.role=system
+
+CMD /hyperkube controller-manager \
+      --master=http://kube-apiserver.weave.local:8080 \
+      --logtostderr=true
