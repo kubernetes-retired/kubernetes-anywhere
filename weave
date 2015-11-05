@@ -3,7 +3,7 @@ set -e
 
 [ -n "$WEAVE_DEBUG" ] && set -x
 
-SCRIPT_VERSION="1.2.0"
+SCRIPT_VERSION="1.2.1"
 if [ "$SCRIPT_VERSION" = "(unreleased version)" ] ; then
     IMAGE_VERSION=latest
 else
@@ -420,6 +420,10 @@ create_bridge() {
             run_iptables -t filter -I FORWARD -i $DOCKER_BRIDGE -o $BRIDGE -j DROP
         fi
 
+        # let DNS traffic to weaveDNS, since otherwise it might get blocked by the likes of UFW
+        add_iptables_rule filter INPUT -i $DOCKER_BRIDGE -p udp --dport 53  -j ACCEPT
+        add_iptables_rule filter INPUT -i $DOCKER_BRIDGE -p tcp --dport 53  -j ACCEPT
+
         # Work around the situation where there are no rules allowing traffic
         # across our bridge. E.g. ufw
         add_iptables_rule filter FORWARD -i $BRIDGE -o $BRIDGE -j ACCEPT
@@ -525,6 +529,8 @@ destroy_bridge() {
         run_iptables -t filter -D FORWARD -i $DOCKER_BRIDGE -o $BRIDGE -j DROP 2>/dev/null || true
     fi
 
+    run_iptables -t filter -D INPUT -i $DOCKER_BRIDGE -p udp --dport 53  -j ACCEPT  >/dev/null 2>&1 || true
+    run_iptables -t filter -D INPUT -i $DOCKER_BRIDGE -p tcp --dport 53  -j ACCEPT  >/dev/null 2>&1 || true
     run_iptables -t filter -D FORWARD -i $BRIDGE -o $BRIDGE -j ACCEPT 2>/dev/null || true
     run_iptables -t nat -F WEAVE >/dev/null 2>&1 || true
     run_iptables -t nat -D POSTROUTING -j WEAVE >/dev/null 2>&1 || true
@@ -1475,7 +1481,7 @@ launch_router() {
         $(router_opts_$BRIDGE_TYPE) \
         --ipalloc-range "$IPRANGE" \
         --dns-effective-listen-address $DOCKER_BRIDGE_IP \
-        ${NETHOST_OPT:+$DNS_ROUTER_OPTS} $NO_DNS_OPT \
+        ${NETHOST_OPT:+$DNS_ROUTER_OPTS --http-addr 127.0.0.1:$HTTP_PORT} $NO_DNS_OPT \
         --docker-api "unix:///var/run/docker.sock" "$@")
     with_container_netns_or_die $CONTAINER_NAME setup_router_iface_$BRIDGE_TYPE
     attach_router
@@ -1896,9 +1902,9 @@ EOF
                 arp_update $BRIDGE $CIDR
                 add_iptables_rule nat WEAVE -d $CIDR ! -s $CIDR -j MASQUERADE
                 add_iptables_rule nat WEAVE -s $CIDR ! -d $CIDR -j MASQUERADE
-                if [ -n "$FQDN" ] ; then
-                    when_weave_running put_dns_fqdn_no_check_alive weave:expose $FQDN $CIDR
-                fi
+            fi
+            if [ -n "$FQDN" ] ; then
+                when_weave_running put_dns_fqdn_no_check_alive weave:expose $FQDN $CIDR
             fi
         done
         show_addrs $ALL_CIDRS
@@ -1927,8 +1933,8 @@ EOF
         ;;
     stop)
         [ $# -eq 0 ] || usage
-        stop_proxy
         stop_router
+        stop_proxy
         ;;
     stop-router)
         [ $# -eq 0 ] || usage
