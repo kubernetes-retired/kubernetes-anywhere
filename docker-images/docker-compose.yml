@@ -1,7 +1,6 @@
 etcd:
   image: "gcr.io/google_containers/etcd:2.0.13"
   hostname: "etcd.weave.local"
-  command: "etcd --listen-peer-urls http://etcd:2380,http://etcd:7001 --listen-client-urls http://etcd:2379,http://etcd:4001 --advertise-client-urls http://etcd:2379,http://etcd:4001"
 
 apiserver:
   image: "weaveworks/kubernetes-anywhere:apiserver"
