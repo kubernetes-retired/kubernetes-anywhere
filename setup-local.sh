@@ -1,4 +1,6 @@
-(cd ./docker-images; ./build.sh)
+#!/bin/bash
+
+#(cd ./docker-images; ./build.sh)
 
 ./weave launch-router
 ./weave launch-proxy --rewrite-inspect
