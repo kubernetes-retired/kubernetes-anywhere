@@ -1,8 +1,8 @@
 FROM gcr.io/google_containers/etcd:2.0.13
 LABEL works.weave.role=system
 
-CMD p="http://$(hostname)" ; \
-  etcd --name=$(hostname) \
+CMD p="http://$(hostname -s)" ; \
+  etcd --name=$(hostname -s) \
     --listen-peer-urls $p:2380,$p:7001 \
     --listen-client-urls $p:2379,$p:4001 \
     --advertise-client-urls $p:2379,$p:4001
