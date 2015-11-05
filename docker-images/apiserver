@@ -3,7 +3,7 @@ LABEL works.weave.role=system
 
 ENV CLOUD_PROVIDER=vagrant
 ENV ETCD_CLUSTER="http://etcd.weave.local:4001"
-CMD weave_ip=`hostname -i` ; \
+CMD weave_ip=$(hostname -i) ; \
     /hyperkube apiserver \
       --insecure-bind-address=$weave_ip \
       --advertise-address=$weave_ip \
