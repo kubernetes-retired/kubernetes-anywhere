@@ -1,8 +1,9 @@
 FROM gcr.io/google_containers/hyperkube:v1.0.7
 LABEL works.weave.role=system
 
-ENV CLOUD_PROVIDER=vagrant
-ENV ETCD_CLUSTER="http://etcd.weave.local:4001"
+ENV CLOUD_PROVIDER="vagrant"
+ENV ETCD_CLUSTER="http://etcd:2379"
+
 CMD weave_ip=$(hostname -i) ; \
     /hyperkube apiserver \
       --insecure-bind-address=$weave_ip \
