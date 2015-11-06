@@ -1,9 +1,11 @@
 FROM gcr.io/google_containers/etcd:2.0.13
 LABEL works.weave.role=system
 
-CMD p="http://$(hostname -s)" ; \
-  etcd --name=$(hostname -s) \
-    --listen-peer-urls $p:2380 \
-    --initial-advertise-peer-urls $p:2380 \
-    --listen-client-urls $p:4001 \
-    --advertise-client-urls $p:4001
+ENV ETCD_INITIAL_CLUSTER="etcd=http://etcd:2380"
+
+CMD n="$(hostname -s)" c="http://${n}:2379" p="http://${n}:2380"; \
+  etcd --name=$n \
+    --listen-peer-urls $p \
+    --initial-advertise-peer-urls $p \
+    --listen-client-urls $c \
+    --advertise-client-urls $c
