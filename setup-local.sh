@@ -8,16 +8,15 @@
 
 docker run -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools compose -p kube up -d
 
-echo 'Once all services are ready run'
+echo '# Once all services are ready run'
 
 echo '> eval $(./weave env)'
 echo '> docker run weaveworks/kubernetes-anywhere:tools kubectl create -f /skydns-addon'
 
-echo 'then wait SkyDNS this to get deployed and deploy the Guesbook app with'
+echo '# now wait SkyDNS this to get deployed and deploy the Guesbook app with'
 
-echo '> docker run weaveworks/kubernetes-anywhere:tools kubectl create -f https://raw.github.com/kubernetes/kubernetes/v1.0.7/examples/guestbook/redis-master-controller.yaml'
-echo '> docker run weaveworks/kubernetes-anywhere:tools kubectl create -f https://raw.github.com/kubernetes/kubernetes/v1.0.7/examples/guestbook/redis-master-service.yaml'
-echo '> docker run weaveworks/kubernetes-anywhere:tools kubectl create -f https://raw.github.com/kubernetes/kubernetes/v1.0.7/examples/guestbook/redis-slave-controller.yaml'
-echo '> docker run weaveworks/kubernetes-anywhere:tools kubectl create -f https://raw.github.com/kubernetes/kubernetes/v1.0.7/examples/guestbook/redis-slave-service.yaml'
-echo '> docker run weaveworks/kubernetes-anywhere:tools kubectl create -f https://raw.github.com/kubernetes/kubernetes/v1.0.7/examples/guestbook/frontend-controller.yaml'
-echo '> docker run weaveworks/kubernetes-anywhere:tools kubectl create -f https://raw.github.com/kubernetes/kubernetes/v1.0.7/examples/guestbook/frontend-service.yaml'
+echo '> docker run weaveworks/kubernetes-anywhere:tools kubectl create -f /guestbook-example'
+
+echo '# if you wanna deploy something else, you can just pass a URL to your manifest like this'
+
+echo '> docker run weaveworks/kubernetes-anywhere:tools kubectl create -f https://example.com/guestbook.yaml'
