@@ -1,8 +1,22 @@
-etcd:
+etcd1:
   image: "weaveworks/kubernetes-anywhere:etcd"
+  environment:
+    ETCD_INITIAL_CLUSTER: "etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380"
+
+etcd2:
+  image: "weaveworks/kubernetes-anywhere:etcd"
+  environment:
+    ETCD_INITIAL_CLUSTER: "etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380"
+
+etcd3:
+  image: "weaveworks/kubernetes-anywhere:etcd"
+  environment:
+    ETCD_INITIAL_CLUSTER: "etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380"
 
 kube-apiserver:
   image: "weaveworks/kubernetes-anywhere:apiserver"
+  environment:
+    ETCD_CLUSTER: "http://etcd1:2379,http://etcd2:2379,http://etcd3:2379"
 
 kube-scheduler:
   image: "weaveworks/kubernetes-anywhere:scheduler"
