@@ -29,7 +29,14 @@ kube-controller-manager:
 #  net: host
 #  pid: host
 #  volumes: 
-#    - "/var/run/weave/weave.sock:/weave.sock"
+#  - "/var/run/weave/weave.sock:/weave.sock"
+#  - "/:/rootfs:ro"
+#  - "/sys:/sys:ro"
+#  - "/dev:/dev"
+#  - "/var/lib/docker/:/var/lib/docker:rw"
+#  - "/var/lib/kubelet/:/var/lib/kubelet:rw"
+#  - "/var/run:/var/run:rw"
+#  - "/mnt/sda1/var/lib/docker/:/mnt/sda1/var/lib/docker:rw"
 #  image: "weaveworks/kubernetes-anywhere:kubelet"
 #
 #kube-proxy:
