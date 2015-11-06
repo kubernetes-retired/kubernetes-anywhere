@@ -1,5 +1,5 @@
 etcd:
-  image: "gcr.io/google_containers/etcd:2.0.13"
+  image: "weaveworks/kubernetes-anywhere:etcd"
   hostname: "etcd.weave.local"
 
 apiserver:
