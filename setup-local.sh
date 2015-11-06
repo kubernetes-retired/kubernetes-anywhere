@@ -6,7 +6,7 @@
 ./weave launch-proxy --rewrite-inspect
 ./weave expose -h $HOSTNAME.weave.local
 
-docker run -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools compose up -d
+docker run -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools compose -p kube up -d
 
 echo 'Once all services are ready run'
 
