@@ -183,7 +183,13 @@ do echo $i:
   ssh $SSH_FLAGS ec2-user@$i \
     docker -H unix:///var/run/weave/weave.sock run -d -l com.amazonaws.ecs.container-name=kubelet \
       --net=host --pid=host --privileged=true \
-      -v /var/run/weave/weave.sock:/weave.sock \
+      -v "/var/run/weave/weave.sock:/weave.sock" \
+      -v "/:/rootfs:ro" \
+      -v "/sys:/sys:ro" \
+      -v "/dev:/dev" \
+      -v "/var/lib/docker/:/var/lib/docker:rw" \
+      -v "/var/lib/kubelet/:/var/lib/kubelet:rw" \
+      -v "/var/run:/var/run:rw" \
       weaveworks/kubernetes-anywhere:kubelet
   ssh $SSH_FLAGS ec2-user@$i \
     docker -H unix:///var/run/weave/weave.sock run -d -l com.amazonaws.ecs.container-name=kube-proxy \
