@@ -4,5 +4,5 @@ LABEL works.weave.role=system
 CMD p="http://$(hostname -s)" ; \
   etcd --name=$(hostname -s) \
     --listen-peer-urls $p:2380 \
-    --listen-client-urls $p:2379,$p:4001 \
-    --advertise-client-urls $p:2379,$p:4001
+    --listen-client-urls $p:4001 \
+    --advertise-client-urls $p:4001
