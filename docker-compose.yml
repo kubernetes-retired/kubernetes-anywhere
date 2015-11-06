@@ -1,0 +1,37 @@
+etcd:
+  image: "gcr.io/google_containers/etcd:2.0.13"
+  command:
+    - "etcd"
+    - "--listen-peer-urls"
+    - "http://etcd:2380,http://etcd:7001"
+    - "--listen-client-urls"
+    - "http://etcd:2379,http://etcd:4001"
+    - "--advertise-client-urls"
+    - "http://etcd:2379,http://etcd:4001"
+
+kube-apiserver:
+  image: "weaveworks/kubernetes-anywhere:apiserver"
+  command:
+     - "/bin/sh"
+     - "-c"
+     - "weave_ip=`hostname -i` ; /hyperkube apiserver --insecure-bind-address=$weave_ip --advertise-address=$weave_ip --external-hostname=kube-apiserver.weave.local --port=8080 --etcd-servers=$ETCD_CLUSTER --service-cluster-ip-range=10.16.0.0/12 --cloud-provider=$CLOUD_PROVIDER  --logtostderr=true"
+
+kube-scheduler:
+  image: "weaveworks/kubernetes-anywhere:scheduler"
+
+kube-controller-manager:
+  image: "weaveworks/kubernetes-anywhere:controller-manager"
+
+#kubelet:
+#  privileged: true
+#  net: host
+#  pid: host
+#  volumes: 
+#    - "/var/run/weave/weave.sock:/weave.sock"
+#  image: "weaveworks/kubernetes-anywhere:kubelet"
+#
+#kube-proxy:
+#  privileged: true
+#  net: host
+#  pid: host
+#  image: "weaveworks/kubernetes-anywhere:proxy"
