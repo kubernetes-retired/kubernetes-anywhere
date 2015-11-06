@@ -6,17 +6,23 @@ ENV DOCKER_HOST=unix:///weave.sock
 RUN curl --silent --location \
   https://storage.googleapis.com/kubernetes-release/release/v1.0.7/bin/linux/amd64/kubectl \
   --output /usr/bin/kubectl \
-  && chmod +x /usr/bin/kubectl
+  && chmod +x /usr/bin/kubectl ;
 
 RUN kubectl config set-cluster default-cluster --server=http://kube-apiserver.weave.local:8080 ; \
    kubectl config set-context default-system --cluster=default-cluster ; \
    kubectl config use-context default-system ;
+
+RUN mkdir guestbook-example ; cd guestbook-example ; \
+  curl --silent --location \
+    'https://raw.github.com/kubernetes/kubernetes/v1.0.7/examples/guestbook/{redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml' \
+    --remote-name ; \
+  sed 's/# type: LoadBalancer/type: NodePort/' -i frontend-service.yaml ;
 
 ADD skydns-addon /skydns-addon
 
 RUN curl --silent --location \
   https://github.com/docker/compose/releases/download/1.5.0/docker-compose-Linux-x86_64 \
   --output /usr/bin/compose \
-  && chmod +x /usr/bin/compose
+  && chmod +x /usr/bin/compose ;
 
 ADD docker-compose.yml /
