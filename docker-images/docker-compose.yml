@@ -43,7 +43,7 @@ weavescope:
   ports:
   - "0.0.0.0:4040:4040"
   volumes:
-  - "/var/run/weave/weave.sock:/var/run/docker.sock"
+  - "/var/run/:/var/run:rw"
   command:
   - "--probe.docker"
   - "true"
