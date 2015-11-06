@@ -26,6 +26,7 @@ kubelet:
   - "/var/lib/docker/:/var/lib/docker:rw"
   - "/var/lib/kubelet/:/var/lib/kubelet:rw"
   - "/var/run:/var/run:rw"
+  - "/mnt/sda1/var/lib/docker/:/mnt/sda1/var/lib/docker:rw"
   image: "weaveworks/kubernetes-anywhere:kubelet"
 
 proxy:
