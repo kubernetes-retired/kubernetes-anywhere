@@ -55,4 +55,6 @@ weavescope:
   - "true"
   - "--probe.kubernetes"
   - "true"
+  - "--probe.kubernetes.api"
+  - "http://kube-apiserver.weave.local:8080"
   restart: "always"
