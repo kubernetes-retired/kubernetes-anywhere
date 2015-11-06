@@ -34,3 +34,18 @@ proxy:
   net: host
   pid: host
   image: "weaveworks/kubernetes-anywhere:proxy"
+
+weavescope:
+  image: weaveworks/scope:0.9.0
+  privileged: true
+  net: host
+  pid: host
+  ports:
+  - "0.0.0.0:4040:4040"
+  volumes:
+  - "/var/run/weave/weave.sock:/var/run/docker.sock"
+  command:
+  - "--probe.docker"
+  - "true"
+  - "--probe.kubernetes"
+  - "true"
