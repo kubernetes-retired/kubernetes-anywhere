@@ -22,7 +22,7 @@ $ docker run -ti weaveworks/kubernetes-anywhere:tools bash -l
 # kubectl scale --namespace=kube-system --replicas=3 rc kube-dns-v8
 # kubectl get pods --all-namespaces --watch
 
-# kubectl get create -f /guestbook-example
+# kubectl create -f /guestbook-example/
 # kubectl get pods --watch
 
 ... ## test it localy first, then forward the port to access it in the browser
