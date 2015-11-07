@@ -1,0 +1,3 @@
+kube-scheduler:
+  image: "weaveworks/kubernetes-anywhere:scheduler"
+  cpu_shares: 1024
