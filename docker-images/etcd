@@ -10,8 +10,8 @@ ENV ETCD_INITIAL_CLUSTER="etcd=http://etcd:2380"
 # Well, we could just pass the size instead of having to pass the list.
 
 CMD n="$(hostname -s)" c="http://${n}:2379" p="http://${n}:2380" ; \
-  etcd --name=$n \
-    --listen-peer-urls $p \
-    --initial-advertise-peer-urls $p \
-    --listen-client-urls $c \
-    --advertise-client-urls $c
+    etcd --name=$n \
+      --listen-peer-urls $p \
+      --initial-advertise-peer-urls $p \
+      --listen-client-urls $c \
+      --advertise-client-urls $c
