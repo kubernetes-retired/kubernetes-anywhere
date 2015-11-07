@@ -2,7 +2,7 @@
 ```
 ./create-ecs-cluser.sh
 ./ecs-deploy-services.sh
-
+./ecs-docker-ps.sh
 ```
 
 ### Kubernetes
