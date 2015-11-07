@@ -19,18 +19,6 @@ if [ -n "$(aws ecs describe-clusters --clusters weave-ecs-demo-cluster --query '
     exit 1
 fi
 
-# Delete service
-echo -n "Deleting ECS Service (weave-ecs-demo-service) .. "
-aws ecs update-service --cluster weave-ecs-demo-cluster --service  weave-ecs-demo-service --desired-count 0 > /dev/null
-aws ecs delete-service --cluster weave-ecs-demo-cluster --service  weave-ecs-demo-service > /dev/null
-echo "done"
-
-# Task definition
-echo -n "De-registering ECS Task Definition (weave-ecs-demo-task) .. "
-REVISION=$(aws ecs describe-task-definition --task-definition weave-ecs-demo-task --query 'taskDefinition.revision' --output text)
-aws ecs deregister-task-definition --task-definition "weave-ecs-demo-task:${REVISION}" > /dev/null
-echo "done"
-
 # Auto Scaling Group
 echo -n "Deleting Auto Scaling Group (weave-ecs-demo-group) .. "
 # Save Auto Scaling Group instances to wait for them to terminate
