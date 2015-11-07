@@ -118,6 +118,9 @@ aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protoco
 aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol udp --port 6784 --source-group $SECURITY_GROUP_ID
 # Scope
 aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 4040 --source-group $SECURITY_GROUP_ID
+# Kubernetes
+aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 30000-32767 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol udp --port 30000-32767 --cidr 0.0.0.0/0
 echo "done"
 
 # Key pair
