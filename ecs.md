@@ -14,7 +14,7 @@ $ eval `weave env`
 $ docker run weaveworks/kubernetes-anywhere:tools kubectl get nodes
 
 $ weave status dns
-$ docker run -ti weaveworks/kubernetes-anywhere:tools  sh -l
+$ docker run -ti weaveworks/kubernetes-anywhere:tools bash -l
 
 # kubectl get nodes
 # kubectl create -f /skydns-addon/
