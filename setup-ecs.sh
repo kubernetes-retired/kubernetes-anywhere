@@ -154,6 +154,7 @@ cp data/set-ecs-cluster-name.sh $TMP_USER_DATA_FILE
 if [ -n "$SCOPE_AAS_PROBE_TOKEN" ]; then
     echo "echo SERVICE_TOKEN=$SCOPE_AAS_PROBE_TOKEN >> /etc/weave/scope.config" >> $TMP_USER_DATA_FILE
 fi
+echo "sed \"s/\(succeed_or_die weave launch-proxy --hostname-from-label 'com.amazonaws.ecs.container-name'\)/\1 --rewrite-inspect/\" -i /etc/weave/run.sh" >> $TMP_USER_DATA_FILE
 aws autoscaling create-launch-configuration --image-id $AMI --launch-configuration-name weave-ecs-launch-configuration --key-name weave-ecs-demo-key --security-groups $SECURITY_GROUP_ID --instance-type m3.xlarge --user-data file://$TMP_USER_DATA_FILE  --iam-instance-profile weave-ecs-instance-profile --associate-public-ip-address --instance-monitoring Enabled=false
 echo "done"
 
