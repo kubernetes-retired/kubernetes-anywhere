@@ -47,8 +47,6 @@ $ docker run -ti weaveworks/kubernetes-anywhere:tools bash -l
 
 # kubectl create -f /guestbook-example/
 # kubectl get pods --watch
-
-... ## test it localy first, then forward the port to access it in the browser
 ```
 
 ## Amazon EC2 Container Service
@@ -88,8 +86,6 @@ $ docker run -ti weaveworks/kubernetes-anywhere:tools bash -l
 
 # kubectl create -f /guestbook-example/
 # kubectl get pods --watch
-
-... ## test it localy first, then forward the port to access it in the browser
 ```
 
 If you want to deploy something else, you can just pass a URL to your manifest like this:
