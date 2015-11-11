@@ -17,10 +17,12 @@ You no longer have to care about the IP address of the API server or any of thos
 ### Launch Weave
 
 ```
-./weave launch-router
-./weave launch-proxy --rewrite-inspect
-./weave expose -h $(hostname).weave.local
-eval $(./weave env)
+sudo curl --location --silent git.io/weave --output /usr/local/bin/weave
+chmod +x /usr/local/bin/weave
+weave launch-router
+weave launch-proxy --rewrite-inspect
+weave expose -h $(hostname).weave.local
+eval $(weave env)
 ```
 
 ### Deploy Kubernetes services
