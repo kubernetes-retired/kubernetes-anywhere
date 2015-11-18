@@ -28,7 +28,8 @@ eval $(weave env)
 ### Deploy Kubernetes services
 
 ```
-docker run -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools compose -p kube up -d
+docker run -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools \
+  compose -p kube up -d
 ```
 
 View DNS records for Kubernetes cluster components
