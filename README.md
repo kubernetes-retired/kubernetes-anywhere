@@ -45,7 +45,6 @@ $ docker run -ti weaveworks/kubernetes-anywhere:tools bash -l
 # kubectl get nodes
 # kubectl create -f /skydns-addon/
 # kubectl get pods,rc,services --all-namespaces
-# kubectl scale --namespace=kube-system --replicas=3 rc kube-dns-v8
 # kubectl get pods --all-namespaces --watch
 
 # kubectl create -f /guestbook-example/
