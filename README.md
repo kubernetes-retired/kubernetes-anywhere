@@ -1,6 +1,6 @@
 # Weaving Kubernetes Anywhere
 
-Weave lets you run Kubernetes clusters anywhere without configuration changes.
+Weave lets you run Kubernetes clusters anywhere without configuration changes. It is by far the easiest way to get started on a single machine, and later scale-out to any infrastructure seemlestly.
 
 Having deployed Kubernetes over Weave Net, you can rely 100% on cloud portability, thanks to Weave being an L2 network.
 
