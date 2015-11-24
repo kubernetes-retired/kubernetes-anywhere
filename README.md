@@ -55,7 +55,8 @@ $ docker run -ti weaveworks/kubernetes-anywhere:tools bash -l
 
 ### Setup ECS cluster
 ```
-./create-ecs-cluser.sh
+cd examples/aws-ecs/
+./create-cluster.sh
 ./ecs-deploy-services.sh
 ./ecs-docker-ps.sh
 ```
@@ -100,5 +101,5 @@ If you want to deploy something else, you can just pass a URL to your manifest l
 
 ```
 ./ecs-remove-services.sh
-./delete-ecs-cluster.sh
+./delete-cluster.sh
 ```

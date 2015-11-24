@@ -1,3 +1,5 @@
+#!/bin/bash -x
+
 DOCKER_MACHINE_DRIVER=${DOCKER_MACHINE_DRIVER:-'vmwarefusion'}
 
 vm_names=$(seq -f 'kube-%g' 1 7)
@@ -65,9 +67,13 @@ for m in 'kube-5' 'kube-6' 'kube-7' ; do
     -v "/var/lib/kubelet/:/var/lib/kubelet:rw" \
     -v "/var/run:/var/run:rw" \
     -v "/mnt/sda1/var/lib/docker/:/mnt/sda1/var/lib/docker:rw" \
-    weaveworks/kubernetes-anywhere:proxy
+    weaveworks/kubernetes-anywhere:kubelet
   docker-machine ssh ${m} docker ${weaveproxy_socket} run -d \
     --name=kube-proxy \
     --privileged=true --net=host --pid=host \
     weaveworks/kubernetes-anywhere:proxy
 done
+
+docker-machine ssh 'kube-4' docker ${weaveproxy_socket} run \
+  weaveworks/kubernetes-anywhere:tools \
+  kubectl create -f /skydns-addon/
