@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 
 gpasswd -a ilya docker
 
@@ -18,8 +18,17 @@ eval $(/usr/local/bin/weave env)
 
 etcd_cluster_list="-e ETCD_INITIAL_CLUSTER=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380"
 
+save_last_run_log_and_cleanup() {
+  if [[ $(docker inspect --format='{{.State.Status}}' $1) = 'running' ]]
+  then
+    docker logs $1 > /var/log/$1_last_run
+    docker rm $1
+  fi
+}
+
 case "$(hostname)" in 
   kube-1)
+    save_last_run_log_and_cleanup etcd1
     docker run -d \
       ${etcd_cluster_list} \
       --name=etcd1 \
@@ -27,6 +36,7 @@ case "$(hostname)" in
     break
     ;;
   kube-2)
+    save_last_run_log_and_cleanup etcd2
     docker run -d \
       ${etcd_cluster_list} \
       --name=etcd2 \
@@ -34,6 +44,7 @@ case "$(hostname)" in
     break
     ;;
   kube-3)
+    save_last_run_log_and_cleanup etcd3
     docker run -d \
       ${etcd_cluster_list} \
       --name=etcd3 \
@@ -41,6 +52,9 @@ case "$(hostname)" in
     break
     ;;
   kube-4)
+    save_last_run_log_and_cleanup kube-apiserver
+    save_last_run_log_and_cleanup kube-controller-manager
+    save_last_run_log_and_cleanup kube-scheduler
     docker run -d \
       -e ETCD_CLUSTER='http://etcd1:2379,http://etcd2:2379,http://etcd3:2379' \
       --name=kube-apiserver \
@@ -54,6 +68,8 @@ case "$(hostname)" in
     break
     ;;
   *)
+    save_last_run_log_and_cleanup kubelet
+    save_last_run_log_and_cleanup kube-proxy
     docker run -d \
       --name=kubelet \
       --privileged=true --net=host --pid=host \
