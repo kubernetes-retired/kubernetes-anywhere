@@ -8,7 +8,7 @@ gcloud compute networks create $p \
 gcloud compute firewall-rules create $p \
   'kube-net-1-fw' \
   --network 'kube-net-1' \
-  --allow 'icmp,tcp:22,tcp:6783,udp:6783'
+  --allow 'icmp,tcp:22,tcp:6783,udp:6783,tcp:4040'
 gcloud compute instances create $p $z \
   $(seq -f 'kube-%g' 1 7) \
   --image 'container-vm' \

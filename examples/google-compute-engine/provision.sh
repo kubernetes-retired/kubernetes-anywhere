@@ -14,6 +14,11 @@ chmod +x /usr/local/bin/weave
 /usr/local/bin/weave connect kube-1
 /usr/local/bin/weave expose -h $(hostname).weave.local
 
+curl --silent --location http://git.io/scope --output /usr/local/bin/scope
+chmod +x /usr/local/bin/scope
+
+/usr/local/bin/scope launch --probe.kubernetes true --probe.kubernetes.api http://kube-apiserver.weave.local:8080
+
 eval $(/usr/local/bin/weave env)
 
 etcd_cluster_list="-e ETCD_INITIAL_CLUSTER=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380"
