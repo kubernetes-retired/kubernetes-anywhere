@@ -1,17 +1,7 @@
-FROM gcr.io/google_containers/etcd:2.0.13
+FROM gcr.io/google_containers/etcd:2.2.1
 LABEL works.weave.role=system
 
-ENV ETCD_INITIAL_CLUSTER="etcd=http://etcd:2380"
+ENV ETCD_CLUSTER_SIZE="1"
 
-# Should brobably do this instead:
-# CMD n="$(hostname -s)" c="http://${n}:2379" p="http://${n}:2380" ; \
-#   export ETCD_INITIAL_CLUSTER="${n}=${p}" ; \
-# ...as currently we assume that hostname of single-node cluster is just `etcd`.
-# Well, we could just pass the size instead of having to pass the list.
-
-CMD n="$(hostname -s)" c="http://${n}:2379" p="http://${n}:2380" ; \
-    etcd --name=$n \
-      --listen-peer-urls $p \
-      --initial-advertise-peer-urls $p \
-      --listen-client-urls $c \
-      --advertise-client-urls $c
+ADD etcd-anywhere.sh /etcd-anywhere
+CMD /etcd-anywhere
