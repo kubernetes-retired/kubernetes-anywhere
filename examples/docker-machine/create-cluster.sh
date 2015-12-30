@@ -24,26 +24,25 @@ for m in $vm_names ; do
   docker-machine ssh ${m} "/usr/local/bin/weave expose -h ${m}.weave.local"
 done
 
-etcd_cluster_list="-e ETCD_INITIAL_CLUSTER='etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380'"
 weaveproxy_socket="-H unix:///var/run/weave/weave.sock"
 
 docker-machine ssh 'kube-1' docker ${weaveproxy_socket} run -d \
-  ${etcd_cluster_list} \
+  -e ETCD_CLUSTER_SIZE=3 \
   --name=etcd1 \
   weaveworks/kubernetes-anywhere:etcd
 
 docker-machine ssh 'kube-2' docker ${weaveproxy_socket} run -d \
-  ${etcd_cluster_list} \
+  -e ETCD_CLUSTER_SIZE=3 \
   --name=etcd2 \
   weaveworks/kubernetes-anywhere:etcd
 
 docker-machine ssh 'kube-3' docker ${weaveproxy_socket} run -d \
-  ${etcd_cluster_list} \
+  -e ETCD_CLUSTER_SIZE=3 \
   --name=etcd3 \
   weaveworks/kubernetes-anywhere:etcd 
 
 docker-machine ssh 'kube-4' docker ${weaveproxy_socket} run -d \
-  -e ETCD_CLUSTER='http://etcd1:2379,http://etcd2:2379,http://etcd3:2379' \
+  -e ETCD_CLUSTER_SIZE=3 \
   --name=kube-apiserver \
   weaveworks/kubernetes-anywhere:apiserver
 

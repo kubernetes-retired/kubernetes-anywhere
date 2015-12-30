@@ -2,4 +2,4 @@ etcd2:
   image: "weaveworks/kubernetes-anywhere:etcd"
   cpu_shares: 3072
   environment:
-    ETCD_INITIAL_CLUSTER: "etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380"
+    ETCD_CLUSTER_SIZE: "3"

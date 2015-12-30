@@ -21,8 +21,6 @@ chmod +x /usr/local/bin/scope
 
 eval $(/usr/local/bin/weave env)
 
-etcd_cluster_list="-e ETCD_INITIAL_CLUSTER=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380"
-
 save_last_run_log_and_cleanup() {
   if [[ $(docker inspect --format='{{.State.Status}}' $1) = 'running' ]]
   then
@@ -35,7 +33,7 @@ case "$(hostname)" in
   kube-1)
     save_last_run_log_and_cleanup etcd1
     docker run -d \
-      ${etcd_cluster_list} \
+      -e ETCD_CLUSTER_SIZE=3 \
       --name=etcd1 \
       weaveworks/kubernetes-anywhere:etcd
     break
@@ -43,7 +41,7 @@ case "$(hostname)" in
   kube-2)
     save_last_run_log_and_cleanup etcd2
     docker run -d \
-      ${etcd_cluster_list} \
+      -e ETCD_CLUSTER_SIZE=3 \
       --name=etcd2 \
       weaveworks/kubernetes-anywhere:etcd
     break
@@ -51,7 +49,7 @@ case "$(hostname)" in
   kube-3)
     save_last_run_log_and_cleanup etcd3
     docker run -d \
-      ${etcd_cluster_list} \
+      -e ETCD_CLUSTER_SIZE=3 \
       --name=etcd3 \
       weaveworks/kubernetes-anywhere:etcd
     break
@@ -61,7 +59,7 @@ case "$(hostname)" in
     save_last_run_log_and_cleanup kube-controller-manager
     save_last_run_log_and_cleanup kube-scheduler
     docker run -d \
-      -e ETCD_CLUSTER='http://etcd1:2379,http://etcd2:2379,http://etcd3:2379' \
+      -e ETCD_CLUSTER_SIZE=3 \
       --name=kube-apiserver \
       weaveworks/kubernetes-anywhere:apiserver
     docker run -d \
