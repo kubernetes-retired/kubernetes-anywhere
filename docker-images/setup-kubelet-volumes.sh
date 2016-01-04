@@ -14,7 +14,8 @@ else
       boot2docker)
         docker_root=/mnt/sda1/var/lib/docker
         kubelet_root=/mnt/sda1/var/lib/kubelet
-        [ -L /var/lib/kubelet ] || ln -s $kubelet_root /var/lib/kubelet
+        mkdir -p /rootfs$kubelet_root
+        ln -sf $kubelet_root /rootfs/var/lib/kubelet
         break
         ;;
       *)
