@@ -29,4 +29,4 @@ RUN curl --silent --location \
 
 ADD docker-compose.yml /
 
-ADD detect-kubelet-volumes.sh /usr/bin/detect-kubelet-volumes
+ADD setup-kubelet-volumes.sh /usr/bin/setup-kubelet-volumes

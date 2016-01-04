@@ -22,5 +22,6 @@ docker run \
   --volume="${docker_root}:/var/lib/docker:rw" \
   --volume="/var/lib/kubelet/:/var/lib/kubelet:rw" \
   --volume="/var/run:/var/run:rw" \
+  --volume="/var/run/weave/weave.sock:/weave.sock" \
   --name=kubelet-volumes \
   weaveworks/kubernetes-anywhere:tools /bin/true
