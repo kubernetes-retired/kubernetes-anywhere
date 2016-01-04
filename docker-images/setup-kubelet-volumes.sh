@@ -23,7 +23,6 @@ else
         kubelet_root_vol=" \
           --volume=\"${kubelet_root}:${def_kubelet_root}:rw\" \
         "
-        break
         ;;
       *)
         docker_root_vol="\
@@ -32,7 +31,6 @@ else
         kubelet_root_vol=" \
           --volume=\"${def_kubelet_root}:${def_kubelet_root}:rw\" \
         "
-        break
         ;;
     esac
   fi
