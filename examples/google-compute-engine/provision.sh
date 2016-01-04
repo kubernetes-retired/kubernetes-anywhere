@@ -78,6 +78,7 @@ case "$(hostname)" in
       --privileged=true --net=host --pid=host \
       -v "/var/run/weave/weave.sock:/weave.sock" \
       -v "/:/rootfs:rw" \
+      -v "/var/lib/kubelet/:/var/lib/kubelet:rw" \
       weaveworks/kubernetes-anywhere:kubelet
     docker run -d \
       --name=kube-proxy \

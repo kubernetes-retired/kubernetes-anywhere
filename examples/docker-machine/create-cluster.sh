@@ -60,6 +60,7 @@ for m in 'kube-5' 'kube-6' 'kube-7' ; do
     --privileged=true --net=host --pid=host \
     -v "/var/run/weave/weave.sock:/weave.sock" \
     -v "/:/rootfs:rw" \
+    -v "/var/lib/kubelet/:/var/lib/kubelet:rw" \
     weaveworks/kubernetes-anywhere:kubelet
   docker-machine ssh ${m} docker ${weaveproxy_socket} run -d \
     --name=kube-proxy \

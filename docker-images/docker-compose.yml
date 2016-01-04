@@ -25,6 +25,7 @@ kubelet:
   volumes:
   - "/var/run/weave/weave.sock:/weave.sock"
   - "/:/rootfs:rw"
+  - "/var/lib/kubelet/:/var/lib/kubelet:rw"
   image: "weaveworks/kubernetes-anywhere:kubelet"
   restart: "always"
 
