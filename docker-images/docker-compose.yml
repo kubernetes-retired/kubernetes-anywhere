@@ -1,6 +1,6 @@
 etcd:
   image: "weaveworks/kubernetes-anywhere:etcd"
-  hostname: "etcd.weave.local"
+  hostname: "etcd1.weave.local"
   restart: "always"
 
 apiserver:
