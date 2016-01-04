@@ -1,6 +1,6 @@
-#!/bin/sh -x
+#!/bin/bash -x
 
-if [ $(docker inspect --format='{{.State.Status}}' kubelet-volumes) = 'exited' ]
+if [[ $(docker inspect --format='{{.State.Status}}' kubelet-volumes) = 'exited' ]]
 then
   exit
 else

@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/bash -x
 
 gpasswd -a ilya docker
 
