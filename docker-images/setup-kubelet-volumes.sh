@@ -5,20 +5,33 @@ then
   exit
 else
 
-  docker_root=/var/lib/docker
-  kubelet_root=/var/lib/kubelet
+  def_docker_root="/var/lib/docker"
+  def_kubelet_root="/var/lib/kubelet"
 
   if [ -d /rootfs/etc ] && [ -f /rootfs/etc/os-release ]
   then
     case "$(eval `cat /rootfs/etc/os-release` ; echo $ID)" in
       boot2docker)
-        docker_root=/mnt/sda1/var/lib/docker
-        kubelet_root=/mnt/sda1/var/lib/kubelet
-        mkdir -p /rootfs$kubelet_root
-        ln -sf $kubelet_root /rootfs/var/lib/kubelet
+        docker_root="/mnt/sda1/${def_docker_root}"
+        kubelet_root="/mnt/sda1/${def_kubelet_root}"
+        mkdir -p "/rootfs/${kubelet_root}"
+        ln -sf "${kubelet_root}" "/rootfs/var/lib/kubelet"
+        docker_root_vol=" \
+          --volume=\"${docker_root}:${docker_root}:rw\" \
+          --volume=\"${def_docker_root}:${def_docker_root}:rw\" \
+        "
+        kubelet_root_vol=" \
+          --volume=\"${kubelet_root}:${def_kubelet_root}:rw\" \
+        "
         break
         ;;
       *)
+        docker_root_vol="\
+          --volume=\"${def_docker_root}/:${def_docker_root}:rw\" \
+        "
+        kubelet_root_vol=" \
+          --volume=\"${def_kubelet_root}:${def_kubelet_root}:rw\" \
+        "
         break
         ;;
     esac
@@ -28,10 +41,10 @@ else
     --volume="/:/rootfs:ro" \
     --volume="/sys:/sys:ro" \
     --volume="/dev:/dev" \
-    --volume="${docker_root}/:${docker_root}:rw" \
-    --volume="${kubelet_root}/:/var/lib/kubelet:rw" \
     --volume="/var/run:/var/run:rw" \
+    ${kubelet_root_vol} \
+    ${docker_root_vol} \
     --volume="/var/run/weave/weave.sock:/weave.sock" \
-    --name=kubelet-volumes \
-    weaveworks/kubernetes-anywhere:tools /bin/true
+    --name="kubelet-volumes" \
+    weaveworks/kubernetes-anywhere:tools "/bin/true"
 fi
