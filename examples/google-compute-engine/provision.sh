@@ -75,7 +75,7 @@ case "$(hostname)" in
     save_last_run_log_and_cleanup kube-proxy
     docker run \
       --volume="/:/rootfs" \
-      --volumes="/var/run/weave/weave.sock:/weave.sock" \
+      --volume="/var/run/weave/weave.sock:/weave.sock" \
       weaveworks/kubernetes-anywhere:tools \
       setup-kubelet-volumes
     docker run -d \
