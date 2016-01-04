@@ -3,6 +3,8 @@ LABEL works.weave.role=system
 
 ENV DOCKER_HOST=unix:///weave.sock
 
+RUN yum --assumeyes --quiet install docker
+
 RUN curl --silent --location \
   https://storage.googleapis.com/kubernetes-release/release/v1.1.3/bin/linux/amd64/kubectl \
   --output /usr/bin/kubectl \
@@ -26,3 +28,5 @@ RUN curl --silent --location \
   && chmod +x /usr/bin/compose ;
 
 ADD docker-compose.yml /
+
+ADD detect-kubelet-volumes.sh /usr/bin/detect-kubelet-volumes
