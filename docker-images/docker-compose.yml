@@ -22,7 +22,7 @@ kubelet:
   privileged: true
   net: host
   pid: host
-  volumes-from: "kubelet-volumes"
+  volumes_from: [ "kubelet-volumes" ]
   image: "weaveworks/kubernetes-anywhere:kubelet"
   restart: "always"
 
