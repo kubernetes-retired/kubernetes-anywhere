@@ -2,6 +2,25 @@
 
 /fix-nameserver
 
+case "$(eval `cat /etc/os-release` ; echo $ID)" in
+  boot2docker)
+    if [[ -d /rootfs/mnt/sda1/var/lib/docker ]]
+    then
+      mkdir -p /var/lib
+      ln -s /rootfs/mnt/sda1/var/lib/docker /var/lib/docker
+    fi
+    break
+    ;;
+  *)
+    if [[ -d /rootfs/var/lib/docker ]]
+    then
+      mkdir -p /var/lib
+      ln -s /rootfs/var/lib/docker /var/lib/docker
+    fi
+    break
+    ;;
+esac
+
 /hyperkube kubelet \
   --docker-endpoint=unix:/weave.sock \
   --port=10250 \
