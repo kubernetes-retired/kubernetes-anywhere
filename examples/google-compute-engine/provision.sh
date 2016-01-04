@@ -73,12 +73,15 @@ case "$(hostname)" in
   *)
     save_last_run_log_and_cleanup kubelet
     save_last_run_log_and_cleanup kube-proxy
+    docker run \
+      --volume="/:/rootfs" \
+      --volumes="/var/run/weave/weave.sock:/weave.sock" \
+      weaveworks/kubernetes-anywhere:tools \
+      setup-kubelet-volumes
     docker run -d \
       --name=kubelet \
       --privileged=true --net=host --pid=host \
-      -v "/var/run/weave/weave.sock:/weave.sock" \
-      -v "/:/rootfs:rw" \
-      -v "/var/lib/kubelet/:/var/lib/kubelet:rw" \
+      --volumes-from=kubelet-volumes \
       weaveworks/kubernetes-anywhere:kubelet
     docker run -d \
       --name=kube-proxy \

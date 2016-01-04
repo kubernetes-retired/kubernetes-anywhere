@@ -22,10 +22,7 @@ kubelet:
   privileged: true
   net: host
   pid: host
-  volumes:
-  - "/var/run/weave/weave.sock:/weave.sock"
-  - "/:/rootfs:rw"
-  - "/var/lib/kubelet/:/var/lib/kubelet:rw"
+  volumes-from: "kubelet-volumes"
   image: "weaveworks/kubernetes-anywhere:kubelet"
   restart: "always"
 
