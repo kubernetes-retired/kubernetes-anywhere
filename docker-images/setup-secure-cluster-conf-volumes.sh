@@ -42,7 +42,7 @@ for account in "${service_accounts[@]}"; do
   echo "${token},${account},${account}" >> known_tokens.csv
 done
 
-cat > "${vol}/kubelet/kubeconfig" <<EOF
+cat > kubelet.conf <<EOF
 apiVersion: v1
 kind: Config
 users:
@@ -62,7 +62,7 @@ contexts:
 current-context: service-account-context
 EOF
 
-cat > "${vol}/kube-proxy/kubeconfig" <<EOF
+cat > kube-proxy.conf <<EOF
 apiVersion: v1
 kind: Config
 users:
@@ -96,4 +96,4 @@ ADD kube-proxy.conf ${vol}/kube-proxy/kubeconfig
 ENTRYPOINT [ "/bin/true" ]
 EOF
 
-docker build -t weaveworks/kubernetes-anywhere:certs .
+docker build -t weaveworks/kubernetes-anywhere:conf .
