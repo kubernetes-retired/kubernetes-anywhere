@@ -49,8 +49,8 @@ cat > apiserver-secure-config.dockerfile <<EOF
 FROM alpine
 VOLUME ${vol}
 ADD pki/ca.crt ${vol}/ca.crt
-ADD pki/issued/kube-apiserver.crt ${vol}/apiserver.crt
-ADD pki/private/kube-apiserver.key ${vol}/apiserver.key
+ADD pki/issued/kube-apiserver.crt ${vol}/kube-apiserver.crt
+ADD pki/private/kube-apiserver.key ${vol}/kube-apiserver.key
 ADD known_tokens.csv ${vol}/known_tokens.csv
 ENTRYPOINT [ "/bin/true" ]
 EOF
