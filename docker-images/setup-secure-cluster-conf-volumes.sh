@@ -26,7 +26,7 @@ function generate_token() {
 
 kubectl config --kubeconfig="cluster.conf" set-cluster secure-cluster \
   --server="https://kube-apiserver.weavel.local:6443" \
-  --certificate-authority="$(cat "pki/ca.crt" | base64 | tr -d '\r\n')"
+  --certificate-authority="kube-ca.crt"
 
 for user in kubelet proxy admin; do
   cp cluster.conf "${user}.conf"
@@ -58,6 +58,7 @@ EOF
 cat > kubelet-secure-config.dockerfile <<EOF
 FROM alpine
 VOLUME ${vol}/kubelet
+ADD pki/ca.crt ${vol}/kubelet/kube-ca.crt
 ADD kubelet.conf ${vol}/kubelet/kubeconfig
 ENTRYPOINT [ "/bin/true" ]
 EOF
@@ -65,6 +66,7 @@ EOF
 cat > proxy-secure-config.dockerfile <<EOF
 FROM alpine
 VOLUME ${vol}/kube-proxy
+ADD pki/ca.crt ${vol}/kube-proxy/kube-ca.crt
 ADD proxy.conf ${vol}/kube-proxy/kubeconfig
 ENTRYPOINT [ "/bin/true" ]
 EOF
@@ -72,6 +74,7 @@ EOF
 cat > tools-secure-config.dockerfile <<EOF
 FROM alpine
 VOLUME /root/.kube
+ADD pki/ca.crt /root/.kube/kube-ca.crt
 ADD admin.conf /root/.kube/config
 ENTRYPOINT [ "/bin/true" ]
 EOF
