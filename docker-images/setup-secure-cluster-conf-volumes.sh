@@ -78,5 +78,5 @@ ENTRYPOINT [ "/bin/true" ]
 EOF
 
 for i in apiserver kubelet proxy tools
-do docker build -t kubernetes-anywhere:${i}-secure-config -f ./${i}.dockerfile ./
+do docker build -t kubernetes-anywhere:${i}-secure-config -f ./${i}-secure-config.dockerfile ./
 done
