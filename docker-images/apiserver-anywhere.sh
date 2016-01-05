@@ -6,9 +6,9 @@ weave_ip=$(hostname -i)
 
 if [ -d '/srv/kubernetes/' ]
 then
-  args="--cert-dir=\"/srv/kubernetes\" --token-auth-file=\"/srv/kubernetes/known_tokens.csv\""
+  args="--cert-dir=/srv/kubernetes --token-auth-file=/srv/kubernetes/known_tokens.csv"
 else
-  args="--insecure-bind-address=\"${weave_ip}\" --port=\"8080\""
+  args="--insecure-bind-address=${weave_ip} --port=8080"
 fi
 
 /hyperkube apiserver ${args} \
