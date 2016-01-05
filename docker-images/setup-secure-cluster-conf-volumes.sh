@@ -25,7 +25,7 @@ function generate_token() {
 }
 
 kubectl config --kubeconfig="cluster.conf" set-cluster secure-cluster \
-  --server="https://kube-apiserver.weavel.local:6443" \
+  --server="https://kube-apiserver.weave.local:6443" \
   --certificate-authority="kube-ca.crt"
 
 for user in kubelet proxy admin; do
