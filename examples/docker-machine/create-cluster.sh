@@ -55,12 +55,15 @@ docker-machine ssh 'kube-4' docker ${weaveproxy_socket} run -d \
   weaveworks/kubernetes-anywhere:controller-manager
 
 for m in 'kube-5' 'kube-6' 'kube-7' ; do
+  docker-machine ssh ${m} docker ${weaveproxy_socket} run \
+    --volume="/:/rootfs" \
+    --volume="/var/run/weave/weave.sock:/weave.sock" \
+    weaveworks/kubernetes-anywhere:tools \
+    setup-kubelet-volumes
   docker-machine ssh ${m} docker ${weaveproxy_socket} run -d \
     --name=kubelet \
     --privileged=true --net=host --pid=host \
-    -v "/var/run/weave/weave.sock:/weave.sock" \
-    -v "/:/rootfs:rw" \
-    -v "/var/lib/kubelet/:/var/lib/kubelet:rw" \
+    --volumes-from=kubelet-volumes \
     weaveworks/kubernetes-anywhere:kubelet
   docker-machine ssh ${m} docker ${weaveproxy_socket} run -d \
     --name=kube-proxy \
