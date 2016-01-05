@@ -14,7 +14,7 @@ set -o pipefail
 
 ./easyrsa \
   "--subject-alt-name=DNS:kubernetes,DNS:kubernetes.default,DNS:kubernetes.default.svc,DNS:kubernetes.default.svc.kube.local,DNS:kube-apiserver.weave.local" \
-  build-server-full kubernetes-master nopass > /dev/null 2>&1
+  build-server-full kube-apiserver nopass > /dev/null 2>&1
 
 #./easyrsa build-client-full kubecfg nopass > /dev/null 2>&1
 #cp -p pki/issued/kubecfg.crt "${cert_dir}/kubecfg.crt"
@@ -52,7 +52,7 @@ users:
 clusters:
 - name: local
   cluster:
-    server: https://kube-apiserver.weavel.local
+    server: https://kube-apiserver.weavel.local:6443
     certificate-authority-data: ${CA_CERT_BASE64}
 contexts:
 - context:
@@ -72,7 +72,7 @@ users:
 clusters:
 - name: local
   cluster:
-    server: https://kube-apiserver.weavel.local
+    server: https://kube-apiserver.weavel.local:6443
     certificate-authority-data: ${CA_CERT_BASE64}
 contexts:
 - context:
@@ -88,8 +88,8 @@ cat > Dockerfile <<EOF
 FROM alpine
 VOLUME ${vol}
 ADD pki/ca.crt ${vol}/ca.crt
-ADD pki/issued/kubernetes-master.crt ${vol}/server.cert
-ADD pki/private/kubernetes-master.key ${vol}/server.key
+ADD pki/issued/kube-apiserver.crt ${vol}/apiserver.crt
+ADD pki/private/kube-apiserver.key ${vol}/apiserver.key
 ADD known_tokens.csv ${vol}/known_tokens.csv
 ADD kubelet.conf ${vol}/kubelet/kubeconfig
 ADD kube-proxy.conf ${vol}/kube-proxy/kubeconfig
