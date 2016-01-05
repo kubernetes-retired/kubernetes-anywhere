@@ -114,7 +114,7 @@ One way to distribute the certificates and configuration files for all the compo
 
 If one assumes that their registry is a secure place, TLS configuration be done very transparently.
 
-First, during the build process run
+First run [a helper script](https://github.com/weaveworks/weave-kubernetes-anywhere/blob/master/docker-images/setup-secure-cluster-conf-volumes.sh) shipped in the `weaveworks/kubernetes-anywhere:tools`:
 
 ```
 docker run -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools setup-secure-cluster-conf-volumes
