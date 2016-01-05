@@ -6,7 +6,7 @@ weave_ip=$(hostname -i)
 
 if [ -d '/srv/kubernetes/' ]
 then
-  args="--cert-dir=/srv/kubernetes --token-auth-file=/srv/kubernetes/known_tokens.csv"
+  args="--tls-cert-file=/srv/kubernetes/kube-apiserver.crt --tls-private-key-file=/srv/kubernetes/kube-apiserver.key --token-auth-file=/srv/kubernetes/known_tokens.csv"
 else
   args="--insecure-bind-address=${weave_ip} --port=8080"
 fi
