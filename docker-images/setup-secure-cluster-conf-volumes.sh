@@ -77,6 +77,6 @@ ADD admin.conf /root/.kube/config
 ENTRYPOINT [ "/bin/true" ]
 EOF
 
-for i apiserver kubelet proxy tools
+for i in apiserver kubelet proxy tools
 do docker build -t kubernetes-anywhere:${i}-secure-config -f ./${i}.dockerfile ./
 done
