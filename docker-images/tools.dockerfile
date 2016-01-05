@@ -13,7 +13,7 @@ RUN curl --silent --location \
 RUN curl --silent --location \
   https://github.com/OpenVPN/easy-rsa/releases/download/3.0.1/EasyRSA-3.0.1.tgz \
   | tar xz -C /opt \
-  && ln -s /opt/EasyRSA-3.0.1 /opt/EasyRSA
+  && mv /opt/EasyRSA-3.0.1 /opt/EasyRSA
 
 RUN kubectl config set-cluster default-cluster --server=http://kube-apiserver.weave.local:8080 ; \
    kubectl config set-context default-system --cluster=default-cluster ; \
