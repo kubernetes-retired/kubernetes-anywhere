@@ -3,12 +3,17 @@ LABEL works.weave.role=system
 
 ENV DOCKER_HOST=unix:///weave.sock
 
-RUN yum --assumeyes --quiet install docker
+RUN yum --assumeyes --quiet install docker openssl
 
 RUN curl --silent --location \
   https://storage.googleapis.com/kubernetes-release/release/v1.1.3/bin/linux/amd64/kubectl \
   --output /usr/bin/kubectl \
   && chmod +x /usr/bin/kubectl ;
+
+RUN curl --silent --location \
+  https://github.com/OpenVPN/easy-rsa/releases/download/3.0.1/EasyRSA-3.0.1.tgz \
+  | tar xz -C /opt \
+  && ln -s /opt/EasyRSA-3.0.1 /opt/EasyRSA
 
 RUN kubectl config set-cluster default-cluster --server=http://kube-apiserver.weave.local:8080 ; \
    kubectl config set-context default-system --cluster=default-cluster ; \
@@ -30,3 +35,4 @@ RUN curl --silent --location \
 ADD docker-compose.yml /
 
 ADD setup-kubelet-volumes.sh /usr/bin/setup-kubelet-volumes
+ADD setup-secure-cluster-conf-volumes.sh /usr/bin/setup-secure-cluster-conf-volumes
