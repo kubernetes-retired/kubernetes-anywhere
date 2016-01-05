@@ -36,7 +36,6 @@ case "$(hostname)" in
       -e ETCD_CLUSTER_SIZE=3 \
       --name=etcd1 \
       weaveworks/kubernetes-anywhere:etcd
-    break
     ;;
   kube-2)
     save_last_run_log_and_cleanup etcd2
@@ -44,7 +43,6 @@ case "$(hostname)" in
       -e ETCD_CLUSTER_SIZE=3 \
       --name=etcd2 \
       weaveworks/kubernetes-anywhere:etcd
-    break
     ;;
   kube-3)
     save_last_run_log_and_cleanup etcd3
@@ -52,7 +50,6 @@ case "$(hostname)" in
       -e ETCD_CLUSTER_SIZE=3 \
       --name=etcd3 \
       weaveworks/kubernetes-anywhere:etcd
-    break
     ;;
   kube-4)
     save_last_run_log_and_cleanup kube-apiserver
@@ -68,7 +65,6 @@ case "$(hostname)" in
     docker run -d \
       --name=kube-scheduler \
       weaveworks/kubernetes-anywhere:scheduler
-    break
     ;;
   *)
     save_last_run_log_and_cleanup kubelet
