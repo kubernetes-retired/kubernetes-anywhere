@@ -105,3 +105,40 @@ If you want to deploy something else, you can just pass a URL to your manifest l
 ./ecs-remove-services.sh
 ./delete-cluster.sh
 ```
+
+# Using TLS
+
+Thanks to WeaveDNS we can create a certificate for fixed `kube-apiserver.weave.local` domain name.
+
+One way to distribute the certificates and configuration files for all the components is via containers.
+
+If one assumes that their registry is a secure place, TLS configuration be done very transparently.
+
+First, during the build process run
+
+```
+docker run -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools setup-secure-cluster-conf-volumes
+```
+
+which results in a number of containers tagged `kubernetes-anywhere:<component>-secure-config`, e.g.
+
+```
+REPOSITORY               TAG                       IMAGE ID        CREATED         VIRTUAL SIZE
+kubernetes-anywhere      tools-secure-config       a93be2f313fd    9 minutes ago   4.796 MB
+kubernetes-anywhere      proxy-secure-config       4120c5fce546    9 minutes ago   4.796 MB
+kubernetes-anywhere      kubelet-secure-config     df9a758b5473    9 minutes ago   4.796 MB
+kubernetes-anywhere      apiserver-secure-config   2ae2ce355f5c    9 minutes ago   4.802 MB
+```
+
+Next, you can push these to the registry and use the volumes these images export like this
+
+```
+docker run --name=kube-tools-secure-config kubernetes-anywhere:tools-secure-config
+docker run -d --name=kube-apiserver --volumes-from=kube-apiserver-secure-config weaveworks/kubernetes-anywhere:apiserver
+```
+
+```
+docker run --name=kube-apiserver-secure-config kubernetes-anywhere:apiserver-secure-config
+docker run --interactive --tty --volumes-from=kube-tools-secure-config weaveworks/kubernetes-anywhere:tools bash -l
+```
+
