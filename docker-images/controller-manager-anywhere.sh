@@ -1,12 +1,12 @@
 #!/bin/sh -x
 
 applet="controller-manager"
-config="/srv/kubernetes/kube-${applet}/kubeconfig"
+config="/srv/kubernetes/kube-${applet}"
 master="kube-apiserver.weave.local"
 
-if [ -f $config ]
+if [ -d $config ]
 then
-  args="--kubeconfig=${config} --service-account-private-key-file=/srv/kubernetes/kube-${applet}/kube-apiserver.key --root-ca-file=/srv/kubernetes/kube-${applet}/kube-ca.crt"
+  args="--master=https://${master}:6443 --service-account-private-key-file=${config}/kube-apiserver.key --root-ca-file=${config}/kube-ca.crt"
 else
   args="--master=http://${master}:8080"
 fi
