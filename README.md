@@ -112,7 +112,7 @@ Thanks to WeaveDNS we can create a certificate for fixed `kube-apiserver.weave.l
 
 One way to distribute the certificates and configuration files for all the components is via containers.
 
-If one assumes that their registry is a secure place, TLS configuration be done very transparently.
+If one assumes that their registry is a secure place, TLS configuration can be done very transparently.
 
 First run [a helper script](https://github.com/weaveworks/weave-kubernetes-anywhere/blob/master/docker-images/setup-secure-cluster-conf-volumes.sh) shipped in the `weaveworks/kubernetes-anywhere:tools`:
 
