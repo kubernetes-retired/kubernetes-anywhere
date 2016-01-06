@@ -2,12 +2,15 @@
 
 /fix-nameserver
 
-if [ -f '/srv/kubernetes/kube-proxy/kubeconfig' ]
+applet="proxy"
+config="/srv/kubernetes/kube-${applet}/kubeconfig"
+master="kube-apiserver.weave.local"
+
+if [ -f $config ]
 then
-  args="--kubeconfig=/srv/kubernetes/kube-proxy/kubeconfig"
+  args="--kubeconfig=${config} --master=https://${master}:6443"
 else
-  args="--api-servers=http://kube-apiserver.weave.local:8080"
+  args="--master=http://${master}:8080"
 fi
 
-/hyperkube proxy ${args} \
-  --logtostderr="true"
+exec /hyperkube ${applet} ${args} --logtostderr="true"

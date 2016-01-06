@@ -2,14 +2,17 @@
 
 /fix-nameserver
 
-if [ -f '/srv/kubernetes/kubelet/kubeconfig' ]
+config="/srv/kubernetes/kubelet/kubeconfig"
+master="kube-apiserver.weave.local"
+
+if [ -f $config ]
 then
-  args="--kubeconfig=/srv/kubernetes/kubelet/kubeconfig --api-servers=https://kube-apiserver.weave.local:6443"
+  args="--kubeconfig=${config} --api-servers=https://${master}:6443"
 else
-  args="--api-servers=http://kube-apiserver.weave.local:8080"
+  args="--api-servers=http://${master}:8080"
 fi
 
-/hyperkube kubelet ${args} \
+exec /hyperkube kubelet ${args} \
   --docker-endpoint="unix:/weave.sock" \
   --cluster-dns="10.16.0.3" \
   --cluster-domain="kube.local" \
