@@ -90,6 +90,6 @@ ADD admin.conf /root/.kube/config
 ENTRYPOINT [ "/bin/true" ]
 EOF
 
-for i in apiserver kubelet proxy controller-manager tools
+for i in apiserver kubelet proxy controller-manager scheduler tools
 do docker build -t kubernetes-anywhere:${i}-secure-config -f ./${i}-secure-config.dockerfile ./
 done
