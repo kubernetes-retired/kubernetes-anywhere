@@ -11,7 +11,7 @@ else
   args="--insecure-bind-address=${weave_ip} --port=8080"
 fi
 
-/hyperkube apiserver ${args} \
+exec /hyperkube apiserver ${args} \
   --advertise-address="${weave_ip}" \
   --external-hostname="kube-apiserver.weave.local" \
   --etcd-servers="${etcd_cluster}" \
