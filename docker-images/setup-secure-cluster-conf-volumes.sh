@@ -75,7 +75,7 @@ cat > controller-manager-secure-config.dockerfile <<EOF
 FROM alpine
 VOLUME ${vol}/kube-controller-manager
 ADD pki/ca.crt ${vol}/kube-controller-manager/kube-ca.crt
-ADD pki/issued/kube-apiserver.key ${vol}/kube-controller-manager/kube-apiserver.key
+ADD pki/private/kube-apiserver.key ${vol}/kube-controller-manager/kube-apiserver.key
 ENTRYPOINT [ "/bin/true" ]
 EOF
 
