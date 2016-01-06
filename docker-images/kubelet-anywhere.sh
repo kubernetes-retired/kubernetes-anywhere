@@ -4,7 +4,7 @@
 
 if [ -f '/srv/kubernetes/kubelet/kubeconfig' ]
 then
-  args="--kubeconfig=/srv/kubernetes/kubelet/kubeconfig"
+  args="--kubeconfig=/srv/kubernetes/kubelet/kubeconfig --api-servers=http://kube-apiserver.weave.local:6443"
 else
   args="--api-servers=http://kube-apiserver.weave.local:8080"
 fi
