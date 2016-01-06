@@ -132,13 +132,28 @@ kubernetes-anywhere      apiserver-secure-config   2ae2ce355f5c    9 minutes ago
 
 Next, you can push these to the registry and use the volumes these images export like this
 
+## API Server
 ```
-docker run --name=kube-tools-secure-config kubernetes-anywhere:tools-secure-config
+docker run --name=kube-apiserver-secure-config kubernetes-anywhere:apiserver-secure-config
 docker run -d --name=kube-apiserver --volumes-from=kube-apiserver-secure-config weaveworks/kubernetes-anywhere:apiserver
 ```
 
+## Kubelet
 ```
-docker run --name=kube-apiserver-secure-config kubernetes-anywhere:apiserver-secure-config
+docker run -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools setup-kubelet-volumes
+docker run --name=kubelet-secure-config kubernetes-anywhere:kubelet-secure-config
+docker run -d --name=kubelet  --privileged=true --net=host --pid=host --volumes-from=kubelet-volumes --volumes-from=kubelet-secure-config weaveworks/kubernetes-anywhere:kubelet
+```
+
+## Proxy
+```
+docker run --name=kube-proxy-secure-config kubernetes-anywhere:proxy-secure-config
+docker run -d --name=kube-proxy  --privileged=true --net=host --pid=host --volumes-from=kube-proxy-secure-config weaveworks/kubernetes-anywhere:proxy
+```
+
+## Tools
+```
+docker run --name=kube-tools-secure-config kubernetes-anywhere:tools-secure-config
 docker run --interactive --tty --volumes-from=kube-tools-secure-config weaveworks/kubernetes-anywhere:tools bash -l
 ```
 
