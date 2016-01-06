@@ -28,7 +28,7 @@ kubectl config --kubeconfig="cluster.conf" set-cluster secure-cluster \
   --server="https://kube-apiserver.weave.local:6443" \
   --certificate-authority="kube-ca.crt"
 
-for user in kubelet proxy admin; do
+for user in kubelet proxy controller-manager scheduler admin; do
   cp cluster.conf "${user}.conf"
   token=$(generate_token)
   echo "${token},${user},${user}" >> known_tokens.csv
@@ -36,12 +36,6 @@ for user in kubelet proxy admin; do
   kubectl config --kubeconfig="${user}.conf" set-context kubernetes-anywhere --cluster="secure-cluster" --user="${user}"
   kubectl config --kubeconfig="${user}.conf" use-context kubernetes-anywhere
 done
-
-#service_accounts=("system:scheduler" "system:controller_manager" "system:logging" "system:monitoring" "system:dns")
-#for account in "${service_accounts[@]}"; do
-#  token=$(generate_token)
-#  echo "${token},${account},${account}" >> known_tokens.csv
-#done
 
 vol="/srv/kubernetes"
 
@@ -76,6 +70,15 @@ FROM alpine
 VOLUME ${vol}/kube-controller-manager
 ADD pki/ca.crt ${vol}/kube-controller-manager/kube-ca.crt
 ADD pki/private/kube-apiserver.key ${vol}/kube-controller-manager/kube-apiserver.key
+ADD controller-manager.conf ${vol}/kube-controller-manager/kubeconfig
+ENTRYPOINT [ "/bin/true" ]
+EOF
+
+cat > scheduler-secure-config.dockerfile <<EOF
+FROM alpine
+VOLUME ${vol}/kube-scheduler
+ADD pki/ca.crt ${vol}/kube-scheduler/kube-ca.crt
+ADD scheduler.conf ${vol}/kube-scheduler/kubeconfig
 ENTRYPOINT [ "/bin/true" ]
 EOF
 
