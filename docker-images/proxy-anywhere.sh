@@ -8,7 +8,7 @@ master="kube-apiserver.weave.local"
 
 if [ -f $config ]
 then
-  args="--kubeconfig=${config} --master=https://${master}:6443"
+  args="--kubeconfig=${config}"
 else
   args="--master=http://${master}:8080"
 fi
