@@ -48,7 +48,7 @@ vol="/srv/kubernetes"
 cat > apiserver-secure-config.dockerfile <<EOF
 FROM alpine
 VOLUME ${vol}
-ADD pki/ca.crt ${vol}/ca.crt
+ADD pki/ca.crt ${vol}/kube-ca.crt
 ADD pki/issued/kube-apiserver.crt ${vol}/kube-apiserver.crt
 ADD pki/private/kube-apiserver.key ${vol}/kube-apiserver.key
 ADD known_tokens.csv ${vol}/known_tokens.csv
@@ -71,6 +71,14 @@ ADD proxy.conf ${vol}/kube-proxy/kubeconfig
 ENTRYPOINT [ "/bin/true" ]
 EOF
 
+cat > controller-manager-secure-config.dockerfile <<EOF
+FROM alpine
+VOLUME ${vol}/kube-controller-manager
+ADD pki/ca.crt ${vol}/kube-controller-manager/kube-ca.crt
+ADD pki/issued/kube-apiserver.key ${vol}/kube-controller-manager/kube-apiserver.key
+ENTRYPOINT [ "/bin/true" ]
+EOF
+
 cat > tools-secure-config.dockerfile <<EOF
 FROM alpine
 VOLUME /root/.kube
@@ -79,6 +87,6 @@ ADD admin.conf /root/.kube/config
 ENTRYPOINT [ "/bin/true" ]
 EOF
 
-for i in apiserver kubelet proxy tools
+for i in apiserver kubelet proxy controller-manager tools
 do docker build -t kubernetes-anywhere:${i}-secure-config -f ./${i}-secure-config.dockerfile ./
 done
