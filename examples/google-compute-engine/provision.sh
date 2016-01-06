@@ -2,7 +2,12 @@
 
 gpasswd -a ilya docker
 
+## The container-optimised image has kubelet running already, but it's old and somewhat useless
+
 /etc/init.d/kubelet stop
+
+## As this script will run on each boot, we will get Weave Net and Scope upgraded as new versions
+## become available
 
 curl --silent --location http://git.io/weave --output /usr/local/bin/weave
 chmod +x /usr/local/bin/weave
@@ -21,6 +26,9 @@ chmod +x /usr/local/bin/scope
 
 eval $(/usr/local/bin/weave env)
 
+## We don't set a restart policy here, as this script re-runs on each boot, which is quite handy,
+## however we need clear out previous container while saving the logs for future reference
+
 save_last_run_log_and_cleanup() {
   if [[ $(docker inspect --format='{{.State.Status}}' $1) = 'running' ]]
   then
@@ -29,7 +37,8 @@ save_last_run_log_and_cleanup() {
   fi
 }
 
-case "$(hostname)" in 
+case "$(hostname)" in
+  ## kube-{1,2,3} run etcd
   kube-1)
     save_last_run_log_and_cleanup etcd1
     docker run -d \
@@ -51,6 +60,7 @@ case "$(hostname)" in
       --name=etcd3 \
       weaveworks/kubernetes-anywhere:etcd
     ;;
+  ## kube-4 runs all the master services
   kube-4)
     save_last_run_log_and_cleanup kube-apiserver
     save_last_run_log_and_cleanup kube-controller-manager
@@ -66,6 +76,7 @@ case "$(hostname)" in
       --name=kube-scheduler \
       weaveworks/kubernetes-anywhere:scheduler
     ;;
+  ## kube-[5..N] are the cluster nodes
   *)
     save_last_run_log_and_cleanup kubelet
     save_last_run_log_and_cleanup kube-proxy
