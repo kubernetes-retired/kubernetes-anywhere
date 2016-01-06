@@ -4,17 +4,21 @@ etcd_cluster=$(seq -s , 1 $ETCD_CLUSTER_SIZE | sed 's|\([1-9]*\)|http://etcd\1:2
 
 weave_ip=$(hostname -i)
 
-if [ -d '/srv/kubernetes/' ]
+config="/srv/kubernetes/"
+
+if [ -d $config ]
 then
-  args="--tls-cert-file=/srv/kubernetes/kube-apiserver.crt --tls-private-key-file=/srv/kubernetes/kube-apiserver.key --client-ca-file=/srv/kubernetes/kube-ca.crt --token-auth-file=/srv/kubernetes/known_tokens.csv"
+  args="--tls-cert-file=${config}/kube-apiserver.crt --tls-private-key-file=${config}/kube-apiserver.key --client-ca-file=${config}/kube-ca.crt --token-auth-file=/srv/kubernetes/known_tokens.csv"
 else
   args="--insecure-bind-address=${weave_ip} --port=8080"
 fi
 
 exec /hyperkube apiserver ${args} \
   --advertise-address="${weave_ip}" \
+  --admission-control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota \
   --external-hostname="kube-apiserver.weave.local" \
   --etcd-servers="${etcd_cluster}" \
   --service-cluster-ip-range="10.16.0.0/12" \
   --cloud-provider="${CLOUD_PROVIDER}" \
+  --allow-privileged="true" \
   --logtostderr="true"

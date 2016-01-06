@@ -17,4 +17,5 @@ exec /hyperkube kubelet ${args} \
   --cluster-dns="10.16.0.3" \
   --cluster-domain="kube.local" \
   --containerized="true" \
+  --allow-privileged="true" \
   --logtostderr="true"
