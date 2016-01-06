@@ -6,8 +6,8 @@ export ETCD_INITIAL_CLUSTER
 
 n="$(hostname -s)" c="http://${n}:2379" p="http://${n}:2380"
 
-etcd --name=$n \
-  --listen-peer-urls $p \
-  --initial-advertise-peer-urls $p \
-  --listen-client-urls $c \
-  --advertise-client-urls $c
+exec etcd --name=$n \
+  --listen-peer-urls=$p \
+  --initial-advertise-peer-urls=$p \
+  --listen-client-urls=$c \
+  --advertise-client-urls=$c
