@@ -1,6 +1,6 @@
 #!/bin/sh -x
 
-applet="kube-proxy"
+applet="controller-manager"
 config="/srv/kubernetes/kube-${applet}/kubeconfig"
 master="kube-apiserver.weave.local"
 
