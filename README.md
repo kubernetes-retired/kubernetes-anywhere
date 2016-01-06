@@ -124,10 +124,12 @@ which results in a number of containers tagged `kubernetes-anywhere:<component>-
 
 ```
 REPOSITORY               TAG                       IMAGE ID        CREATED         VIRTUAL SIZE
-kubernetes-anywhere      tools-secure-config       a93be2f313fd    9 minutes ago   4.796 MB
-kubernetes-anywhere      proxy-secure-config       4120c5fce546    9 minutes ago   4.796 MB
-kubernetes-anywhere      kubelet-secure-config     df9a758b5473    9 minutes ago   4.796 MB
-kubernetes-anywhere      apiserver-secure-config   2ae2ce355f5c    9 minutes ago   4.802 MB
+kubernetes-anywhere                  tools-secure-config                9f29f12d2462        9 minutes ago       4.796 MB
+kubernetes-anywhere                  scheduler-secure-config            7a6b45807c48        9 minutes ago       4.796 MB
+kubernetes-anywhere                  controller-manager-secure-config   cb0dd7c10ba7        9 minutes ago       4.797 MB
+kubernetes-anywhere                  kubelet-secure-config              f80fcff78a37        9 minutes ago       4.796 MB
+kubernetes-anywhere                  proxy-secure-config                073305ee4bef        9 minutes ago       4.796 MB
+kubernetes-anywhere                  apiserver-secure-config            3b7f44eb2fc2        9 minutes ago       4.802 MB
 ```
 
 Next, you can push these to the registry and use the volumes these images export like this
@@ -151,9 +153,20 @@ docker run --name=kube-proxy-secure-config kubernetes-anywhere:proxy-secure-conf
 docker run -d --name=kube-proxy  --privileged=true --net=host --pid=host --volumes-from=kube-proxy-secure-config weaveworks/kubernetes-anywhere:proxy
 ```
 
+## Controller Manager
+```
+docker run --name=kube-controller-manager-secure-config kubernetes-anywhere:controller-manager-secure-config
+docker run -d --name=kube-controller-manager --volumes-from=kube-controller-manager-secure-config weaveworks/kubernetes-anywhere:controller-manager
+```
+
+## Scheduler
+```
+docker run --name=kube-scheduler-secure-config kubernetes-anywhere:scheduler-secure-config
+docker run -d --name=kube-scheduler --volumes-from=kube-scheduler-secure-config weaveworks/kubernetes-anywhere:scheduler
+```
+
 ## Tools
 ```
 docker run --name=kube-tools-secure-config kubernetes-anywhere:tools-secure-config
 docker run --interactive --tty --volumes-from=kube-tools-secure-config weaveworks/kubernetes-anywhere:tools bash -l
 ```
-
