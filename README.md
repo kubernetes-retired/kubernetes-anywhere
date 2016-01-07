@@ -52,7 +52,6 @@ $ docker run -ti weaveworks/kubernetes-anywhere:tools bash -l
 
 # kubectl create -f /guestbook-example/
 # kubectl get pods --watch
-
 ```
 
 ## A multi-node cluter
@@ -243,6 +242,9 @@ Next, you can push these to the registry and use the volumes these images export
 docker run --name=kube-apiserver-secure-config kubernetes-anywhere:apiserver-secure-config
 docker run -d --name=kube-apiserver --volumes-from=kube-apiserver-secure-config weaveworks/kubernetes-anywhere:apiserver
 ```
+
+> Don't forget to pass `-e ETCD_CLUSTER_SIZE=<N>` as intended.
+
 ### Kubelet
 ```
 docker run -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools setup-kubelet-volumes
