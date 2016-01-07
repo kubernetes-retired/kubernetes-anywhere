@@ -35,4 +35,4 @@ RUN curl --silent --location \
 ADD docker-compose.yml /
 
 ADD setup-kubelet-volumes.sh /usr/bin/setup-kubelet-volumes
-ADD setup-secure-cluster-conf-volumes.sh /usr/bin/setup-secure-cluster-conf-volumes
+ADD setup-secure-cluster-config-volumes.sh /usr/bin/setup-secure-cluster-config-volumes
