@@ -1,10 +1,10 @@
 # Weaving Kubernetes Anywhere
 
-Weave lets you run Kubernetes clusters anywhere without configuration changes. It is by far the easiest way to get started on a single machine, and later scale-out to any infrastructure seemlestly.
+Weave lets you run Kubernetes clusters anywhere without configuration changes. It is by far the easiest way to get started on a single machine, and later scale-out to any infrastructure seemlestly. This poroject is aimed to dramatically simplify Kubernetes cluster provisioning in any environment, allowing one to move or clone the entire cluster. Even TLS setup is fully transparent.
 
 Having deployed Kubernetes over Weave Net, you can rely 100% on cloud portability, thanks to Weave being an L2 network.
 
-Additionally, thanks to Weave Run and how it [handles IP address allocation as well as DNS](http://weave.works/talks/crdt/slides.html#1) without requiring a persistant store, you can deploy etcd over Weave as well.
+Additionally, thanks to how it [Weave Net handles IP address allocation as well as DNS](http://weave.works/talks/crdt/slides.html#1) without requiring a persistant store, you can deploy etcd over Weave as well. The etcd cluster can thereby benefit from simple service discovery WeaveDNS provides and thereby cater for node replacement without config changes.
 
 Now you can simply configure all of the cluster components to have fixed DNS names, all you should care about is how these services are distributed accross your compute instances, e.g. what is the size of etcd cluster and whether it is on a dedcicated machines with the right type of storage attached.
 
