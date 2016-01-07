@@ -35,6 +35,7 @@ $ docker run -ti -v /:/rootfs -v /var/run/weave/weave.sock:/weave.sock weavework
 ```
 
 View DNS records for Kubernetes cluster components
+
 ```
 $ weave status dns
 ```
@@ -62,9 +63,9 @@ For a more relasitic setup, let's say you'd like to have a cluster of 5 servers 
   - 1 host running all master components (`$KUBE_MASTER_0`)
   - 2 worker nodes (`$KUBE_WORKER_1`, `$KUBE_WORKER_2`)
 
-As you will soon see, this approach doesn't requite any configuration changes at all, you simply run containers on different hosts and only need to think about how many hosts there and not what's running where. You can potentially use any tools (e.g.: Fleet, Swarm, Ansible), but it's pretty simple to describe with automation aside.
+As you will soon see, if you were to modify the cluster topology, it won't requite any configuration changes at all. You simply run containers on different hosts and only need to think about how many hosts are there and not what's running where exactly. You can potentially use any provisioning automation tools (Ansible, Terraform, Fleet or Swarm), but it's pretty simple to describe with automation aside.
 
-Given a recent version of Docker is running on each of these hosts, let's install & launch Weave Net first:
+Given a recent version of Docker is running on each of the hosts you have setup, let's install & launch Weave Net first.
 
 ```Shell
 sudo curl --location --silent git.io/weave --output /usr/local/bin/weave
@@ -75,7 +76,7 @@ Next, given `/usr/local/bin/` is in your shell's `$PATH`, you need to launch the
 
 > Please note that you will need to have Weave Net ports open on those hosts, which are the _control port (TCP 6783)_ and _data ports (UDP 6783/6784)_.
 
-If you already know all hostnames/IPs of servers in your cluster, you can run the following on each of those servers:
+If you already know all hostnames/IPs of the servers in your cluster, you can run the following to launch Weave Net router on each of those servers:
 
 ```Shell
 weave launch-router \
@@ -84,13 +85,13 @@ weave launch-router \
   $KUBE_WORKER_1 $KUBE_WORKER_2
 ```
 
-If you only know some of the peer hostnames/IPs do this:
+If you only know some of the peer hostnames/IPs, you can launch Weave Net router like this:
 
 ```Shell
 weave launch-router --init-peer-count 6 $KUBE_ETCD_1 $KUBE_MASTER_0 $KUBE_WORKER_1
 ```
 
-or even 
+or even
 
 ```Shell
 weave launch-router --init-peer-count 6 $KUBE_MASTER_0
@@ -105,6 +106,7 @@ weave launch-proxy --rewrite-inspect
 ```
 
 And finally, you need to expose the host on Weave Net and set a DNS record for it like so:
+
 ```Shell
 weave expose -h "$(hostname).weave.local"
 ```
@@ -135,6 +137,7 @@ On `$KUBE_ETCD_3`:
 ```Shell
 docker run -d -e ETCD_CLUSTER_SIZE=3 --name=etcd3 weaveworks/kubernetes-anywhere:etcd
 ```
+
 ### Launch master components
 
 On `$KUBE_MASTER_0`, run:
@@ -179,14 +182,18 @@ $ docker run -ti weaveworks/kubernetes-anywhere:tools
 ```
 
 Check there is an expected number of worker nodes in the cluster:
+
 ```
 # kubectl get nodes
 ```
-Deploy SkyDNS addon and, if you like, scale it from default single replica to 3 :
+
+Deploy SkyDNS addon and, if you like, scale it from default single replica to 3:
+
 ```
 # kubectl create -f /skydns-addon/
 # kubectl scale --namespace=kube-system --replicas=3 rc kube-dns-v8
 ```
+
 Deploy Guestbook example app and wait for pods become ready
 
 ```
