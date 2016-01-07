@@ -12,7 +12,9 @@ You no longer have to care about the IP address of the API server or any of thos
 
 # Try it!
 
-## Local Docker host
+All you need is a 1 or more Docker hosts.
+
+## Get started using a single Docker host
 
 ### Launch Weave
 
@@ -51,44 +53,145 @@ $ docker run -ti weaveworks/kubernetes-anywhere:tools bash -l
 
 # kubectl create -f /guestbook-example/
 # kubectl get pods --watch
-```
-
-## Amazon EC2 Container Service
-
-### Setup ECS cluster
-```
-cd examples/aws-ecs/
-./create-cluster.sh
-./ecs-deploy-services.sh
-./ecs-docker-ps.sh
-```
-
-### Login to an instance
 
 ```
-> ssh_cloud -i weave-ecs-demo-key.pem ec2-user@XXX.compute-1.amazonaws.com
+
+## A multi-node cluter
+
+For a more relasitic setup, let's say you'd like to have a cluster of 5 servers like this:
+
+  - 3 dedicated etcd hosts (`$KUBE_ETCD_1`, `$KUBE_ETCD_2`, `$KUBE_ETCD_3`)
+  - 1 host running all master components (`$KUBE_MASTER_0`)
+  - 2 worker nodes (`$KUBE_WORKER_1`, `$KUBE_WORKER_2`)
+
+As you will soon see, this approach doesn't requite any configuration changes at all, you simply run containers on different hosts and only need to think about how many hosts there and not what's running where. You can potentially use any tools (e.g.: Fleet, Swarm, Ansible), but it's pretty simple to describe with automation aside.
+
+Given a recent version of Docker is running on each of these hosts, let's install & launch Weave Net first:
+
+```Shell
+sudo curl --location --silent git.io/weave --output /usr/local/bin/weave
+sudo chmod +x /usr/local/bin/weave
 ```
 
-Setup Weave environment:
-```
-$ eval $(weave env)
-```
-View DNS records for Kubernetes cluster components
-```
-$ weave status dns
+Next, given `/usr/local/bin/` is in your shell's `$PATH`, you need to launch the Weave Net router.
+
+> Please note that you will need to have Weave Net ports open on those hosts, which are the _control port (TCP 6783)_ and _data ports (UDP 6783/6784)_.
+
+If you already know all hostnames/IPs of servers in your cluster, you can run the following on each of those servers:
+
+```Shell
+weave launch-router \
+  $KUBE_ETCD_1 $KUBE_ETCD_2  $KUBE_ETCD_3 \
+  $KUBE_MASTER_0 \
+  $KUBE_WORKER_1 $KUBE_WORKER_2
 ```
 
-### Deploy the Kubernetes app
+If you only know some of the peer hostnames/IPs do this:
+
+```Shell
+weave launch-router --init-peer-count 6 $KUBE_ETCD_1 $KUBE_MASTER_0 $KUBE_WORKER_1
+```
+
+or even 
+
+```Shell
+weave launch-router --init-peer-count 6 $KUBE_MASTER_0
+```
+
+Otherwise, you could also run `weave connect` later, just make sure to pass `--init-peer-count` with a number of servers you are expecing to have in your cluster.
+
+Next, you need to launch Weave proxy for the Docker API. It's crictical to pass `--rewrite-inspect` flag for Kubernetes integration to function properly.
+
+```Shell
+weave launch-proxy --rewrite-inspect
+```
+
+And finally, you need to expose the host on Weave Net and set a DNS record for it like so:
+```Shell
+weave expose -h "$(hostname).weave.local"
+```
+
+Before launching any containers you will also need to point Docker client to Weave proxy socket by setting `$DOCKER_HOST` like with the following command:
+```Shell
+eval $(weave env)
+```
+
+The above can be wrapped in a simple provisioning script which you will find below.
+
+### Launch etcd cluster
+
+On `$KUBE_ETCD_1`, run:
+
+```Shell
+docker run -d -e ETCD_CLUSTER_SIZE=3 --name=etcd1 weaveworks/kubernetes-anywhere:etcd
+```
+
+On `$KUBE_ETCD_2`:
+
+```Shell
+docker run -d -e ETCD_CLUSTER_SIZE=3 --name=etcd2 weaveworks/kubernetes-anywhere:etcd
+```
+
+On `$KUBE_ETCD_3`:
+
+```Shell
+docker run -d -e ETCD_CLUSTER_SIZE=3 --name=etcd3 weaveworks/kubernetes-anywhere:etcd
+```
+### Launch master components
+
+On `$KUBE_MASTER_0`, run:
+
+```Shell
+docker run -d -e ETCD_CLUSTER_SIZE=3 --name=kube-apiserver weaveworks/kubernetes-anywhere:apiserver
+docker run -d --name=kube-controller-manager weaveworks/kubernetes-anywhere:controller-manager
+docker run -d --name=kube-scheduler weaveworks/kubernetes-anywhere:scheduler
+```
+
+### Launch workers
+
+On `$KUBE_WORKER_1` & `$KUBE_WORKER_2`, start kubelet and proxy like this:
 
 ```
-$ docker run -ti weaveworks/kubernetes-anywhere:tools bash -l
+docker run \
+      --volume="/:/rootfs" \
+      --volume="/var/run/weave/weave.sock:/weave.sock" \
+      weaveworks/kubernetes-anywhere:tools \
+      setup-kubelet-volumes
+docker run -d \
+      --name=kubelet \
+      --privileged=true --net=host --pid=host \
+      --volumes-from=kubelet-volumes \
+      weaveworks/kubernetes-anywhere:kubelet
+docker run -d \
+      --name=kube-proxy \
+      --privileged=true --net=host --pid=host \
+      weaveworks/kubernetes-anywhere:proxy
+```
 
+### Provisioning is done, let's launch an app!
+
+There is a tools container you can run on any of the hosts in the cluster that has `kubectl` preconfigured to use `kube-apiserver.weave.local`.
+
+Here is how you can use this tools container.
+
+Start it in interactive mode:
+
+```
+$ docker run -ti weaveworks/kubernetes-anywhere:tools
+```
+
+Check there is an expected number of worker nodes in the cluster:
+```
 # kubectl get nodes
+```
+Deploy SkyDNS addon and, if you like, scale it from default single replica to 3 :
+```
 # kubectl create -f /skydns-addon/
-# kubectl get pods,rc,services --all-namespaces
 # kubectl scale --namespace=kube-system --replicas=3 rc kube-dns-v8
-# kubectl get pods --all-namespaces --watch
+```
+Deploy Guestbook example app and wait for pods become ready
 
+```
 # kubectl create -f /guestbook-example/
 # kubectl get pods --watch
 ```
@@ -96,17 +199,13 @@ $ docker run -ti weaveworks/kubernetes-anywhere:tools bash -l
 If you want to deploy something else, you can just pass a URL to your manifest like this:
 
 ```
-# kubectl create -f https://example.com/guestbook.yaml
+# kubectl create -f https://example.com/app-controller.yaml
+# kubectl create -f https://example.com/app-service.yaml
 ```
 
-### Tear-down the ECS cluster
+> Please note that that you can add a management node to run tools container, which may be part of your CI/CD setup or even just a VM on your laptop, given it can Weave Net ports on your cluster.
 
-```
-./ecs-remove-services.sh
-./delete-cluster.sh
-```
-
-# Using TLS
+## Using TLS
 
 Thanks to WeaveDNS we can create a certificate for fixed `kube-apiserver.weave.local` domain name.
 
@@ -134,39 +233,38 @@ kubernetes-anywhere                  apiserver-secure-config            3b7f44eb
 
 Next, you can push these to the registry and use the volumes these images export like this
 
-## API Server
+### API Server
 ```
 docker run --name=kube-apiserver-secure-config kubernetes-anywhere:apiserver-secure-config
 docker run -d --name=kube-apiserver --volumes-from=kube-apiserver-secure-config weaveworks/kubernetes-anywhere:apiserver
 ```
-
-## Kubelet
+### Kubelet
 ```
 docker run -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools setup-kubelet-volumes
 docker run --name=kubelet-secure-config kubernetes-anywhere:kubelet-secure-config
 docker run -d --name=kubelet  --privileged=true --net=host --pid=host --volumes-from=kubelet-volumes --volumes-from=kubelet-secure-config weaveworks/kubernetes-anywhere:kubelet
 ```
-
-## Proxy
+### Proxy
 ```
 docker run --name=kube-proxy-secure-config kubernetes-anywhere:proxy-secure-config
 docker run -d --name=kube-proxy  --privileged=true --net=host --pid=host --volumes-from=kube-proxy-secure-config weaveworks/kubernetes-anywhere:proxy
 ```
-
-## Controller Manager
+### Controller Manager
 ```
 docker run --name=kube-controller-manager-secure-config kubernetes-anywhere:controller-manager-secure-config
 docker run -d --name=kube-controller-manager --volumes-from=kube-controller-manager-secure-config weaveworks/kubernetes-anywhere:controller-manager
 ```
-
-## Scheduler
+### Scheduler
 ```
 docker run --name=kube-scheduler-secure-config kubernetes-anywhere:scheduler-secure-config
 docker run -d --name=kube-scheduler --volumes-from=kube-scheduler-secure-config weaveworks/kubernetes-anywhere:scheduler
 ```
-
-## Tools
+### Tools
 ```
 docker run --name=kube-tools-secure-config kubernetes-anywhere:tools-secure-config
 docker run --interactive --tty --volumes-from=kube-tools-secure-config weaveworks/kubernetes-anywhere:tools bash -l
 ```
+
+## Other examples
+
+Please see [`examples/`](https://github.com/weaveworks/weave-kubernetes-anywhere/tree/master/examples) direcotry for more integrations.
