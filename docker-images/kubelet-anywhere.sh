@@ -2,7 +2,7 @@
 
 /fix-nameserver
 
-config="/srv/kubernetes/kubelet/kubeconfig"
+config="./srv/kubernetes/kubelet/kubeconfig"
 master="kube-apiserver.weave.local"
 
 if [ -f $config ]
