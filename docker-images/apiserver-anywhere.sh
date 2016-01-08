@@ -15,6 +15,7 @@ fi
 
 exec /hyperkube apiserver ${args} \
   --advertise-address="${weave_ip}" \
+  --admission-control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota \
   --external-hostname="kube-apiserver.weave.local" \
   --etcd-servers="${etcd_cluster}" \
   --service-cluster-ip-range="10.16.0.0/12" \
