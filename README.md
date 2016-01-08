@@ -2,7 +2,7 @@
 
 This project uses Weave to dramatically simplify Kubernetes deployment - anywhere. It is by far the easiest way to get started on a single machine, and later scale-out to any infrastructure seamlessly. We use Weave Net as a cluster management network. This enables complete portability, and for example allows one to move or clone the entire cluster. Even TLS setup is fully transparent.
 
-Additionally, thanks to how [Weave Net handles IP address allocation as well as DNS](http://weave.works/talks/crdt/slides.html#1) without requiring a persistant store, you can deploy etcd over Weave Net as well. The etcd cluster can thereby benefit from simple service discovery WeaveDNS provides and therefor cater for node replacement without config changes.
+Additionally, thanks to how [Weave Net handles IP address allocation as well as DNS](http://weave.works/talks/crdt/slides.html#1) without requiring a persistant store, you can deploy etcd over Weave Net as well. The etcd cluster can thereby benefit from simple service discovery WeaveDNS provides and therefor facilitate node replacement without config changes.
 
 Now you can simply configure all of the cluster components to have fixed DNS names, all you should care about is how these services are distributed accross your compute instances, e.g. what is the size of etcd cluster and whether it is on a dedcicated machines with the right type of storage attached.
 
