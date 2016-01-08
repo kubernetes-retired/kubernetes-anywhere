@@ -247,7 +247,7 @@ docker run -d --name=kube-apiserver --volumes-from=kube-apiserver-secure-config 
 
 ### Kubelet
 ```
-docker run -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools setup-kubelet-volumes
+docker run -v /:/rootfs -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools setup-kubelet-volumes
 docker run --name=kubelet-secure-config kubernetes-anywhere:kubelet-secure-config
 docker run -d --name=kubelet  --privileged=true --net=host --pid=host --volumes-from=kubelet-volumes --volumes-from=kubelet-secure-config weaveworks/kubernetes-anywhere:kubelet
 ```
