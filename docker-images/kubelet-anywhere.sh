@@ -12,9 +12,10 @@ else
   args="--api-servers=http://${master}:8080"
 fi
 
-./hyperkube kubelet ${args} \
+exec ./hyperkube kubelet ${args} \
   --docker-endpoint="unix:/weave.sock" \
   --cluster-dns="10.16.0.3" \
+  --resolv-conf="" \
   --cluster-domain="kube.local" \
   --allow-privileged="true" \
   --logtostderr="true"
