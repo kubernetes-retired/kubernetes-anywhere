@@ -33,6 +33,12 @@ install_weave=" \
   /usr/local/bin/weave launch-proxy --rewrite-inspect ; \
 "
 
+docker_on() {
+  m=$1
+  shift
+  echo docker-machine ssh ${m} "docker $*"
+}
+
 ## Create 7 VMs and install weave
 
 for m in $vm_names ; do
@@ -54,17 +60,17 @@ weaveproxy_socket="-H unix:///var/run/weave/weave.sock"
 
 ## Start etcd on `kube-{1,2,3}`
 
-docker-machine ssh 'kube-1' docker ${weaveproxy_socket} run -d \
+docker_on 'kube-1' ${weaveproxy_socket} run -d \
   -e ETCD_CLUSTER_SIZE=3 \
   --name="etcd1" \
   weaveworks/kubernetes-anywhere:etcd
 
-docker-machine ssh 'kube-2' docker ${weaveproxy_socket} run -d \
+docker_on 'kube-2' ${weaveproxy_socket} run -d \
   -e ETCD_CLUSTER_SIZE=3 \
   --name="etcd2" \
   weaveworks/kubernetes-anywhere:etcd
 
-docker-machine ssh 'kube-3' docker ${weaveproxy_socket} run -d \
+docker_on 'kube-3' ${weaveproxy_socket} run -d \
   -e ETCD_CLUSTER_SIZE=3 \
   --name="etcd3" \
   weaveworks/kubernetes-anywhere:etcd
@@ -101,18 +107,18 @@ docker ${master_config} save \
 
 ## Launch the master components using volumes provided as artefact of running the `*-secure-config` containers
 
-docker-machine ssh 'kube-4' docker ${weaveproxy_socket} run -d \
+docker_on 'kube-4' ${weaveproxy_socket} run -d \
   -e ETCD_CLUSTER_SIZE=3 \
   --name="kube-apiserver" \
   --volumes-from="kube-apiserver-secure-config" \
   weaveworks/kubernetes-anywhere:apiserver
 
-docker-machine ssh 'kube-4' docker ${weaveproxy_socket} run -d \
+docker_on 'kube-4' ${weaveproxy_socket} run -d \
   --name="kube-scheduler" \
   --volumes-from="kube-scheduler-secure-config" \
   weaveworks/kubernetes-anywhere:scheduler
 
-docker-machine ssh 'kube-4' docker ${weaveproxy_socket} run -d \
+docker_on 'kube-4' ${weaveproxy_socket} run -d \
   --name="kube--controller-manager" \
   --volumes-from="kube-controller-manager-secure-config" \
   weaveworks/kubernetes-anywhere:controller-manager
@@ -126,17 +132,17 @@ for m in 'kube-5' 'kube-6' 'kube-7' ; do
   docker-machine ssh ${m} "/usr/local/bin/weave expose -h ${m}.weave.local"
 
   ## Run intermediate containers to export volumes kubelet wants
-  docker-machine ssh ${m} "mount --make-rshared /" # TODO: can run from tools container via nsenter
+  docker-machine ssh ${m} "sudo mount --make-rshared /" # TODO: can run from tools container via nsenter
   docker ${worker_config} run \
     --name="kubelet-secure-config" \
     kubernetes-anywhere:kubelet-secure-config
-  docker-machine ssh ${m} docker ${weaveproxy_socket} run \
+  docker_on ${m} ${weaveproxy_socket} run \
     --volume="/:/rootfs" \
     --volume="/var/run/weave/weave.sock:/weave.sock" \
     weaveworks/kubernetes-anywhere:tools \
     setup-kubelet-volumes
   ## Start the kubelete itself now
-  docker-machine ssh ${m} docker ${weaveproxy_socket} run -d \
+  docker_on ${m} ${weaveproxy_socket} run -d \
     --name="kubelet" \
     --privileged=true --net=host --pid=host \
     --volumes-from="kubelet-volumes" \
@@ -148,7 +154,7 @@ for m in 'kube-5' 'kube-6' 'kube-7' ; do
     --name="kube-proxy-secure-config" \
     kubernetes-anywhere:proxy-secure-config
   ## And now start the proxy itself
-  docker-machine ssh ${m} docker ${weaveproxy_socket} run -d \
+  docker_on ${m} ${weaveproxy_socket} run -d \
     --name="kube-proxy" \
     --privileged=true --net=host --pid=host \
     --volumes-from="kube-proxy-secure-config" \
@@ -156,11 +162,11 @@ for m in 'kube-5' 'kube-6' 'kube-7' ; do
 done
 
 ## Run tools container to deploy SkyDNS addon
-docker-machine ssh 'kube-4' docker ${weaveproxy_socket} run \
+docker_on 'kube-4' ${weaveproxy_socket} run \
   --volumes-from="kube-tools-secure-config" \
   weaveworks/kubernetes-anywhere:tools \
   kubectl create -f /kube-system-namespace.yaml
-docker-machine ssh 'kube-4' docker ${weaveproxy_socket} run \
+docker_on 'kube-4' ${weaveproxy_socket} run \
   --volumes-from="kube-tools-secure-config" \
   weaveworks/kubernetes-anywhere:tools \
   kubectl create -f /skydns-addon/
