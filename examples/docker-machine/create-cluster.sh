@@ -39,7 +39,7 @@ install_weave=" \
 docker_on() {
   m=$1
   shift
-  echo docker-machine ssh ${m} "docker $*"
+  docker-machine ssh ${m} "docker $*"
 }
 
 ## Create 7 VMs and install weave
