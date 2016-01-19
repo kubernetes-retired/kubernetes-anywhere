@@ -73,7 +73,7 @@ sudo chmod +x /usr/local/bin/weave
 
 Next, given `/usr/local/bin/` is in your shell's `$PATH`, you need to launch the Weave Net router.
 
-> Please note that you will need to have Weave Net ports open on those hosts, which are the _control port (TCP 6783)_ and _data ports (UDP 6783/6784)_.
+> **Please note** that you will need to have Weave Net ports open on those hosts, which are the _control port (TCP 6783)_ and _data ports (UDP 6783/6784)_.
 
 If you already know all hostnames/IPs of the servers in your cluster, you can run the following to launch Weave Net router on each of those servers:
 
@@ -211,6 +211,8 @@ If you want to deploy something else, you can just pass a URL to your manifest l
 
 ## Using TLS
 
+> **Please note** that this currently requires Docker version 1.10, for the mount propagation feature. We are continously testing release candidates to make sure all is well.
+
 Thanks to WeaveDNS we can create a certificate for fixed `kube-apiserver.weave.local` domain name.
 
 One way to distribute the certificates and configuration files for all the components is via containers.
@@ -243,7 +245,7 @@ docker run --name=kube-apiserver-secure-config kubernetes-anywhere:apiserver-sec
 docker run -d --name=kube-apiserver --volumes-from=kube-apiserver-secure-config weaveworks/kubernetes-anywhere:apiserver
 ```
 
-> Don't forget to pass `-e ETCD_CLUSTER_SIZE=<N>` as intended.
+> **Don't forget** to pass `-e ETCD_CLUSTER_SIZE=<N>` as intended.
 
 ### Kubelet
 ```
@@ -270,6 +272,15 @@ docker run -d --name=kube-scheduler --volumes-from=kube-scheduler-secure-config 
 ```
 docker run --name=kube-tools-secure-config kubernetes-anywhere:tools-secure-config
 docker run --interactive --tty --volumes-from=kube-tools-secure-config weaveworks/kubernetes-anywhere:tools bash -l
+```
+
+Setting up SkyDNS requires a different version of the manisfest, which had been provided in tools container, please use it like this:
+```
+# kubectl create -f /kube-system-namespace.yaml 
+namespace "kube-system" created
+# kubectl create -f /skydns-addon-secure/
+replicationcontroller "kube-dns-v10" created
+service "kube-dns" created
 ```
 
 ## Other examples
