@@ -32,6 +32,8 @@ RUN mkdir guestbook-example ; cd guestbook-example ; \
 
 ADD kube-system-namespace.yaml /kube-system-namespace.yaml
 ADD skydns-addon /skydns-addon
+RUN cp -a /skydns-addon /skydns-addon-secure ; \
+  sed 's|\(- -kube_master_url=http://kube-apiserver.weave.local:8080\)$|#\1|' -i skydns-addon-secure/controller.yaml
 
 RUN curl --silent --location \
   https://github.com/docker/compose/releases/download/1.5.1/docker-compose-Linux-x86_64 \
