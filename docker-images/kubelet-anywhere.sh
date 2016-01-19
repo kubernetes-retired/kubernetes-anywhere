@@ -14,7 +14,7 @@ fi
 
 exec nsenter --target=1 --mount --wd=. -- \
   ./hyperkube kubelet ${args} \
-    --docker-endpoint="unix:/weave.sock" \
+    --docker-endpoint="unix:/var/run/weave/weave.sock" \
     --cluster-dns="10.16.0.3" \
     --cluster-domain="kube.local" \
     --containerized="true" \
