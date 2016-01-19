@@ -172,4 +172,4 @@ docker_on 'kube-4' ${weaveproxy_socket} run \
 docker_on 'kube-4' ${weaveproxy_socket} run \
   --volumes-from="kube-tools-secure-config" \
   weaveworks/kubernetes-anywhere:tools \
-  kubectl create -f /skydns-addon/
+  kubectl create -f /skydns-addon-secure/
