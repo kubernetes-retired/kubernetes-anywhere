@@ -12,11 +12,9 @@ else
   args="--api-servers=http://${master}:8080"
 fi
 
-exec nsenter --target=1 --mount --wd=. -- \
-  ./hyperkube kubelet ${args} \
-    --docker-endpoint="unix:/var/run/weave/weave.sock" \
-    --cluster-dns="10.16.0.3" \
-    --cluster-domain="kube.local" \
-    --containerized="true" \
-    --allow-privileged="true" \
-    --logtostderr="true"
+./hyperkube kubelet ${args} \
+  --docker-endpoint="unix:/weave.sock" \
+  --cluster-dns="10.16.0.3" \
+  --cluster-domain="kube.local" \
+  --allow-privileged="true" \
+  --logtostderr="true"
