@@ -21,7 +21,7 @@ else
           --volume=\"${def_docker_root}:${def_docker_root}:rw\" \
         "
         kubelet_root_vol=" \
-          --volume=\"${kubelet_root}:${def_kubelet_root}:rw\" \
+          --volume=\"${kubelet_root}:${def_kubelet_root}:rw,rshared\" \
         "
         ;;
       *)
