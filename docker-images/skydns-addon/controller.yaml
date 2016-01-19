@@ -71,7 +71,8 @@ spec:
         # command = "/skydns"
         - -machines=http://127.0.0.1:4001
         - -addr=0.0.0.0:53
-        - -ns-rotate=false
+        - -nameservers=8.8.8.8:53,8.8.4.4:53
+        - -ns-rotate=true
         - -domain=kube.local
         ports:
         - containerPort: 53
