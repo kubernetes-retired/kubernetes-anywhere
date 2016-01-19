@@ -25,6 +25,7 @@ RUN mkdir guestbook-example ; cd guestbook-example ; \
     --remote-name ; \
   sed 's/# type: LoadBalancer/type: NodePort/' -i frontend-service.yaml ;
 
+ADD kube-system-namespace.yaml /kube-system-namespace.yaml
 ADD skydns-addon /skydns-addon
 
 RUN curl --silent --location \

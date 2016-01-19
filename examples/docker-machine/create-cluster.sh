@@ -158,4 +158,8 @@ done
 docker-machine ssh 'kube-4' docker ${weaveproxy_socket} run \
   --volumes-from="kube-tools-secure-config" \
   weaveworks/kubernetes-anywhere:tools \
+  kubectl create -f /kube-system-namespace.yaml
+docker-machine ssh 'kube-4' docker ${weaveproxy_socket} run \
+  --volumes-from="kube-tools-secure-config" \
+  weaveworks/kubernetes-anywhere:tools \
   kubectl create -f /skydns-addon/
