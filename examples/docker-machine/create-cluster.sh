@@ -122,7 +122,7 @@ docker_on 'kube-4' ${weaveproxy_socket} run -d \
   weaveworks/kubernetes-anywhere:scheduler
 
 docker_on 'kube-4' ${weaveproxy_socket} run -d \
-  --name="kube--controller-manager" \
+  --name="kube-controller-manager" \
   --volumes-from="kube-controller-manager-secure-config" \
   weaveworks/kubernetes-anywhere:controller-manager
 
