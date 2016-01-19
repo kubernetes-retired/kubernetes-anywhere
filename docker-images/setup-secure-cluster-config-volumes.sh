@@ -13,7 +13,7 @@ set -o pipefail
   build-ca nopass > /dev/null 2>&1
 
 ./easyrsa \
-  "--subject-alt-name=DNS:kubernetes,DNS:kubernetes.default,DNS:kubernetes.default.svc,DNS:kubernetes.default.svc.kube.local,DNS:kube-apiserver.weave.local" \
+  "--subject-alt-name=DNS:kubernetes,DNS:kubernetes.default,DNS:kubernetes.default.svc,DNS:kubernetes.default.svc.kube.local,DNS:kube-apiserver.weave.local,IP:10.16.0.1" \
   build-server-full kube-apiserver nopass > /dev/null 2>&1
 
 #./easyrsa build-client-full kubecfg nopass > /dev/null 2>&1
