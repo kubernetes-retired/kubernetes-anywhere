@@ -15,7 +15,7 @@ fi
 exec /hyperkube kubelet ${args} \
   --docker-endpoint="unix:/weave.sock" \
   --cluster-dns="10.16.0.3" \
-  --resolv-conf="" \
+  --resolv-conf="/dev/null" \
   --cluster-domain="kube.local" \
   --allow-privileged="true" \
   --logtostderr="true"
