@@ -2,7 +2,7 @@
 
 /fix-nameserver
 
-config="./srv/kubernetes/kubelet/kubeconfig"
+config="/srv/kubernetes/kubelet/kubeconfig"
 master="kube-apiserver.weave.local"
 
 if [ -f $config ]
@@ -12,7 +12,7 @@ else
   args="--api-servers=http://${master}:8080"
 fi
 
-exec ./hyperkube kubelet ${args} \
+exec /hyperkube kubelet ${args} \
   --docker-endpoint="unix:/weave.sock" \
   --cluster-dns="10.16.0.3" \
   --resolv-conf="" \
