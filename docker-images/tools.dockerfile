@@ -3,7 +3,12 @@ LABEL works.weave.role=system
 
 ENV DOCKER_HOST=unix:///weave.sock
 
-RUN yum --assumeyes --quiet install docker openssl
+RUN yum --assumeyes --quiet install openssl
+
+RUN curl --silent --location \
+  https://test.docker.com/builds/Linux/x86_64/docker-1.10.0-rc1 \
+  --output /usr/bin/docker \
+  && chmod +x /usr/bin/docker ;
 
 RUN curl --silent --location \
   https://storage.googleapis.com/kubernetes-release/release/v1.1.3/bin/linux/amd64/kubectl \
