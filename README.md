@@ -46,7 +46,6 @@ $ weave status dns
 $ docker run -ti weaveworks/kubernetes-anywhere:tools bash -l
 
 # kubectl get nodes
-# kubectl create -f /kube-system-namespace.yaml
 # kubectl create -f /skydns-addon/
 # kubectl get pods,rc,services --all-namespaces
 # kubectl get pods --all-namespaces --watch
@@ -190,9 +189,8 @@ Check there is an expected number of worker nodes in the cluster:
 Deploy SkyDNS addon and, if you like, scale it from default single replica to 3:
 
 ```
-# kubectl create -f /kube-system-namespace.yaml
 # kubectl create -f /skydns-addon/
-# kubectl scale --namespace=kube-system --replicas=3 rc kube-dns-v10
+# kubectl scale --namespace=kube-system --replicas=3 rc kube-dns-v8
 ```
 
 Deploy Guestbook example app and wait for pods become ready
