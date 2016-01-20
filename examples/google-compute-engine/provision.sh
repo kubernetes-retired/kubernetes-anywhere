@@ -1,16 +1,23 @@
 #!/bin/bash -x
 
-gpasswd -a ilya docker
+if ! /usr/local/bin/docker -v 2> /dev/null | grep -q "^Docker\ version\ 1\.10" ; then
+  echo "Installing current version of Docker Engine 1.10"
+  curl --silent --location  https://test.docker.com/builds/Linux/x86_64/docker-1.10.0-rc1  --output /usr/local/bin/docker
+  chmod +x /usr/local/bin/docker
+fi
 
-## The container-optimised image has kubelet running already, but it's old and somewhat useless
+systemd-run --unit=docker.service /usr/local/bin/docker daemon
 
-/etc/init.d/kubelet stop
+/usr/local/bin/docker version
 
-## As this script will run on each boot, we will get Weave Net and Scope upgraded as new versions
-## become available
+if ! [ -x /usr/local/bin/weave ] ; then
+  echo "Installing current version of Weave Net"
+  curl --silent --location http://git.io/weave --output /usr/local/bin/weave
+  chmod +x /usr/local/bin/weave
+  /usr/local/bin/weave setup
+fi
 
-curl --silent --location http://git.io/weave --output /usr/local/bin/weave
-chmod +x /usr/local/bin/weave
+/usr/local/bin/weave version
 
 /usr/local/bin/weave launch-router --init-peer-count 7
 
@@ -19,8 +26,13 @@ chmod +x /usr/local/bin/weave
 /usr/local/bin/weave connect kube-1
 /usr/local/bin/weave expose -h $(hostname).weave.local
 
-curl --silent --location http://git.io/scope --output /usr/local/bin/scope
-chmod +x /usr/local/bin/scope
+if ! [ -x /usr/local/bin/weave ] ; then
+  echo "Installing current version of Weave Scope"
+  curl --silent --location http://git.io/scope --output /usr/local/bin/scope
+  chmod +x /usr/local/bin/scope
+fi
+
+/usr/local/bin/scope version
 
 /usr/local/bin/scope launch --probe.kubernetes true --probe.kubernetes.api http://kube-apiserver.weave.local:8080
 
