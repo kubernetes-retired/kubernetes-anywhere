@@ -79,7 +79,7 @@ If you already know all hostnames/IPs of the servers in your cluster, you can ru
 
 ```Shell
 weave launch-router \
-  $KUBE_ETCD_1 $KUBE_ETCD_2  $KUBE_ETCD_3 \
+  $KUBE_ETCD_1 $KUBE_ETCD_2 $KUBE_ETCD_3 \
   $KUBE_MASTER_0 \
   $KUBE_WORKER_1 $KUBE_WORKER_2
 ```
