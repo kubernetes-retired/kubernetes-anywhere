@@ -26,7 +26,7 @@ fi
 /usr/local/bin/weave connect kube-1
 /usr/local/bin/weave expose -h $(hostname).weave.local
 
-if ! [ -x /usr/local/bin/weave ] ; then
+if ! [ -x /usr/local/bin/scope ] ; then
   echo "Installing current version of Weave Scope"
   curl --silent --location http://git.io/scope --output /usr/local/bin/scope
   chmod +x /usr/local/bin/scope
