@@ -29,7 +29,7 @@ else
           --volume=\"${def_docker_root}/:${def_docker_root}:rw\" \
         "
         kubelet_root_vol=" \
-          --volume=\"${def_kubelet_root}:${def_kubelet_root}:rw\" \
+          --volume=\"${def_kubelet_root}:${def_kubelet_root}:rw,rshared\" \
         "
         ;;
     esac
