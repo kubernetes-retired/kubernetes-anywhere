@@ -12,4 +12,4 @@ gcloud compute firewall-rules create $p 'kube-net-1-intfw' \
   --network 'kube-net-1' --allow 'tcp:6783,udp:6783-6784' --source-ranges '192.168.0.0/16'
 
 gcloud compute instances create $p $z $(seq -f 'kube-%g' 1 7) \
-  --network 'kube-net-1' --image 'debian-8' --preemptible --metadata-from-file 'startup-script=provision.sh'
+  --network 'kube-net-1' --image 'debian-8' --metadata-from-file 'startup-script=provision.sh'
