@@ -135,7 +135,6 @@ for m in 'kube-5' 'kube-6' 'kube-7' ; do
   docker-machine ssh ${m} "/usr/local/bin/weave expose -h ${m}.weave.local"
 
   ## Run intermediate containers to export volumes kubelet wants
-  docker-machine ssh ${m} "sudo mount --make-rshared /" # TODO: can run from tools container via nsenter
   docker ${worker_config} run \
     --name="kubelet-secure-config" \
     kubernetes-anywhere:kubelet-secure-config

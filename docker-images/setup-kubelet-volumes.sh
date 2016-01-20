@@ -36,6 +36,11 @@ else
   fi
 
   docker run \
+    --pid="host" \
+    --privileged="true" \
+    weaveworks/kubernetes-anywhere:tools "nsenter --mount=/proc/1/ns/mnt -- mount --make-rshared /"
+
+  docker run \
     --volume="/:/rootfs:ro" \
     --volume="/sys:/sys:ro" \
     --volume="/dev:/dev" \
