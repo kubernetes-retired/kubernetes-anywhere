@@ -10,7 +10,7 @@ You no longer have to care about the IP address of the API server or any of thos
 
 # Try it!
 
-All you need is a 1 or more Docker hosts.
+All you need is one or more Docker hosts.
 
 ## Get started using a single Docker host
 
