@@ -56,7 +56,7 @@ $ docker run -ti weaveworks/kubernetes-anywhere:tools bash -l
 
 ## A multi-node cluter
 
-For a more relasitic setup, let's say you'd like to have a cluster of 5 servers like this:
+For a more realisitic setup, let's say you'd like to have a cluster of 5 servers like this:
 
   - 3 dedicated etcd hosts (`$KUBE_ETCD_1`, `$KUBE_ETCD_2`, `$KUBE_ETCD_3`)
   - 1 host running all master components (`$KUBE_MASTER_0`)
