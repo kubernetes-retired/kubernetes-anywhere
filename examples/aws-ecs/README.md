@@ -5,6 +5,8 @@ Running Kubernetes on ECS might seeem odd at first, however it provides the user
 > Please do note this is an experiment part of the Kubernetes Anywhere project, it needs some more testing before this notice can be removed.
 >
 > Currently ECS doesn't support `--pid=host` and `--pid=host`, and the default scheduler doesn't provides a way of launching a task on each instance, thereby the `kubelet` and `kube-proxy` are launched directly on all intances.
+>
+> The `ecs-cli` binary (compiled for OS X) has been checked-in, as at the time the master branch had the certain features that had not been released, you might want to try latest version...
 
 ### Setup ECS cluster
 ```
