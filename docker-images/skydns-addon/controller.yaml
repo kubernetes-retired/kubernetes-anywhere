@@ -44,7 +44,7 @@ spec:
         - name: etcd-storage
           mountPath: /var/etcd/data
       - name: kube2sky
-        image: gcr.io/google_containers/kube2sky:1.11
+        image: gcr.io/google_containers/kube2sky:1.12
         resources:
           # keep request = limit to keep this container in guaranteed class
           limits:
