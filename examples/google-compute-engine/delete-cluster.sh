@@ -1,9 +1,7 @@
-#!/bin/bash -ex
-p="--project weave-testing-1"
-z="--zone europe-west1-c"
+#!/bin/bash -x
 
-gcloud compute instances delete -q $p $z $(seq -f 'kube-%g' 1 7)
+gcloud compute instances delete -q $(seq -f 'kube-%g' 1 7)
 
-gcloud compute firewall-rules delete -q $p 'kube-net-1-extfw' 'kube-net-1-intfw'
+gcloud compute firewall-rules delete -q 'kube-net-1-extfw' 'kube-net-1-intfw'
 
-gcloud compute networks delete -q $p 'kube-net-1'
+gcloud compute networks delete -q 'kube-net-1'

@@ -79,9 +79,11 @@ case "$(hostname)" in
     save_last_run_log_and_cleanup kube-scheduler
     docker run -d \
       -e ETCD_CLUSTER_SIZE=3 \
+      -e CLOUD_PROVIDER=gce \
       --name=kube-apiserver \
       weaveworks/kubernetes-anywhere:apiserver
     docker run -d \
+      -e CLOUD_PROVIDER=gce \
       --name=kube-controller-manager \
       weaveworks/kubernetes-anywhere:controller-manager
     docker run -d \
@@ -98,6 +100,7 @@ case "$(hostname)" in
       weaveworks/kubernetes-anywhere:tools \
       setup-kubelet-volumes
     docker run -d \
+      -e CLOUD_PROVIDER=gce \
       --name=kubelet \
       --privileged=true --net=host --pid=host \
       --volumes-from=kubelet-volumes \
