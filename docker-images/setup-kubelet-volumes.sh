@@ -38,7 +38,7 @@ else
   docker run \
     --pid="host" \
     --privileged="true" \
-    weaveworks/kubernetes-anywhere:tools "nsenter --mount=/proc/1/ns/mnt -- mount --make-rshared /"
+    weaveworks/kubernetes-anywhere:tools nsenter --mount=/proc/1/ns/mnt -- mount --make-rshared /
 
   docker run \
     --volume="/:/rootfs:ro" \
@@ -49,5 +49,5 @@ else
     ${docker_root_vol} \
     --volume="/var/run/weave/weave.sock:/weave.sock" \
     --name="kubelet-volumes" \
-    weaveworks/kubernetes-anywhere:tools "/bin/true"
+    weaveworks/kubernetes-anywhere:tools true
 fi
