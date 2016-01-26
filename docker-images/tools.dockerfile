@@ -11,7 +11,7 @@ RUN curl --silent --location \
   && chmod +x /usr/bin/docker ;
 
 RUN curl --silent --location \
-  https://storage.googleapis.com/kubernetes-release/release/v1.1.3/bin/linux/amd64/kubectl \
+  https://storage.googleapis.com/kubernetes-release/release/v1.1.4/bin/linux/amd64/kubectl \
   --output /usr/bin/kubectl \
   && chmod +x /usr/bin/kubectl ;
 
@@ -26,7 +26,7 @@ RUN kubectl config set-cluster default-cluster --server=http://kube-apiserver.we
 
 RUN mkdir guestbook-example ; cd guestbook-example ; \
   curl --silent --location \
-    'https://raw.github.com/kubernetes/kubernetes/v1.1.3/examples/guestbook/{redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml' \
+    'https://raw.github.com/kubernetes/kubernetes/v1.1.4/examples/guestbook/{redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml' \
     --remote-name ; \
   sed 's/# type: LoadBalancer/type: NodePort/' -i frontend-service.yaml ;
 
