@@ -11,4 +11,6 @@ else
   args="--master=http://${master}:8080"
 fi
 
-exec /hyperkube ${applet} ${args} --logtostderr="true"
+weave_ip=$(hostname -i)
+
+exec /hyperkube ${applet} ${args} --address=${weave_ip} --logtostderr="true"

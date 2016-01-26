@@ -12,10 +12,13 @@ else
   args="--api-servers=http://${master}:8080"
 fi
 
+weave_ip=$(hostname -i)
+
 exec /hyperkube kubelet ${args} \
   --docker-endpoint="unix:/weave.sock" \
   --cluster-dns="10.16.0.3" \
   --resolv-conf="/dev/null" \
   --cluster-domain="kube.local" \
+  --address=${weave_ip}
   --allow-privileged="true" \
   --logtostderr="true"
