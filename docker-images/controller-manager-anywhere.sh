@@ -13,4 +13,4 @@ fi
 
 weave_ip=$(hostname -i)
 
-exec /hyperkube ${applet} ${args} --address=${weave_ip} --logtostderr="true"
+exec /hyperkube ${applet} ${args} --address=${weave_ip} --cloud-provider="${CLOUD_PROVIDER}" --logtostderr="true"

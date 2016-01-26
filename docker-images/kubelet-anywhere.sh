@@ -20,5 +20,6 @@ exec /hyperkube kubelet ${args} \
   --resolv-conf="/dev/null" \
   --cluster-domain="kube.local" \
   --address=${weave_ip}
+  --cloud-provider="${CLOUD_PROVIDER}" \
   --allow-privileged="true" \
   --logtostderr="true"
