@@ -23,7 +23,8 @@ fi
 
 /usr/local/bin/weave launch-proxy --rewrite-inspect
 
-/usr/local/bin/weave connect kube-1
+/usr/local/bin/weave connect kube-etcd-1 kube-etcd-2 kube-etcd-3 kube-master-0
+
 /usr/local/bin/weave expose -h $(hostname).weave.local
 
 if ! [ -x /usr/local/bin/scope ] ; then
@@ -50,30 +51,28 @@ save_last_run_log_and_cleanup() {
 }
 
 case "$(hostname)" in
-  ## kube-{1,2,3} run etcd
-  kube-1)
+  kube-etcd-1)
     save_last_run_log_and_cleanup etcd1
     docker run -d \
       -e ETCD_CLUSTER_SIZE=3 \
       --name=etcd1 \
       weaveworks/kubernetes-anywhere:etcd
     ;;
-  kube-2)
+  kube-etcd-2)
     save_last_run_log_and_cleanup etcd2
     docker run -d \
       -e ETCD_CLUSTER_SIZE=3 \
       --name=etcd2 \
       weaveworks/kubernetes-anywhere:etcd
     ;;
-  kube-3)
+  kube-etcd-3)
     save_last_run_log_and_cleanup etcd3
     docker run -d \
       -e ETCD_CLUSTER_SIZE=3 \
       --name=etcd3 \
       weaveworks/kubernetes-anywhere:etcd
     ;;
-  ## kube-4 runs all the master services
-  kube-4)
+  kube-master-0)
     save_last_run_log_and_cleanup kube-apiserver
     save_last_run_log_and_cleanup kube-controller-manager
     save_last_run_log_and_cleanup kube-scheduler
@@ -91,7 +90,7 @@ case "$(hostname)" in
       weaveworks/kubernetes-anywhere:scheduler
     ;;
   ## kube-[5..N] are the cluster nodes
-  *)
+  kubernetes-minion-*)
     save_last_run_log_and_cleanup kubelet
     save_last_run_log_and_cleanup kube-proxy
     docker run \

@@ -1,7 +1,11 @@
 #!/bin/bash -x
 
-gcloud compute instances delete -q $(seq -f 'kube-%g' 1 7)
+gcloud compute instances delete -q $(seq -f 'kube-etcd-%g' 1 3) 'kube-master-0'
 
-gcloud compute firewall-rules delete -q 'kube-net-1-extfw' 'kube-net-1-intfw'
+gcloud compute instance-groups managed delete -q 'kubernetes-minion-group'
+
+gcloud compute instance-templates delete -q 'kubernetes-minion-template'
+
+gcloud compute firewall-rules delete -q 'kube-net-1-extfw' 'kube-net-1-intfw' 'kubernetes-minion-all'
 
 gcloud compute networks delete -q 'kube-net-1'
