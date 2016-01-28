@@ -23,11 +23,13 @@ gcloud compute firewall-rules create 'kube-nodefw' \
   --target-tags 'kube-node' \
   --description 'Internal access to all ports on the nodes'
 
-## However, it'd be hard to decide which of the instances in a managed
-## group should run `etcd1`, `etcd2` or `etcd3`. Hence the etcd nodes and
-## master are be part of an unmanaged instance group and thereby
-## retain predefined hostnames. With Kubernetes 1.2 and the leader election
-## feature we might move master nodes into a managed group.
+## The etcd nodes and master are in an unmanaged group, because it'd be hard
+## for the provisioning script to decide which of the instances in a managed
+## group should run `etcd1`, `etcd2` or `etcd3`. It's also not quite likelly
+## that one will autoscale the etcd nodes, as that cannot be magic. Hence an
+## unmanaged instance group is used and thereby our predefined hostnames are
+## retained and provisioning script is kept simple. With Kubernetes 1.2 and
+## the leader election feature we might put master nodes into a managed group.
 
 gcloud compute instance-groups unmanaged create 'kube-master-group'
 
