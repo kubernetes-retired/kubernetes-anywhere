@@ -20,6 +20,11 @@ gcloud compute firewall-rules create 'kubernetes-minion-all' \
   --source-ranges '192.168.0.0/16' \
   --target-tags 'kubernetes-minion'
 
+## TODO: either figure out a sensible way to discover Weave Net peers
+## and turn all the things into either one or more intance groups;
+## OR figure out how what's missing to make it all a flat set of
+## instances where cloud provider will still function as it is
+
 gcloud compute instances create $(seq -f 'kube-etcd-%g' 1 3) \
   --network 'kube-net-1' \
   --tags 'kube-net-weave,kube-ext' \
