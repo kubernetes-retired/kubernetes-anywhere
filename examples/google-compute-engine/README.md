@@ -47,3 +47,7 @@ kubectl create -f guestbook-example
 ```
 
 Run `kubectl get services --watch` and grab the external IP once it's shown.
+
+## Visibility, Monitoring and Control with Weave Scope
+
+You can find Weave Scope UI on port 4040 on any of the instances.
