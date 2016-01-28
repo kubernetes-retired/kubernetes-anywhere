@@ -23,7 +23,22 @@ fi
 
 /usr/local/bin/weave launch-proxy --rewrite-inspect
 
-/usr/local/bin/weave connect kube-etcd-1 kube-etcd-2 kube-etcd-3 kube-master-0
+## In a specific instance groups find nodes with `kube-weave` tag
+
+list_weave_peers_in_group() {
+  gcloud compute instance-groups list-instances $1 --uri --quiet \
+    | xargs -n1 gcloud compute instances describe \
+        --format='value(tags.items[], name, networkInterfaces[0].accessConfigs[0].natIP)' \
+    | awk '$1 ~ /(^|\;)kube-weave($|\;).*/ && $2 ~ /^kube-.*$/ { print $2 }'
+}
+
+## This is very basic way of doing Weave Net peer discovery, one could potentially implement a pair of
+## systemd units that write and watch an environment file and call `weave connect` when needed...
+## However, the purpose of this script is only too illustrate the usage of Kubernetes Anywhere in GCE.
+
+/usr/local/bin/weave connect \
+  $(list_weave_peers_in_group kube-master-group) \
+  $(list_weave_peers_in_group kube-node-group)
 
 /usr/local/bin/weave expose -h $(hostname).weave.local
 
@@ -90,7 +105,7 @@ case "$(hostname)" in
       weaveworks/kubernetes-anywhere:scheduler
     ;;
   ## kube-[5..N] are the cluster nodes
-  kubernetes-minion-*)
+  kube-node-*)
     save_last_run_log_and_cleanup kubelet
     save_last_run_log_and_cleanup kube-proxy
     docker run \

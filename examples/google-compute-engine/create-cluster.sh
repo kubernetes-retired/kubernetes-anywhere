@@ -23,24 +23,13 @@ gcloud compute firewall-rules create 'kube-nodefw' \
   --target-tags 'kube-node' \
   --description 'Internal access to all ports on the nodes'
 
-## TODO: either figure out a sensible way to discover Weave Net peers
-## and turn all the things into either one or more intance groups;
-## OR figure out what's missing to make it all a flat set of
-## instances where cloud provider will still function as it is
-##
-## Peer discovery for Weave Net should be fairly simple, one can
-## either list all instance groups and find instances in those groups
-## OR look for given tags. Actually doing both would be best, as
-## we then can control whether there may be some instances that are
-## not on Weave Net, or if the `weave-net` tag spans multiple groups
-## which are independant of each other.
-##
-## However, it'd be hard to decide which of the instances in a group
-## should run `etcd1`, `etcd2` or `etcd3`. Hence the etcd nodes and
-## master could be part of an unmanaged instance group and thereby
-## retain predefined hostnames.
+## However, it'd be hard to decide which of the instances in a managed
+## group should run `etcd1`, `etcd2` or `etcd3`. Hence the etcd nodes and
+## master are be part of an unmanaged instance group and thereby
+## retain predefined hostnames. With Kubernetes 1.2 and the leader election
+## feature we might move master nodes into a managed group.
 
-gcloud compute instance-groups unmanaged delete -q 'kube-master-group'
+gcloud compute instance-groups unmanaged create 'kube-master-group'
 
 gcloud compute instances create $(seq -f 'kube-etcd-%g' 1 3) \
   --network 'kube-net' \
@@ -60,6 +49,9 @@ gcloud compute instances create 'kube-master-0' \
   --boot-disk-size '10GB' \
   --can-ip-forward \
   --scopes 'storage-ro,compute-rw,monitoring,logging-write'
+
+gcloud compute instance-groups unmanaged add-instances 'kube-master-group' \
+  --instances $(seq -f 'kube-etcd-%g' 1 3) 'kube-master-0'
 
 gcloud compute instance-templates create 'kube-node-template' \
   --network 'kube-net' \
