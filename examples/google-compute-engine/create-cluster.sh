@@ -5,7 +5,7 @@ gcloud compute networks create 'kube-net-1' \
 
 gcloud compute firewall-rules create 'kube-net-1-extfw' \
   --network 'kube-net-1' \
-  --allow 'tcp:22,tcp:4040,tcp:30000-32767,udp:30000-32767,icmp' \
+  --allow 'tcp:22,tcp:4040' \
   --target-tags 'kube-ext'
 
 gcloud compute firewall-rules create 'kube-net-1-intfw' \
