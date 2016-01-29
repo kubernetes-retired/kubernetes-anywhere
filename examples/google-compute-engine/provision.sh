@@ -26,6 +26,7 @@ fi
 ## In a specific instance groups find nodes with `kube-weave` tag
 
 list_weave_peers_in_group() {
+  ## There doesn't seem to be a native way to obtain instances with certain tags, so we use awk
   gcloud compute instance-groups list-instances $1 --uri --quiet \
     | xargs -n1 gcloud compute instances describe \
         --format='value(tags.items[], name, networkInterfaces[0].accessConfigs[0].natIP)' \
@@ -58,7 +59,7 @@ eval $(/usr/local/bin/weave env)
 ## however we need clear out previous container while saving the logs for future reference
 
 save_last_run_log_and_cleanup() {
-  if [[ $(docker inspect --format='{{.State.Status}}' $1) = 'running' ]]
+  if [[ $(docker inspect --format='{{.State.Status}}' $1) = 'running' ]] # XXX: this needs more testing
   then
     docker logs $1 > /var/log/$1_last_run
     docker rm $1
