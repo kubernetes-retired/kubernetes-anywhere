@@ -6,7 +6,7 @@ resource "aws_autoscaling_group" "kubernetes-minion-group" {
     max_size                  = 4
     min_size                  = 4
     name                      = "kubernetes-minion-group"
-    vpc_zone_identifier       = ["subnet-ed556b9a"]
+    vpc_zone_identifier       = ["${aws_subnet.kubernetes-subnet.id}"]
 
     tag {
         key   = "KubernetesCluster"
@@ -28,7 +28,7 @@ resource "aws_instance" "kubernetes-master" {
     instance_type               = "t2.micro"
     monitoring                  = false
     key_name                    = "terraform"
-    subnet_id                   = "subnet-ed556b9a"
+    subnet_id                   = "${aws_subnet.kubernetes-subnet.id}"
     vpc_security_group_ids      = ["sg-5f6e9638"]
     associate_public_ip_address = true
     private_ip                  = "172.20.0.9"
@@ -64,7 +64,7 @@ resource "aws_instance" "kubernetes-minion" {
     instance_type               = "t2.micro"
     monitoring                  = true
     key_name                    = "terraform"
-    subnet_id                   = "subnet-ed556b9a"
+    subnet_id                   = "${aws_subnet.kubernetes-subnet.id}"
     vpc_security_group_ids      = ["sg-5b6e963c"]
     associate_public_ip_address = true
     private_ip                  = "172.20.0.35"
@@ -91,7 +91,7 @@ resource "aws_instance" "kubernetes-minion" {
     instance_type               = "t2.micro"
     monitoring                  = true
     key_name                    = "terraform"
-    subnet_id                   = "subnet-ed556b9a"
+    subnet_id                   = "${aws_subnet.kubernetes-subnet.id}"
     vpc_security_group_ids      = ["sg-5b6e963c"]
     associate_public_ip_address = true
     private_ip                  = "172.20.0.33"
@@ -118,7 +118,7 @@ resource "aws_instance" "kubernetes-minion" {
     instance_type               = "t2.micro"
     monitoring                  = true
     key_name                    = "terraform"
-    subnet_id                   = "subnet-ed556b9a"
+    subnet_id                   = "${aws_subnet.kubernetes-subnet.id}"
     vpc_security_group_ids      = ["sg-5b6e963c"]
     associate_public_ip_address = true
     private_ip                  = "172.20.0.34"
@@ -145,7 +145,7 @@ resource "aws_instance" "kubernetes-minion" {
     instance_type               = "t2.micro"
     monitoring                  = true
     key_name                    = "terraform"
-    subnet_id                   = "subnet-ed556b9a"
+    subnet_id                   = "${aws_subnet.kubernetes-subnet.id}"
     vpc_security_group_ids      = ["sg-5b6e963c"]
     associate_public_ip_address = true
     private_ip                  = "172.20.0.36"

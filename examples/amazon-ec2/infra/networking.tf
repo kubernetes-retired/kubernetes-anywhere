@@ -13,7 +13,7 @@ resource "aws_vpc" "kubernetes-vpc" {
 resource "aws_security_group" "sg-796e961e-default" {
     name        = "default"
     description = "default VPC security group"
-    vpc_id      = "vpc-5fb9ae3a"
+    vpc_id      = "${aws_vpc.kubernetes-vpc.id}"
 
     ingress {
         from_port       = 0
@@ -35,7 +35,7 @@ resource "aws_security_group" "sg-796e961e-default" {
 resource "aws_security_group" "sg-5f6e9638-kubernetes-master-kubernetes" {
     name        = "kubernetes-master-kubernetes"
     description = "Kubernetes security group applied to master nodes"
-    vpc_id      = "vpc-5fb9ae3a"
+    vpc_id      = "${aws_vpc.kubernetes-vpc.id}"
 
     ingress {
         from_port       = 0
@@ -74,7 +74,7 @@ resource "aws_security_group" "sg-5f6e9638-kubernetes-master-kubernetes" {
 resource "aws_security_group" "sg-5b6e963c-kubernetes-minion-kubernetes" {
     name        = "kubernetes-minion-kubernetes"
     description = "Kubernetes security group applied to minion nodes"
-    vpc_id      = "vpc-5fb9ae3a"
+    vpc_id      = "${aws_vpc.kubernetes-vpc.id}"
 
     ingress {
         from_port       = 0
@@ -104,8 +104,8 @@ resource "aws_security_group" "sg-5b6e963c-kubernetes-minion-kubernetes" {
 }
 
 resource "aws_network_acl" "acl-9e9c82fb" {
-    vpc_id     = "vpc-5fb9ae3a"
-    subnet_ids = ["subnet-ed556b9a"]
+    vpc_id     = "${aws_vpc.kubernetes-vpc.id}"
+    subnet_ids = ["${aws_subnet.kubernetes-subnet.id}"]
 
     ingress {
         from_port  = 0
@@ -129,8 +129,8 @@ resource "aws_network_acl" "acl-9e9c82fb" {
     }
 }
 
-resource "aws_subnet" "subnet-ed556b9a" {
-    vpc_id                  = "vpc-5fb9ae3a"
+resource "aws_subnet" "kubernetes-subnet" {
+    vpc_id                  = "${aws_vpc.kubernetes-vpc.id}"
     cidr_block              = "172.20.0.0/24"
     availability_zone       = "us-west-2a"
     map_public_ip_on_launch = false
@@ -141,14 +141,14 @@ resource "aws_subnet" "subnet-ed556b9a" {
 }
 
 resource "aws_route_table" "rtb-7446aa10" {
-    vpc_id     = "vpc-5fb9ae3a"
+    vpc_id     = "${aws_vpc.kubernetes-vpc.id}"
 
     tags {
     }
 }
 
 resource "aws_route_table" "rtb-7846aa1c" {
-    vpc_id     = "vpc-5fb9ae3a"
+    vpc_id     = "${aws_vpc.kubernetes-vpc.id}"
 
     route {
         cidr_block = "10.244.2.0/24"
@@ -192,11 +192,11 @@ resource "aws_route_table" "rtb-7846aa1c" {
 
 resource "aws_route_table_association" "rtb-7846aa1c-rtbassoc-12842276" {
     route_table_id = "rtb-7846aa1c"
-    subnet_id = "subnet-ed556b9a"
+    subnet_id = "${aws_subnet.kubernetes-subnet.id}"
 }
 
 resource "aws_network_interface" "eni-b11e6efa" {
-    subnet_id         = "subnet-ed556b9a"
+    subnet_id         = "${aws_subnet.kubernetes-subnet.id}"
     private_ips       = ["172.20.0.34"]
     security_groups   = ["sg-5b6e963c"]
     source_dest_check = false
@@ -207,7 +207,7 @@ resource "aws_network_interface" "eni-b11e6efa" {
 }
 
 resource "aws_network_interface" "eni-b31e6ef8" {
-    subnet_id         = "subnet-ed556b9a"
+    subnet_id         = "${aws_subnet.kubernetes-subnet.id}"
     private_ips       = ["172.20.0.35"]
     security_groups   = ["sg-5b6e963c"]
     source_dest_check = false
@@ -218,7 +218,7 @@ resource "aws_network_interface" "eni-b31e6ef8" {
 }
 
 resource "aws_network_interface" "eni-e31d6da8" {
-    subnet_id         = "subnet-ed556b9a"
+    subnet_id         = "${aws_subnet.kubernetes-subnet.id}"
     private_ips       = ["172.20.0.9"]
     security_groups   = ["sg-5f6e9638"]
     source_dest_check = true
@@ -229,7 +229,7 @@ resource "aws_network_interface" "eni-e31d6da8" {
 }
 
 resource "aws_network_interface" "eni-bc1e6ef7" {
-    subnet_id         = "subnet-ed556b9a"
+    subnet_id         = "${aws_subnet.kubernetes-subnet.id}"
     private_ips       = ["172.20.0.36"]
     security_groups   = ["sg-5b6e963c"]
     source_dest_check = false
@@ -240,7 +240,7 @@ resource "aws_network_interface" "eni-bc1e6ef7" {
 }
 
 resource "aws_network_interface" "eni-b21e6ef9" {
-    subnet_id         = "subnet-ed556b9a"
+    subnet_id         = "${aws_subnet.kubernetes-subnet.id}"
     private_ips       = ["172.20.0.33"]
     security_groups   = ["sg-5b6e963c"]
     source_dest_check = false
