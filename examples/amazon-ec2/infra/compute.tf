@@ -27,7 +27,7 @@ resource "aws_instance" "kubernetes-master" {
     ebs_optimized               = false
     instance_type               = "t2.micro"
     monitoring                  = false
-    key_name                    = "kubernetes-SHA256+sRBIkdUTp1dNYSFMsDOcz5kqwlvSWQPC9ByldooxY0"
+    key_name                    = "terraform"
     subnet_id                   = "subnet-ed556b9a"
     vpc_security_group_ids      = ["sg-5f6e9638"]
     associate_public_ip_address = true
@@ -63,7 +63,7 @@ resource "aws_instance" "kubernetes-minion" {
     ebs_optimized               = false
     instance_type               = "t2.micro"
     monitoring                  = true
-    key_name                    = "kubernetes-SHA256+sRBIkdUTp1dNYSFMsDOcz5kqwlvSWQPC9ByldooxY0"
+    key_name                    = "terraform"
     subnet_id                   = "subnet-ed556b9a"
     vpc_security_group_ids      = ["sg-5b6e963c"]
     associate_public_ip_address = true
@@ -90,7 +90,7 @@ resource "aws_instance" "kubernetes-minion" {
     ebs_optimized               = false
     instance_type               = "t2.micro"
     monitoring                  = true
-    key_name                    = "kubernetes-SHA256+sRBIkdUTp1dNYSFMsDOcz5kqwlvSWQPC9ByldooxY0"
+    key_name                    = "terraform"
     subnet_id                   = "subnet-ed556b9a"
     vpc_security_group_ids      = ["sg-5b6e963c"]
     associate_public_ip_address = true
@@ -117,7 +117,7 @@ resource "aws_instance" "kubernetes-minion" {
     ebs_optimized               = false
     instance_type               = "t2.micro"
     monitoring                  = true
-    key_name                    = "kubernetes-SHA256+sRBIkdUTp1dNYSFMsDOcz5kqwlvSWQPC9ByldooxY0"
+    key_name                    = "terraform"
     subnet_id                   = "subnet-ed556b9a"
     vpc_security_group_ids      = ["sg-5b6e963c"]
     associate_public_ip_address = true
@@ -144,7 +144,7 @@ resource "aws_instance" "kubernetes-minion" {
     ebs_optimized               = false
     instance_type               = "t2.micro"
     monitoring                  = true
-    key_name                    = "kubernetes-SHA256+sRBIkdUTp1dNYSFMsDOcz5kqwlvSWQPC9ByldooxY0"
+    key_name                    = "terraform"
     subnet_id                   = "subnet-ed556b9a"
     vpc_security_group_ids      = ["sg-5b6e963c"]
     associate_public_ip_address = true
