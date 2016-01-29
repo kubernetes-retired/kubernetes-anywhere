@@ -4,10 +4,10 @@ resource "aws_iam_instance_profile" "kubernetes-master" {
     roles = ["kubernetes-master"]
 }
 
-resource "aws_iam_instance_profile" "kubernetes-minion" {
-    name  = "kubernetes-minion"
+resource "aws_iam_instance_profile" "kubernetes-node" {
+    name  = "kubernetes-node"
     path  = "/"
-    roles = ["kubernetes-minion"]
+    roles = ["kubernetes-node"]
 }
 
 resource "aws_iam_role" "kubernetes-master" {
@@ -29,8 +29,8 @@ resource "aws_iam_role" "kubernetes-master" {
 POLICY
 }
 
-resource "aws_iam_role" "kubernetes-minion" {
-    name               = "kubernetes-minion"
+resource "aws_iam_role" "kubernetes-node" {
+    name               = "kubernetes-node"
     path               = "/"
     assume_role_policy = <<POLICY
 {
@@ -40,25 +40,6 @@ resource "aws_iam_role" "kubernetes-minion" {
       "Effect": "Allow",
       "Principal": {
         "Service": "ec2.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-POLICY
-}
-
-resource "aws_iam_role" "LambdaECS" {
-    name               = "LambdaECS"
-    path               = "/"
-    assume_role_policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
       },
       "Action": "sts:AssumeRole"
     }
@@ -104,9 +85,9 @@ resource "aws_iam_role_policy" "kubernetes-master" {
 POLICY
 }
 
-resource "aws_iam_role_policy" "kubernetes-minion" {
-    name   = "kubernetes-minion"
-    role   = "kubernetes-minion"
+resource "aws_iam_role_policy" "kubernetes-node" {
+    name   = "kubernetes-node"
+    role   = "kubernetes-node"
     policy = <<POLICY
 {
   "Version": "2012-10-17",
@@ -137,4 +118,3 @@ resource "aws_iam_role_policy" "kubernetes-minion" {
 }
 POLICY
 }
-

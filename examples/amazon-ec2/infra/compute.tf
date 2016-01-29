@@ -1,11 +1,11 @@
-resource "aws_autoscaling_group" "kubernetes-minion-group" {
+resource "aws_autoscaling_group" "kubernetes-node-group" {
     desired_capacity          = 4
     health_check_grace_period = 0
     health_check_type         = "EC2"
-    launch_configuration      = "kubernetes-minion-group"
+    launch_configuration      = "kubernetes-node-group"
     max_size                  = 4
     min_size                  = 4
-    name                      = "kubernetes-minion-group"
+    name                      = "kubernetes-node-group"
     vpc_zone_identifier       = ["${aws_subnet.kubernetes-subnet.id}"]
 
     tag {
@@ -13,10 +13,10 @@ resource "aws_autoscaling_group" "kubernetes-minion-group" {
         value = "kubernetes"
         propagate_at_launch = true
         key   = "Name"
-        value = "kubernetes-minion"
+        value = "kubernetes-node"
         propagate_at_launch = true
         key   = "Role"
-        value = "kubernetes-minion"
+        value = "kubernetes-node"
         propagate_at_launch = true
     }
 }
@@ -41,10 +41,10 @@ resource "aws_instance" "kubernetes-node-1" {
     }
 
     tags {
-        "Role" = "kubernetes-minion"
+        "Role" = "kubernetes-node"
         "KubernetesCluster" = "kubernetes"
-        "Name" = "kubernetes-minion"
-        "aws:autoscaling:groupName" = "kubernetes-minion-group"
+        "Name" = "kubernetes-node"
+        "aws:autoscaling:groupName" = "kubernetes-node-group"
     }
 }
 
@@ -68,10 +68,10 @@ resource "aws_instance" "kubernetes-node-2" {
     }
 
     tags {
-        "aws:autoscaling:groupName" = "kubernetes-minion-group"
+        "aws:autoscaling:groupName" = "kubernetes-node-group"
         "KubernetesCluster" = "kubernetes"
-        "Name" = "kubernetes-minion"
-        "Role" = "kubernetes-minion"
+        "Name" = "kubernetes-node"
+        "Role" = "kubernetes-node"
     }
 }
 
@@ -96,9 +96,9 @@ resource "aws_instance" "kubernetes-node-3" {
 
     tags {
         "KubernetesCluster" = "kubernetes"
-        "Name" = "kubernetes-minion"
-        "aws:autoscaling:groupName" = "kubernetes-minion-group"
-        "Role" = "kubernetes-minion"
+        "Name" = "kubernetes-node"
+        "aws:autoscaling:groupName" = "kubernetes-node-group"
+        "Role" = "kubernetes-node"
     }
 }
 
@@ -122,9 +122,9 @@ resource "aws_instance" "kubernetes-node-4" {
     }
 
     tags {
-        "aws:autoscaling:groupName" = "kubernetes-minion-group"
-        "Name" = "kubernetes-minion"
-        "Role" = "kubernetes-minion"
+        "aws:autoscaling:groupName" = "kubernetes-node-group"
+        "Name" = "kubernetes-node"
+        "Role" = "kubernetes-node"
         "KubernetesCluster" = "kubernetes"
     }
 }
