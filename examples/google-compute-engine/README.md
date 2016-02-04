@@ -42,7 +42,7 @@ kubectl create -f skydns-addon
 
 And now you can deploy the guestbook app:
 ```
-sed 's/type: NodePort/type: LoadBalancer' -i guestbook-example/frontend-service.yaml
+sed 's/type: NodePort/type: LoadBalancer/' -i guestbook-example/frontend-service.yaml
 kubectl create -f guestbook-example
 ```
 
