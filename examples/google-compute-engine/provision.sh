@@ -2,7 +2,7 @@
 
 if ! /usr/local/bin/docker -v 2> /dev/null | grep -q "^Docker\ version\ 1\.10" ; then
   echo "Installing current version of Docker Engine 1.10"
-  curl --silent --location  https://test.docker.com/builds/Linux/x86_64/docker-1.10.0-rc1  --output /usr/local/bin/docker
+  curl --silent --location  https://test.docker.com/builds/Linux/x86_64/docker-1.10.0-rc4  --output /usr/local/bin/docker
   chmod +x /usr/local/bin/docker
 fi
 
