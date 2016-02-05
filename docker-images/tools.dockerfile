@@ -29,15 +29,16 @@ RUN kubectl config set-cluster default-cluster --server=http://kube-apiserver.we
    kubectl config use-context default-system ;
 
 RUN mkdir $WD ; cd $WD ; \
+  resources='{redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml' ; \
   curl --silent --location \
-    'https://raw.github.com/kubernetes/kubernetes/$KUBE_RELEASE/examples/guestbook/{redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml' \
+    "https://raw.github.com/kubernetes/kubernetes/${KUBE_RELEASE}/examples/guestbook/${resources}" \
     --remote-name ; \
   mkdir guestbook-example-LoadBalancer ; \
-  cp {redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml guestbook-example-LoadBalancer ;\
+  cp "${resources}" guestbook-example-LoadBalancer ; \
   sed 's/# \(type: LoadBalancer\)/\1/' \
     -i guestbook-example-LoadBalancer/frontend-service.yaml ; \
   mkdir guestbook-example-NodePort ; \
-  cp {redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml guestbook-example-NodePort ;\
+  cp "${resources}" guestbook-example-NodePort ; \
   sed 's/# \(type:\) LoadBalancer/\1 NodePort/' \
     -i guestbook-example-NodePort/frontend-service.yaml ; \
   rm -f {redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml ;
