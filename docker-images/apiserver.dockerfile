@@ -1,4 +1,4 @@
-FROM gcr.io/google_containers/hyperkube:v1.1.4
+FROM gcr.io/google_containers/hyperkube:v1.1.7
 LABEL works.weave.role=system
 
 ENV ETCD_CLUSTER_SIZE="1"

@@ -164,8 +164,8 @@ done
 docker_on 'kube-4' ${weaveproxy_socket} run \
   --volumes-from="kube-tools-secure-config" \
   weaveworks/kubernetes-anywhere:tools \
-  kubectl create -f /kube-system-namespace.yaml
+  kubectl create -f kube-system-namespace.yaml
 docker_on 'kube-4' ${weaveproxy_socket} run \
   --volumes-from="kube-tools-secure-config" \
   weaveworks/kubernetes-anywhere:tools \
-  kubectl create -f /skydns-addon-secure/
+  kubectl create -f skydns-addon-secure

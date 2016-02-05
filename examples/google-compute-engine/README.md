@@ -42,8 +42,7 @@ kubectl create -f skydns-addon
 
 And now you can deploy the guestbook app:
 ```
-sed 's/type: NodePort/type: LoadBalancer/' -i guestbook-example/frontend-service.yaml
-kubectl create -f guestbook-example
+kubectl create -f guestbook-example-LoadBalancer
 ```
 
 Run `kubectl get services --watch` and grab the external IP once it's shown.

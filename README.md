@@ -46,11 +46,11 @@ $ weave status dns
 $ docker run -ti weaveworks/kubernetes-anywhere:tools bash -l
 
 # kubectl get nodes
-# kubectl create -f /skydns-addon/
+# kubectl create -f skydns-addon
 # kubectl get pods,rc,services --all-namespaces
 # kubectl get pods --all-namespaces --watch
 
-# kubectl create -f /guestbook-example/
+# kubectl create -f guestbook-example-NodePort
 # kubectl get pods --watch
 ```
 
@@ -189,14 +189,14 @@ Check there is an expected number of worker nodes in the cluster:
 Deploy SkyDNS addon and, if you like, scale it from default single replica to 3:
 
 ```
-# kubectl create -f /skydns-addon/
-# kubectl scale --namespace=kube-system --replicas=3 rc kube-dns-v8
+# kubectl create -f skydns-addon
+# kubectl scale --namespace=kube-system --replicas=3 rc kube-dns-v10
 ```
 
 Deploy Guestbook example app and wait for pods become ready
 
 ```
-# kubectl create -f /guestbook-example/
+# kubectl create -f guestbook-example-NodePort
 # kubectl get pods --watch
 ```
 
@@ -211,7 +211,7 @@ If you want to deploy something else, you can just pass a URL to your manifest l
 
 ## Using TLS
 
-> **Please note** that this currently requires Docker version 1.10, for the mount propagation feature. We are continously testing release candidates to make sure all is well.
+> **Please note** that this currently requires Docker version 1.10, for the mount propagation feature.
 
 Thanks to WeaveDNS we can create a certificate for fixed `kube-apiserver.weave.local` domain name.
 
@@ -276,9 +276,9 @@ docker run --interactive --tty --volumes-from=kube-tools-secure-config weavework
 
 Setting up SkyDNS requires a different version of the manisfest, which had been provided in tools container, please use it like this:
 ```
-# kubectl create -f /kube-system-namespace.yaml 
+# kubectl create -f kube-system-namespace.yaml
 namespace "kube-system" created
-# kubectl create -f /skydns-addon-secure/
+# kubectl create -f skydns-addon-secure
 replicationcontroller "kube-dns-v10" created
 service "kube-dns" created
 ```

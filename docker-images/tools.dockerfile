@@ -3,15 +3,19 @@ LABEL works.weave.role=system
 
 ENV DOCKER_HOST=unix:///weave.sock
 
+ENV WD=/etc/resources
+
+ENV KUBE_RELEASE=v1.1.7
+
 RUN yum --assumeyes --quiet install openssl
 
 RUN curl --silent --location \
-  https://test.docker.com/builds/Linux/x86_64/docker-1.10.0-rc1 \
+  https://get.docker.com/builds/Linux/x86_64/docker-1.10.0 \
   --output /usr/bin/docker \
   && chmod +x /usr/bin/docker ;
 
 RUN curl --silent --location \
-  https://storage.googleapis.com/kubernetes-release/release/v1.1.4/bin/linux/amd64/kubectl \
+  https://storage.googleapis.com/kubernetes-release/release/$KUBE_RELEASE/bin/linux/amd64/kubectl \
   --output /usr/bin/kubectl \
   && chmod +x /usr/bin/kubectl ;
 
@@ -24,23 +28,33 @@ RUN kubectl config set-cluster default-cluster --server=http://kube-apiserver.we
    kubectl config set-context default-system --cluster=default-cluster ; \
    kubectl config use-context default-system ;
 
-RUN mkdir guestbook-example ; cd guestbook-example ; \
+RUN mkdir $WD ; cd $WD ; \
   curl --silent --location \
-    'https://raw.github.com/kubernetes/kubernetes/v1.1.4/examples/guestbook/{redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml' \
+    'https://raw.github.com/kubernetes/kubernetes/$KUBE_RELEASE/examples/guestbook/{redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml' \
     --remote-name ; \
-  sed 's/# type: LoadBalancer/type: NodePort/' -i frontend-service.yaml ;
+  mkdir guestbook-example-LoadBalancer ; \
+  cp {redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml guestbook-example-LoadBalancer ;\
+  sed 's/# \(type: LoadBalancer\)/\1/' \
+    -i guestbook-example-LoadBalancer/frontend-service.yaml ; \
+  mkdir guestbook-example-NodePort ; \
+  cp {redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml guestbook-example-NodePort ;\
+  sed 's/# \(type:\) LoadBalancer/\1 NodePort/' \
+    -i guestbook-example-NodePort/frontend-service.yaml ; \
+  rm -f {redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml ;
 
-ADD kube-system-namespace.yaml /kube-system-namespace.yaml
-ADD skydns-addon /skydns-addon
-RUN cp -a /skydns-addon /skydns-addon-secure ; \
-  sed 's|\(- -kube_master_url=http://kube-apiserver.weave.local:8080\)$|#\1|' -i skydns-addon-secure/controller.yaml
+ADD kube-system-namespace.yaml $WD/kube-system-namespace.yaml
+ADD skydns-addon $WD/skydns-addon
+RUN cp -a $WD/skydns-addon $WD/skydns-addon-secure ; \
+  sed 's|\(- -kube_master_url=http://kube-apiserver.weave.local:8080\)$|# \1|' -i $WD/skydns-addon-secure/controller.yaml
 
 RUN curl --silent --location \
-  https://github.com/docker/compose/releases/download/1.5.1/docker-compose-Linux-x86_64 \
+  https://github.com/docker/compose/releases/download/1.6.0/docker-compose-Linux-x86_64 \
   --output /usr/bin/compose \
   && chmod +x /usr/bin/compose ;
 
-ADD docker-compose.yml /
+ADD docker-compose.yml $WD/
 
 ADD setup-kubelet-volumes.sh /usr/bin/setup-kubelet-volumes
 ADD setup-secure-cluster-config-volumes.sh /usr/bin/setup-secure-cluster-config-volumes
+
+WORKDIR $WD
