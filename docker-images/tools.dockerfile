@@ -34,14 +34,14 @@ RUN mkdir $WD ; cd $WD ; \
     "https://raw.github.com/kubernetes/kubernetes/${KUBE_RELEASE}/examples/guestbook/${resources}" \
     --remote-name ; \
   mkdir guestbook-example-LoadBalancer ; \
-  cp "${resources}" guestbook-example-LoadBalancer ; \
+  cp *.yaml guestbook-example-LoadBalancer ; \
   sed 's/# \(type: LoadBalancer\)/\1/' \
     -i guestbook-example-LoadBalancer/frontend-service.yaml ; \
   mkdir guestbook-example-NodePort ; \
-  cp "${resources}" guestbook-example-NodePort ; \
+  cp *.yaml guestbook-example-NodePort ; \
   sed 's/# \(type:\) LoadBalancer/\1 NodePort/' \
     -i guestbook-example-NodePort/frontend-service.yaml ; \
-  rm -f {redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml ;
+  rm -f *.yaml ;
 
 ADD kube-system-namespace.yaml $WD/kube-system-namespace.yaml
 ADD skydns-addon $WD/skydns-addon
