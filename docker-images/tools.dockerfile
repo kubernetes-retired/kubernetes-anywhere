@@ -29,7 +29,7 @@ RUN kubectl config set-cluster default-cluster --server=http://kube-apiserver.we
    kubectl config use-context default-system ;
 
 RUN mkdir $WD ; cd $WD ; \
-  resources='{redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml' ; \
+  resources="{redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml" ; \
   curl --silent --location \
     "https://raw.github.com/kubernetes/kubernetes/${KUBE_RELEASE}/examples/guestbook/${resources}" \
     --remote-name ; \
