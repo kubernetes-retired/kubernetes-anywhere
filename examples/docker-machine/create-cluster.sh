@@ -22,9 +22,6 @@
 ## Similarly, there are environment variables for all major cloud providers, please check Docker Machine docs
 ## for details
 
-boot2docker_url="https://github.com/tianon/boot2docker-legacy/releases/download/v1.10.0-rc1/boot2docker.iso"
-export FUSION_BOOT2DOCKER_URL="${boot2docker_url}" VIRTUALBOX_BOOT2DOCKER_URL="${boot2docker_url}"
-
 DOCKER_MACHINE_DRIVER=${DOCKER_MACHINE_DRIVER:-'vmwarefusion'}
 
 vm_names=$(seq -f 'kube-%g' 1 7)
