@@ -59,7 +59,7 @@ eval $(/usr/local/bin/weave env)
 ## however we need clear out previous container while saving the logs for future reference
 
 save_last_run_log_and_cleanup() {
-  if [[ $(docker inspect --format='{{.State.Status}}' $1) = 'running' ]] # XXX: this needs more testing
+  if [[ $(docker inspect --format='{{.State.Status}}' $1) = 'exited' ]]
   then
     docker logs $1 > /var/log/$1_last_run
     docker rm $1
