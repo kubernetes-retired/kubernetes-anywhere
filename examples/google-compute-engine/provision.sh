@@ -61,7 +61,7 @@ eval $(/usr/local/bin/weave env)
 save_last_run_log_and_cleanup() {
   if [[ $(docker inspect --format='{{.State.Status}}' $1) = 'exited' ]]
   then
-    docker logs $1 > /var/log/$1_last_run
+    docker logs $1 > /var/log/$1_last_run 2>&1
     docker rm $1
   fi
 }
