@@ -1,13 +1,13 @@
 resource "aws_iam_instance_profile" "kubernetes-master" {
     name  = "kubernetes-master"
     path  = "/"
-    roles = ["kubernetes-master"]
+    roles = ["${aws_iam_role.kubernetes-master.name}"]
 }
 
 resource "aws_iam_instance_profile" "kubernetes-node" {
     name  = "kubernetes-node"
     path  = "/"
-    roles = ["kubernetes-node"]
+    roles = ["${aws_iam_role.kubernetes-node.name}"]
 }
 
 resource "aws_iam_role" "kubernetes-master" {
@@ -50,7 +50,7 @@ POLICY
 
 resource "aws_iam_role_policy" "kubernetes-master" {
     name   = "kubernetes-master"
-    role   = "kubernetes-master"
+    role   = "${aws_iam_role.kubernetes-master.name}"
     policy = <<POLICY
 {
   "Version": "2012-10-17",
@@ -75,6 +75,11 @@ resource "aws_iam_role_policy" "kubernetes-master" {
     },
     {
       "Effect": "Allow",
+      "Action": "ec2:Describe*",
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
       "Action": "s3:*",
       "Resource": [
         "arn:aws:s3:::kubernetes-*"
@@ -87,7 +92,7 @@ POLICY
 
 resource "aws_iam_role_policy" "kubernetes-node" {
     name   = "kubernetes-node"
-    role   = "kubernetes-node"
+    role   = "${aws_iam_role.kubernetes-node.name}"
     policy = <<POLICY
 {
   "Version": "2012-10-17",

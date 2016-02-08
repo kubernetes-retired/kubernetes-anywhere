@@ -1,0 +1,141 @@
+#cloud-config
+
+repo_update: true
+repo_upgrade: all
+
+packages:
+  - awscli
+  - jq
+  - curl
+
+write_files:
+  - path: /tmp/kubernetes-anywhere-provision.sh
+    owner: root:root
+    permissions: '0755'
+    content: |
+      #!/bin/bash -x
+
+      export AWS_DEFAULT_REGION=$(curl --silent curl http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)
+
+      if ! /usr/local/bin/docker -v 2> /dev/null | grep -q "^Docker\ version\ 1\.10" ; then
+        echo "Installing current version of Docker Engine 1.10"
+        curl --silent --location  https://get.docker.com/builds/Linux/x86_64/docker-1.10.0  --output /usr/local/bin/docker
+        chmod +x /usr/local/bin/docker
+      fi
+
+      systemd-run --unit=docker.service /usr/local/bin/docker daemon
+
+      /usr/local/bin/docker version
+
+      if ! [ -x /usr/local/bin/weave ] ; then
+        echo "Installing current version of Weave Net"
+        curl --silent --location http://git.io/weave --output /usr/local/bin/weave
+        chmod +x /usr/local/bin/weave
+        /usr/local/bin/weave setup
+      fi
+
+      /usr/local/bin/weave version
+
+      /usr/local/bin/weave launch-router --init-peer-count 7
+
+      /usr/local/bin/weave launch-proxy --rewrite-inspect
+
+      list_weave_peers_by_tag() {
+        aws ec2 describe-instances --filters \
+            'Name=tag:KubernetesCluster,Values=kubernetes' \
+            'Name=instance-state-name,Values=running,pending' \
+          | jq -r '.Reservations[].Instances[].PrivateIpAddress' \
+          | grep -v null
+      }
+
+      /usr/local/bin/weave connect \
+        $(list_weave_peers_by_tag)
+
+      /usr/local/bin/weave expose -h $(hostname).weave.local
+
+      if ! [ -x /usr/local/bin/scope ] ; then
+        echo "Installing current version of Weave Scope"
+        curl --silent --location http://git.io/scope --output /usr/local/bin/scope
+        chmod +x /usr/local/bin/scope
+      fi
+
+      /usr/local/bin/scope version
+
+      /usr/local/bin/scope launch --probe.kubernetes true --probe.kubernetes.api http://kube-apiserver.weave.local:8080
+
+      eval $(/usr/local/bin/weave env)
+
+      get_instance_description() {
+        aws ec2 describe-instances \
+          --instance-ids $(curl -s curl http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .instanceId) \
+          --filters 'Name=tag:KubernetesCluster,Values=kubernetes'
+      }
+
+      get_instance_name_tag() {
+        get_instance_description \
+          | jq -r '.Reservations[].Instances[].Tags[] | select(.Key=="Name") .Value'
+      }
+
+      get_etcd_node_number() {
+        get_instance_description \
+          | jq -r '.Reservations[].Instances[].Tags[] | select(.Key=="KubernetesEtcdNodeName") .Value'
+      }
+
+      save_last_run_log_and_cleanup() {
+        if [[ $(docker inspect --format='{{.State.Status}}' $1) = 'exited' ]]
+        then
+          docker logs $1 > /var/log/$1_last_run
+          docker rm $1
+        fi
+      }
+
+      case "$(get_instance_name_tag)" in
+        kubernetes-etcd)
+          etcd_node=$(get_etcd_node_number)
+          save_last_run_log_and_cleanup ${etcd_node}
+          docker run -d \
+            -e ETCD_CLUSTER_SIZE=3 \
+            --name=${etcd_node} \
+            weaveworks/kubernetes-anywhere:etcd
+          ;;
+        kubernetes-master)
+          save_last_run_log_and_cleanup kube-apiserver
+          save_last_run_log_and_cleanup kube-controller-manager
+          save_last_run_log_and_cleanup kube-scheduler
+          docker run -d \
+            -e ETCD_CLUSTER_SIZE=3 \
+            -e CLOUD_PROVIDER=aws \
+            --name=kube-apiserver \
+            weaveworks/kubernetes-anywhere:apiserver
+          docker run -d \
+            -e CLOUD_PROVIDER=aws \
+            --name=kube-controller-manager \
+            weaveworks/kubernetes-anywhere:controller-manager
+          docker run -d \
+            --name=kube-scheduler \
+            weaveworks/kubernetes-anywhere:scheduler
+          ;;
+        ## kube-[5..N] are the cluster nodes
+        kubernetes-node)
+          save_last_run_log_and_cleanup kubelet
+          save_last_run_log_and_cleanup kube-proxy
+          docker run \
+            --volume="/:/rootfs" \
+            --volume="/var/run/weave/weave.sock:/weave.sock" \
+            weaveworks/kubernetes-anywhere:tools \
+            setup-kubelet-volumes
+          docker run -d \
+            -e CLOUD_PROVIDER=aws \
+            --name=kubelet \
+            --privileged=true --net=host --pid=host \
+            --volumes-from=kubelet-volumes \
+            weaveworks/kubernetes-anywhere:kubelet
+          docker run -d \
+            --name=kube-proxy \
+            --privileged=true --net=host --pid=host \
+            weaveworks/kubernetes-anywhere:proxy
+          ;;
+      esac
+
+runcmd:
+  - /tmp/kubernetes-anywhere-provision.sh
