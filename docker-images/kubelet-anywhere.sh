@@ -14,6 +14,11 @@ fi
 
 weave_ip=$(hostname -i)
 
+if [ ${CLOUD_PROVIDER} = 'aws' ]
+then ## TODO: check if not needed with v1.2.0 is out (see kubernetes/kubernetes#11543)
+  args="${args} --hostname-override=$(hostname --all-fqdns | xargs -n1 echo | grep -v weave.local)"
+fi
+
 exec /hyperkube kubelet ${args} \
   --docker-endpoint="unix:/weave.sock" \
   --cluster-dns="10.16.0.3" \
