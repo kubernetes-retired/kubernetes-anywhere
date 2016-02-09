@@ -283,6 +283,21 @@ replicationcontroller "kube-dns-v10" created
 service "kube-dns" created
 ```
 
-## Other examples
+## Further Examples
 
-Please see [`examples/`](https://github.com/weaveworks/weave-kubernetes-anywhere/tree/master/examples) direcotry for more integrations.
+The goal of this project is to illustrate how Kubernetes clusters can be deployed in different environments, and there
+are a few complete examples provided in order to accomplish this.
+
+  - [**Amazon EC2 (with Terraform, using Ubuntu)**][aws-ec2-terraform]
+  - [**Google Compute Engine (with `glcoud` CLI, using Debian)**][google-compute-engine]
+  - [**Docker Machine (with TLS)**][docker-machine]
+
+These examples are design to be easy to adopt and thereby are kept simple. Cluster component images published in
+`weaveworks/kubernetes-anywhere` are kept up-to-date, however there may be a good reason for the user to rebuild
+these images and publish in their own registry, please see [`docker-images`][docker-images] directory for scripts
+and `Dockerfile`s used to build the images.
+
+[aws-ec2-terraform]: https://github.com/weaveworks/weave-kubernetes-anywhere/tree/master/examples/aws-ec2-terraform
+[google-compute-engine]: https://github.com/weaveworks/weave-kubernetes-anywhere/tree/master/examples/google-compute-engine
+[docker-machine]: https://github.com/weaveworks/weave-kubernetes-anywhere/tree/master/examples/docker-machine
+[docker-images]: https://github.com/weaveworks/weave-kubernetes-anywhere/tree/master/docker-images
