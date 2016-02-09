@@ -126,6 +126,7 @@ write_files:
             setup-kubelet-volumes
           docker run -d \
             -e CLOUD_PROVIDER=aws \
+            -e AWS_LOCAL_HOSTNAME=$(hostname -f) \
             --name=kubelet \
             --privileged=true --net=host --pid=host \
             --volumes-from=kubelet-volumes \
