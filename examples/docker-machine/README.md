@@ -22,6 +22,8 @@ docker run --interactive --tty --volumes-from=kube-tools-secure-config \
   weaveworks/kubernetes-anywhere:tools bash -l
 ```
 
+> **Please note** this example has TLS enabled, see `create-cluster.sh` for more details.
+
 Inside this container you can check that there 3 nodes ready to take workload on board:
 ```
 kubectl get nodes
