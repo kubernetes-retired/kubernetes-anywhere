@@ -54,7 +54,7 @@ $ docker run -ti weaveworks/kubernetes-anywhere:tools bash -l
 # kubectl get pods --watch
 ```
 
-## A multi-node cluter
+## A multi-node cluster
 
 For a more realisitic setup, let's say you'd like to have a cluster of 5 servers like this:
 
