@@ -59,7 +59,7 @@ resource "aws_instance" "kubernetes-master" {
         snapshot_id           = ""
         volume_type           = "gp2"
         volume_size           = 20
-        delete_on_termination = false
+        delete_on_termination = true
     }
 
     root_block_device {
@@ -93,7 +93,7 @@ resource "aws_instance" "kubernetes-etcd" {
         snapshot_id           = ""
         volume_type           = "gp2"
         volume_size           = 20
-        delete_on_termination = false
+        delete_on_termination = true
     }
 
     root_block_device {
