@@ -1,4 +1,4 @@
-# Example: Google Compute Engins
+# Example: Google Compute Engine
 
 ```
 git clone https://github.com/weaveworks/weave-kubernetes-anywhere
