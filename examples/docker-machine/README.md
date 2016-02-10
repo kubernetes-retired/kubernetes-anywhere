@@ -12,6 +12,11 @@ This is as simple as:
 ./create-cluster.sh
 ```
 
+> **Please note** the default driver is current `virtualbox`, so if you wish to
+> use a different driver you need to set `DOCKER_MACHINE_DRIVER` accordingly.
+> Please see below for more information about drivers.
+
+
 Once done, you need to login to _any_ of the instances with `docker-machine ssh`,
 e.g. `docker-machine ssh kube-5` and run the following commands.
 
@@ -36,3 +41,30 @@ kubectl create -f guestbook-example-NodePort
 
 You will need to note the port number allocated for the app and then you can hit it in
 your browser via any of the node IPs (`docker-machine ip kube-5 kube-6 kube-7`).
+
+## Supported Drivers
+
+This code has been tested with VMWare Fusion and DigitalOcean drivers.
+
+> VMWare vSphere and Microsoft Hyper-V drivers should probably work out of the box.
+> Public cloud provider drivers vary a lot more and require additonal setup steps,
+> e.g. Amazon EC2 driver needs VPC pre-configured and probably won't work with
+> Kubernetes cloud provider for AWS, as that require cetainer tagging scheme on
+> all of there resources... Anyhow, we do provide separate examples for EC2 and GCE.
+
+### DigitalOcean
+
+It should be suffiencent to
+```
+export DOCKER_MACHINE_DRIVER=digitalocean
+export DIGITALOCEAN_ACCESS_TOKEN=<...>
+```
+and then run `./create-cluster.sh`.
+
+### VMWare Fusion
+
+If you have VMWare Fusion installed on your machine, you might care to
+```
+export DOCKER_MACHINE_DRIVER=vmwarefusion
+```
+prior to running `./create-cluster.sh`, as it's a bit quicker then VirtualBox.
