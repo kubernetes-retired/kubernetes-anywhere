@@ -41,6 +41,12 @@ install_weave=" \
   /usr/local/bin/weave launch-proxy --rewrite-inspect ; \
 "
 
+## TODO: with a private network we still need to find a way to obtain the IPs, as Docker Machine doesn't have it
+if [ ${DOCKER_MACHINE_DRIVER} = 'digitalocean' ] && ! [ ${DIGITALOCEAN_PRIVATE_NETWORKING} = 'true' ]; then
+  WEAVE_PASSWORD=$(openssl genrsa 2> /dev/null | openssl base64 | tr -d "=+/\n")
+  install_weave="export WEAVE_PASSWORD=${WEAVE_PASSWORD} ; ${install_weave}"
+fi
+
 docker_on() {
   m=$1
   shift
