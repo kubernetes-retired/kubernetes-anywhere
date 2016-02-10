@@ -49,8 +49,8 @@ This code has been tested with VMWare Fusion and DigitalOcean drivers.
 > VMWare vSphere and Microsoft Hyper-V drivers should probably work out of the box.
 > Public cloud provider drivers vary a lot more and require additonal setup steps,
 > e.g. Amazon EC2 driver needs VPC pre-configured and probably won't work with
-> Kubernetes cloud provider for AWS, as that require cetainer tagging scheme on
-> all of there resources... Anyhow, we do provide separate examples for EC2 and GCE.
+> Kubernetes cloud provider for AWS, as that deppends on certainer tagging scheme on
+> all of the resources... Anyhow, we do provide separate examples for EC2 and GCE.
 
 ### DigitalOcean
 
