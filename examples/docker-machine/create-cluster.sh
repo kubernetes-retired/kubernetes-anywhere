@@ -26,6 +26,14 @@ DOCKER_MACHINE_DRIVER=${DOCKER_MACHINE_DRIVER:-'virtualbox'}
 
 vm_names=$(seq -f 'kube-%g' 1 7)
 
+fix_systemd_unit_if_needed=" \
+  if grep -q MountFlags=slave /etc/systemd/system/docker.service 2> /dev/null ; then \
+    sudo sed 's/\(MountFlags=slave\)/# \1/' -i /etc/systemd/system/docker.service ; \
+    sudo systemctl daemon-reload ; \
+    sudo systemctl restart docker ; \
+  fi
+"
+
 install_weave=" \
   sudo curl --silent --location http://git.io/weave --output /usr/local/bin/weave ; \
   sudo chmod +x /usr/local/bin/weave ; \
@@ -43,6 +51,7 @@ docker_on() {
 
 for m in $vm_names ; do
   docker-machine create -d ${DOCKER_MACHINE_DRIVER} ${m}
+  docker-machine ssh ${m} "${fix_systemd_unit_if_needed}"
   docker-machine ssh ${m} "${install_weave}"
 done
 
