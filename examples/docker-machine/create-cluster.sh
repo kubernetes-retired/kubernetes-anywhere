@@ -22,7 +22,7 @@
 ## Similarly, there are environment variables for all major cloud providers, please check Docker Machine docs
 ## for details
 
-DOCKER_MACHINE_DRIVER=${DOCKER_MACHINE_DRIVER:-'vmwarefusion'}
+DOCKER_MACHINE_DRIVER=${DOCKER_MACHINE_DRIVER:-'virtualbox'}
 
 vm_names=$(seq -f 'kube-%g' 1 7)
 
