@@ -1,5 +1,14 @@
 # Example: Google Compute Engine
 
+Setting up a cluster in Google Compute Engine (GCE) might seem trivial at first, however
+if youtry to understand how it works exactly, if not that easy to read. This example is
+aimed to demonstrate how to deploy Kubernetes in GCE through a smallest number of steps.
+
+Being part of Kubernetes Anywhere project, this example will utilise Wevae Net as management
+and apps network and all-Dockerized cluster components, thereby making it more portable
+and much easier to setup and operate.
+
+You will need to dowload the code first:
 ```
 git clone https://github.com/weaveworks/weave-kubernetes-anywhere
 cd examples/google-compute-engine
