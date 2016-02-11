@@ -17,7 +17,7 @@ This is as simple as:
 > Please see below for more information about drivers.
 
 
-Once done, you need to login to _any_ of the instances with `docker-machine ssh`,
+Once done, you need to login to either of `kube-[4-7]` with `docker-machine ssh`,
 e.g. `docker-machine ssh kube-5` and run the following commands.
 
 ```
