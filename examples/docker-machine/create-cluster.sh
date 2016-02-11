@@ -1,7 +1,7 @@
 #!/bin/bash -xe
 
-## This example features TLS configuration, which leverages availability of remote Docker API to securelly
-## transfer images whith certificates between the master and worker nodes
+## This example features TLS configuration, which leverages availability of remote Docker API to securely
+## transfer images with certificates between the master and worker nodes
 ##
 ## WARNING: This is an advanced example with TLS, although usage of Docker Machine keeps it rather readable
 ## and provides an ability to quickly spawn a cluster on a local hypervisor of your choice or one of the public
@@ -56,7 +56,7 @@ docker_on() {
 ## Create 7 VMs and install weave
 
 for m in $vm_names ; do
-  docker-machine create -d ${DOCKER_MACHINE_DRIVER} ${m}
+  docker-machine create --driver ${DOCKER_MACHINE_DRIVER} ${m}
   docker-machine ssh ${m} "${fix_systemd_unit_if_needed}"
   docker-machine ssh ${m} "${install_weave}"
 done
@@ -69,24 +69,24 @@ done
 
 
 ## In most cases we need to SSH into the VM in order to communicate with Weave proxy via the UNIX socket,
-## as exposing it remotely doesn't make sense in the contex of the Kubernetes Anywhere project
+## as exposing it remotely doesn't make sense in the context of the Kubernetes Anywhere project
 
 weaveproxy_socket="-H unix:///var/run/weave/weave.sock"
 
 ## Start etcd on `kube-{1,2,3}`
 
-docker_on 'kube-1' ${weaveproxy_socket} run -d \
-  -e ETCD_CLUSTER_SIZE=3 \
+docker_on 'kube-1' ${weaveproxy_socket} run --detach \
+  --env="ETCD_CLUSTER_SIZE=3" \
   --name="etcd1" \
   weaveworks/kubernetes-anywhere:etcd
 
-docker_on 'kube-2' ${weaveproxy_socket} run -d \
-  -e ETCD_CLUSTER_SIZE=3 \
+docker_on 'kube-2' ${weaveproxy_socket} run --detach \
+  --env="ETCD_CLUSTER_SIZE=3" \
   --name="etcd2" \
   weaveworks/kubernetes-anywhere:etcd
 
-docker_on 'kube-3' ${weaveproxy_socket} run -d \
-  -e ETCD_CLUSTER_SIZE=3 \
+docker_on 'kube-3' ${weaveproxy_socket} run --detach \
+  --env="ETCD_CLUSTER_SIZE=3" \
   --name="etcd3" \
   weaveworks/kubernetes-anywhere:etcd
 
@@ -122,18 +122,18 @@ docker ${master_config} save \
 
 ## Launch the master components using volumes provided as artefact of running the `*-secure-config` containers
 
-docker_on 'kube-4' ${weaveproxy_socket} run -d \
-  -e ETCD_CLUSTER_SIZE=3 \
+docker_on 'kube-4' ${weaveproxy_socket} run --detach \
+  --env="ETCD_CLUSTER_SIZE=3" \
   --name="kube-apiserver" \
   --volumes-from="kube-apiserver-secure-config" \
   weaveworks/kubernetes-anywhere:apiserver
 
-docker_on 'kube-4' ${weaveproxy_socket} run -d \
+docker_on 'kube-4' ${weaveproxy_socket} run --detach \
   --name="kube-scheduler" \
   --volumes-from="kube-scheduler-secure-config" \
   weaveworks/kubernetes-anywhere:scheduler
 
-docker_on 'kube-4' ${weaveproxy_socket} run -d \
+docker_on 'kube-4' ${weaveproxy_socket} run --detach \
   --name="kube-controller-manager" \
   --volumes-from="kube-controller-manager-secure-config" \
   weaveworks/kubernetes-anywhere:controller-manager
@@ -156,7 +156,7 @@ for m in 'kube-5' 'kube-6' 'kube-7' ; do
     weaveworks/kubernetes-anywhere:tools \
     setup-kubelet-volumes
   ## Start the kubelete itself now
-  docker_on ${m} ${weaveproxy_socket} run -d \
+  docker_on ${m} ${weaveproxy_socket} run --detach \
     --name="kubelet" \
     --privileged=true --net=host --pid=host \
     --volumes-from="kubelet-volumes" \
@@ -168,11 +168,15 @@ for m in 'kube-5' 'kube-6' 'kube-7' ; do
     --name="kube-proxy-secure-config" \
     kubernetes-anywhere:proxy-secure-config
   ## And now start the proxy itself
-  docker_on ${m} ${weaveproxy_socket} run -d \
+  docker_on ${m} ${weaveproxy_socket} run --detach \
     --name="kube-proxy" \
     --privileged=true --net=host --pid=host \
     --volumes-from="kube-proxy-secure-config" \
     weaveworks/kubernetes-anywhere:proxy
+  ## Create tools data volume for convenience
+  docker ${worker_config} create \
+    --name=kube-tools-secure-config \
+    kubernetes-anywhere:tools-secure-config
 done
 
 ## Run tools container to deploy SkyDNS addon

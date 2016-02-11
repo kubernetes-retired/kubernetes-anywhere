@@ -22,7 +22,6 @@ e.g. `docker-machine ssh kube-5` and run the following commands.
 
 ```
 eval $(weave env)
-docker run --name=kube-tools-secure-config kubernetes-anywhere:tools-secure-config
 docker run --interactive --tty --volumes-from=kube-tools-secure-config \
   weaveworks/kubernetes-anywhere:tools bash -l
 ```
