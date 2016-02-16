@@ -1,17 +1,17 @@
 resource "aws_iam_instance_profile" "kubernetes-master" {
-    name  = "kubernetes-master"
+    name  = "kubernetes-master-${var.cluster}"
     path  = "/"
     roles = ["${aws_iam_role.kubernetes-master.name}"]
 }
 
 resource "aws_iam_instance_profile" "kubernetes-node" {
-    name  = "kubernetes-node"
+    name  = "kubernetes-node-${var.cluster}"
     path  = "/"
     roles = ["${aws_iam_role.kubernetes-node.name}"]
 }
 
 resource "aws_iam_role" "kubernetes-master" {
-    name               = "kubernetes-master"
+    name               = "kubernetes-master-${var.cluster}"
     path               = "/"
     assume_role_policy = <<POLICY
 {
@@ -30,7 +30,7 @@ POLICY
 }
 
 resource "aws_iam_role" "kubernetes-node" {
-    name               = "kubernetes-node"
+    name               = "kubernetes-node-${var.cluster}"
     path               = "/"
     assume_role_policy = <<POLICY
 {
@@ -49,7 +49,7 @@ POLICY
 }
 
 resource "aws_iam_role_policy" "kubernetes-master" {
-    name   = "kubernetes-master"
+    name   = "kubernetes-master-${var.cluster}"
     role   = "${aws_iam_role.kubernetes-master.name}"
     policy = <<POLICY
 {
@@ -91,7 +91,7 @@ POLICY
 }
 
 resource "aws_iam_role_policy" "kubernetes-node" {
-    name   = "kubernetes-node"
+    name   = "kubernetes-node-${var.cluster}"
     role   = "${aws_iam_role.kubernetes-node.name}"
     policy = <<POLICY
 {

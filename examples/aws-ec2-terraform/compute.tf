@@ -1,11 +1,11 @@
 resource "aws_launch_configuration" "kubernetes-node-group" {
     name                        = "kubernetes-node-group"
-    image_id                    = "ami-33566d03"
-    instance_type               = "t2.micro"
+    image_id                    = "${lookup(var.ami, var.ec2_region)}"
+    instance_type               = "${var.node_instance_type}"
     iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-node.name}"
     ebs_optimized               = false
     enable_monitoring           = true
-    key_name                    = "terraform"
+    key_name                    = "${var.ec2_key_name}"
     security_groups             = ["${aws_security_group.kubernetes-node.id}"]
     associate_public_ip_address = true
     user_data                   = "${file("user-data.yaml")}"
@@ -41,11 +41,11 @@ resource "aws_autoscaling_group" "kubernetes-node-group" {
 }
 
 resource "aws_instance" "kubernetes-master" {
-    ami                         = "ami-33566d03"
+    ami                         = "${lookup(var.ami, var.ec2_region)}"
     ebs_optimized               = false
-    instance_type               = "t2.micro"
+    instance_type               = "${var.master_instance_type}"
     monitoring                  = false
-    key_name                    = "terraform"
+    key_name                    = "${var.ec2_key_name}"
     subnet_id                   = "${aws_subnet.kubernetes-subnet.id}"
     vpc_security_group_ids      = ["${aws_security_group.kubernetes-master.id}"]
     associate_public_ip_address = true
@@ -76,11 +76,11 @@ resource "aws_instance" "kubernetes-master" {
 
 resource "aws_instance" "kubernetes-etcd" {
     count                       = 3
-    ami                         = "ami-33566d03"
+    ami                         = "${lookup(var.ami, var.ec2_region)}"
     ebs_optimized               = false
-    instance_type               = "t2.micro"
+    instance_type               = "${var.etcd_instance_type}"
     monitoring                  = false
-    key_name                    = "terraform"
+    key_name                    = "${var.ec2_key_name}"
     subnet_id                   = "${aws_subnet.kubernetes-subnet.id}"
     vpc_security_group_ids      = ["${aws_security_group.kubernetes-master.id}"]
     associate_public_ip_address = true
