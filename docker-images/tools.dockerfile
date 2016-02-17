@@ -10,7 +10,7 @@ ENV KUBE_RELEASE=v1.1.7
 RUN yum --assumeyes --quiet install openssl
 
 RUN curl --silent --location \
-  https://get.docker.com/builds/Linux/x86_64/docker-1.10.0 \
+  https://get.docker.com/builds/Linux/x86_64/docker-1.10.1 \
   --output /usr/bin/docker \
   && chmod +x /usr/bin/docker ;
 
