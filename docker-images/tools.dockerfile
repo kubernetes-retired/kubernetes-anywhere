@@ -7,7 +7,14 @@ ENV WD=/etc/resources
 
 ENV KUBE_RELEASE=v1.1.7
 
-RUN yum --assumeyes --quiet install openssl
+RUN yum --assumeyes --quiet install openssl python-setuptools git-core
+
+RUN easy_install awscli
+
+RUN curl --silent --location \
+  https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 \
+  --output /usr/bin/jq \
+  && chmod +x /usr/bin/jq ;
 
 RUN curl --silent --location \
   https://get.docker.com/builds/Linux/x86_64/docker-1.10.1 \
@@ -57,5 +64,11 @@ ADD docker-compose.yml $WD/
 
 ADD setup-kubelet-volumes.sh /usr/bin/setup-kubelet-volumes
 ADD setup-secure-cluster-config-volumes.sh /usr/bin/setup-secure-cluster-config-volumes
+
+ADD find-weave-peers-by-ec2-tag.sh /usr/bin/find-weave-peers-by-ec2-tag
+ADD describe-ec2-node.sh /usr/bin/describe-ec2-node
+ADD install-basic-systemd-units.sh /usr/bin/install-basic-systemd-units
+
+ADD systemd-units /usr/share/systemd-units/
 
 WORKDIR $WD

@@ -1,0 +1,17 @@
+[Unit]
+Wants=weave-network.target
+After=weave-network.target
+After=kube-apiserver.service
+Description=Kubernetes Scheduler
+Documentation=http://kubernetes.io/
+[Service]
+EnvironmentFile=-/etc/kubernetes-anywhere.env
+ExecStartPre=/usr/local/bin/docker pull weaveworks/kubernetes-anywhere:scheduler
+ExecStartPre=-/usr/local/bin/docker rm -f kube-scheduler
+ExecStart=/usr/local/bin/docker run \
+  --name=kube-scheduler \
+    weaveworks/kubernetes-anywhere:scheduler
+Restart=always
+RestartSec=10
+[Install]
+WantedBy=kubernetes-master.target

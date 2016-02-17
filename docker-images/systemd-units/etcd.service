@@ -1,0 +1,15 @@
+[Unit]
+Wants=weave-network.target
+After=weave-network.target
+[Service]
+EnvironmentFile=-/etc/kubernetes-anywhere.env
+ExecStartPre=/usr/local/bin/docker pull weaveworks/kubernetes-anywhere:etcd
+ExecStartPre=-/usr/local/bin/docker rm -f $ETCD_NODE_NAME
+ExecStart=/usr/local/bin/docker run \
+  --env=ETCD_CLUSTER_SIZE \
+  --name $ETCD_NODE_NAME \
+    weaveworks/kubernetes-anywhere:etcd
+Restart=always
+RestartSec=10
+[Install]
+WantedBy=multi-user.target

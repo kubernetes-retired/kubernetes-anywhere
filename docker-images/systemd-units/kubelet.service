@@ -1,0 +1,25 @@
+[Unit]
+Wants=weave-network.target
+After=weave-network.target
+Description=Kubelet
+Documentation=http://kubernetes.io/
+[Service]
+EnvironmentFile=-/etc/kubernetes-anywhere.env
+ExecStartPre=/usr/local/bin/docker pull weaveworks/kubernetes-anywhere:kubelet
+ExecStartPre=-/usr/local/bin/docker rm -f kubelet
+ExecStartPre=-/usr/local/bin/docker run \
+  --volume="/:/rootfs" \
+  --volume="/var/run/weave/weave.sock:/weave.sock" \
+  weaveworks/kubernetes-anywhere:tools \
+  setup-kubelet-volumes
+ExecStart=/usr/local/bin/docker run \
+  --env=CLOUD_PROVIDER \
+  --env=AWS_LOCAL_HOSTNAME \
+  --name=kubelet \
+  --privileged=true --net=host --pid=host \
+  --volumes-from=kubelet-volumes \
+    weaveworks/kubernetes-anywhere:kubelet
+Restart=always
+RestartSec=10
+[Install]
+WantedBy=kubernetes-node.target

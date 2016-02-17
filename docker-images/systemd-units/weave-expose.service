@@ -1,0 +1,16 @@
+[Unit]
+After=docker.service
+After=install-weave.service
+After=weave.service
+Requires=docker.service
+Requires=install-weave.service
+Requires=weave.service
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+TimeoutStartSec=0
+EnvironmentFile=-/etc/kubernetes-anywhere.env
+ExecStart=/usr/local/bin/weave expose $WEAVE_EXPOSE_ARGS
+ExecStop=/usr/local/bin/weave hide
+[Install]
+WantedBy=weave-network.target

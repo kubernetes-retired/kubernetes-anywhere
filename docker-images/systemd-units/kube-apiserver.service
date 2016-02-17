@@ -1,0 +1,20 @@
+[Unit]
+Wants=weave-network.target
+After=weave-network.target
+Before=kube-scheduler.service
+Before=kube-controller-manager.service
+Description=Kubernetes API Server
+Documentation=http://kubernetes.io/
+[Service]
+EnvironmentFile=-/etc/kubernetes-anywhere.env
+ExecStartPre=/usr/local/bin/docker pull weaveworks/kubernetes-anywhere:apiserver
+ExecStartPre=-/usr/local/bin/docker rm -f kube-apiserver
+ExecStart=/usr/local/bin/docker run \
+  --env=ETCD_CLUSTER_SIZE \
+  --env=CLOUD_PROVIDER \
+  --name=kube-apiserver \
+    weaveworks/kubernetes-anywhere:apiserver
+Restart=always
+RestartSec=10
+[Install]
+WantedBy=kubernetes-master.target
