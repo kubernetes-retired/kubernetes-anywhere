@@ -23,12 +23,13 @@ write_files:
       WEAVEPROXY_ARGS="--rewrite-inspect"
       WEAVE_DOWNLOAD_URL="git.io/weave"
 
-  - path: /etc/kubernetes-anywehere.env
+  - path: /etc/kubernetes-anywhere.env
     permissions: '0600'
     owner: root
     content: |
       ETCD_CLUSTER_SIZE="3"
       CLOUD_PROVIDER="aws"
+      DOCKER_HOST="unix:///var/run/weave/weave.sock"
 
   - path: /etc/systemd/system/install-docker.service
     content: |
@@ -36,9 +37,8 @@ write_files:
       After=network-online.target
       Before=docker.service
       Before=install-weave.service
-      Description=Download Docker Binary
       Requires=network-online.target
-      ConditionFirstBoot=yes
+      Description=Download Docker Binary
       ConditionFileNotEmpty=!/usr/local/bin/docker
       ConditionFileIsExecutable=!/usr/local/bin/docker
       [Service]
@@ -63,11 +63,13 @@ write_files:
       [Unit]
       After=network-online.target
       After=docker.service
+      After=install-docker.service
       Before=weave.service
+      Requires=docker.service
+      Requires=install-docker.service
+      Requires=network-online.target
       Description=Install Weave
       Documentation=http://docs.weave.works/
-      Requires=network-online.target
-      ConditionFirstBoot=yes
       ConditionFileNotEmpty=!/usr/local/bin/weave
       ConditionFileIsExecutable=!/usr/local/bin/weave
       [Service]
@@ -141,11 +143,15 @@ write_files:
       After=install-docker.service
       Before=weave.service
       Before=weaveproxy.service
+      Requires=install-docker.service
       Description=Docker Daemon
       [Service]
       EnvironmentFile=/etc/docker.env
       ExecStart=/usr/local/bin/docker daemon $DOCKER_ARGS
       Restart=on-failure
+      [Install]
+      WantedBy=weave-network.target
+      WantedBy=weave.service
 
   - path: /etc/systemd/system/weave.service
     permissions: '0600'
@@ -194,8 +200,8 @@ write_files:
     content: |
       [Unit]
       After=docker.service
-      After=weave.service
       After=install-weave.service
+      After=weave.service
       Requires=docker.service
       Requires=install-weave.service
       Requires=weave.service
@@ -221,10 +227,10 @@ write_files:
       Description=Kubernetes API Server
       Documentation=http://kubernetes.io/
       [Service]
-      EnvironmentFile=-/etc/kubernetes-anywehere.env
+      EnvironmentFile=-/etc/kubernetes-anywhere.env
       ExecStartPre=/usr/local/bin/docker pull weaveworks/kubernetes-anywhere:apiserver
       ExecStartPre=-/usr/local/bin/docker rm -f kube-apiserver
-      ExecStart=/usr/local/bin/docker
+      ExecStart=/usr/local/bin/docker run \
         --env=ETCD_CLUSTER_SIZE \
         --env=CLOUD_PROVIDER \
         --name=kube-apiserver \
@@ -245,10 +251,10 @@ write_files:
       Description=Kubernetes Scheduler
       Documentation=http://kubernetes.io/
       [Service]
-      EnvironmentFile=-/etc/kubernetes-anywehere.env
+      EnvironmentFile=-/etc/kubernetes-anywhere.env
       ExecStartPre=/usr/local/bin/docker pull weaveworks/kubernetes-anywhere:scheduler
       ExecStartPre=-/usr/local/bin/docker rm -f kube-scheduler
-      ExecStart=/usr/local/bin/docker \
+      ExecStart=/usr/local/bin/docker run \
         --name=kube-scheduler \
           weaveworks/kubernetes-anywhere:scheduler
       Restart=always
@@ -267,10 +273,10 @@ write_files:
       Description=Kubernetes Controller Manager
       Documentation=http://kubernetes.io/
       [Service]
-      EnvironmentFile=-/etc/kubernetes-anywehere.env
+      EnvironmentFile=-/etc/kubernetes-anywhere.env
       ExecStartPre=/usr/local/bin/docker pull weaveworks/kubernetes-anywhere:controller-manager
       ExecStartPre=-/usr/local/bin/docker rm -f kube-controller-manager
-      ExecStart=/usr/local/bin/docker \
+      ExecStart=/usr/local/bin/docker run \
         --env=CLOUD_PROVIDER \
         --name=kube-controller-manager \
           weaveworks/kubernetes-anywhere:controller-manager
@@ -289,7 +295,7 @@ write_files:
       Description=Kubelet
       Documentation=http://kubernetes.io/
       [Service]
-      EnvironmentFile=-/etc/kubernetes-anywehere.env
+      EnvironmentFile=-/etc/kubernetes-anywhere.env
       ExecStartPre=/usr/local/bin/docker pull weaveworks/kubernetes-anywhere:kubelet
       ExecStartPre=-/usr/local/bin/docker rm -f kubelet
       ExecStartPre=-/usr/local/bin/docker run \
@@ -297,7 +303,7 @@ write_files:
         --volume="/var/run/weave/weave.sock:/weave.sock" \
         weaveworks/kubernetes-anywhere:tools \
         setup-kubelet-volumes
-      ExecStart=/usr/local/bin/docker \
+      ExecStart=/usr/local/bin/docker run \
         --env=CLOUD_PROVIDER \
         --env=AWS_LOCAL_HOSTNAME \
         --name=kubelet \
@@ -319,10 +325,10 @@ write_files:
       Description=Kubernetes Proxy
       Documentation=http://kubernetes.io/
       [Service]
-      EnvironmentFile=-/etc/kubernetes-anywehere.env
+      EnvironmentFile=-/etc/kubernetes-anywhere.env
       ExecStartPre=/usr/local/bin/docker pull weaveworks/kubernetes-anywhere:proxy
       ExecStartPre=-/usr/local/bin/docker rm -f kube-proxy
-      ExecStart=/usr/local/bin/docker \
+      ExecStart=/usr/local/bin/docker run \
         --name=kube-proxy \
         --privileged=true --net=host --pid=host \
           weaveworks/kubernetes-anywhere:proxy
@@ -339,15 +345,17 @@ write_files:
       Wants=weave-network.target
       After=weave-network.target
       [Service]
-      EnvironmentFile=-/etc/kubernetes-anywehere.env
+      EnvironmentFile=-/etc/kubernetes-anywhere.env
       ExecStartPre=/usr/local/bin/docker pull weaveworks/kubernetes-anywhere:etcd
       ExecStartPre=-/usr/local/bin/docker rm -f $ETCD_NODE_NAME
-      ExecStart=/usr/local/bin/docker
+      ExecStart=/usr/local/bin/docker run \
         --env=ETCD_CLUSTER_SIZE \
         --name $ETCD_NODE_NAME \
           weaveworks/kubernetes-anywhere:etcd
       Restart=always
       RestartSec=10
+      [Install]
+      WantedBy=multi-user.target
 
   - path: /tmp/kubernetes-anywhere-provision.sh
     owner: root
@@ -355,7 +363,7 @@ write_files:
     content: |
       #!/bin/bash -x
 
-      echo "WEAVE_EXPOSE_ARGS=\"-h $(hostname)\"" >> /etc/weave.env
+      echo "WEAVE_EXPOSE_ARGS=\"-h $(hostname).weave.local\"" >> /etc/weave.env
       echo "AWS_LOCAL_HOSTNAME=\"$(hostname -f)\"" >> /etc/kubernetes-anywhere.env
 
       export AWS_DEFAULT_REGION=$(curl --silent curl http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)
@@ -375,10 +383,6 @@ write_files:
       systemctl enable docker.service weave.service weaveproxy.service weave-expose.service weave-network.target
       systemctl start weave-network.target
 
-      eval $(/usr/local/bin/weave env)
-
-      echo "DOCKER_HOST=\"${DOCKER_HOST}\"" >> /etc/kubernetes-anywhere.env
-
       get_instance_description() {
         aws ec2 describe-instances \
           --instance-ids $(curl -s curl http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .instanceId) \
@@ -395,14 +399,6 @@ write_files:
           | jq -r '.Reservations[].Instances[].Tags[] | select(.Key=="KubernetesEtcdNodeName") .Value'
       }
 
-      save_last_run_log_and_cleanup() {
-        if [[ $(docker inspect --format='{{.State.Status}}' $1) = 'exited' ]]
-        then
-          docker logs $1 > /var/log/$1_last_run 2>&1
-          docker rm $1
-        fi
-      }
-
       case "$(get_instance_name_tag)" in
         kubernetes-etcd)
           echo "ETCD_NODE_NAME=\"$(get_etcd_node_name)\"" >> /etc/kubernetes-anywhere.env
@@ -410,12 +406,12 @@ write_files:
           systemctl start etcd.service
           ;;
         kubernetes-master)
-          systemctl enable kube-apiserver.service kube-scheduler.service kube-controller-manager.service kube-master.target
-          systemctl start kube-master.target
+          systemctl enable kube-apiserver.service kube-scheduler.service kube-controller-manager.service kubernetes-master.target
+          systemctl start kubernetes-master.target
           ;;
         kubernetes-node)
-          systemctl enable kubelet.service kube-proxy.service kube-node.target
-          systemctl start kube-node.target
+          systemctl enable kubelet.service kube-proxy.service kubernetes-node.target
+          systemctl start kubernetes-node.target
           ;;
       esac
 
