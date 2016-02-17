@@ -23,7 +23,7 @@ exec /hyperkube kubelet ${args} \
   --docker-endpoint="unix:/weave.sock" \
   --cluster-dns="10.16.0.3" \
   --resolv-conf="/dev/null" \
-  --cluster-domain="kube.local" \
+  --cluster-domain="cluster.local" \
   --address=${weave_ip}
   --cloud-provider="${CLOUD_PROVIDER}" \
   --allow-privileged="true" \

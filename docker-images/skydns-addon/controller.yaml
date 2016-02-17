@@ -55,7 +55,7 @@ spec:
             memory: 50Mi
         args:
         # command = "/kube2sky"
-        - -domain=kube.local
+        - -domain=cluster.local
         - -kube_master_url=http://kube-apiserver.weave.local:8080
       - name: skydns
         image: gcr.io/google_containers/skydns:2015-10-13-8c72f8c
@@ -73,7 +73,7 @@ spec:
         - -addr=0.0.0.0:53
         - -nameservers=8.8.8.8:53,8.8.4.4:53
         - -ns-rotate=true
-        - -domain=kube.local
+        - -domain=cluster.local
         ports:
         - containerPort: 53
           name: dns
@@ -106,7 +106,7 @@ spec:
             cpu: 10m
             memory: 20Mi
         args:
-        - -cmd=nslookup kubernetes.default.svc.kube.local localhost >/dev/null
+        - -cmd=nslookup kubernetes.default.svc.cluster.local localhost >/dev/null
         - -port=8080
         ports:
         - containerPort: 8080
