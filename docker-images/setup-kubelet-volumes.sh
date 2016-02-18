@@ -1,5 +1,7 @@
 #!/bin/bash -x
 
+KUBERNETES_ANYWHERE_TOOLS_IMAGE=${KUBERNETES_ANYWHERE_TOOLS_IMAGE:-'weaveworks/kubernetes-anywhere:tools'}
+
 if [[ $(docker inspect --format='{{.State.Status}}' kubelet-volumes) = 'exited' ]]
 then
   exit
@@ -38,7 +40,7 @@ else
   docker run \
     --pid="host" \
     --privileged="true" \
-    weaveworks/kubernetes-anywhere:tools nsenter --mount=/proc/1/ns/mnt -- mount --make-rshared /
+    ${KUBERNETES_ANYWHERE_TOOLS_IMAGE} nsenter --mount=/proc/1/ns/mnt -- mount --make-rshared /
 
   docker run \
     --volume="/:/rootfs:ro" \
@@ -49,5 +51,5 @@ else
     ${docker_root_vol} \
     --volume="/var/run/weave/weave.sock:/weave.sock" \
     --name="kubelet-volumes" \
-    weaveworks/kubernetes-anywhere:tools true
+    ${KUBERNETES_ANYWHERE_TOOLS_IMAGE} true
 fi
