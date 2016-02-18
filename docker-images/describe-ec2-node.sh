@@ -4,11 +4,12 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-export AWS_DEFAULT_REGION=$(curl --silent curl http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)
+doc=$(curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document)
+export AWS_DEFAULT_REGION=$(echo "${doc}" | jq -r .region)
 
 instance_description=$(
   aws ec2 describe-instances \
-    --instance-ids $(curl -s curl http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .instanceId) \
+    --instance-ids $(echo "${doc}" | jq -r .instanceId) \
     --filters 'Name=tag:KubernetesCluster,Values=kubernetes'
 )
 
