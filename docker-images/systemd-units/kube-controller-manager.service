@@ -6,9 +6,9 @@ Description=Kubernetes Controller Manager
 Documentation=http://kubernetes.io/
 [Service]
 EnvironmentFile=-/etc/kubernetes-anywhere.env
-ExecStartPre=/usr/local/bin/docker pull weaveworks/kubernetes-anywhere:controller-manager
-ExecStartPre=-/usr/local/bin/docker rm -f kube-controller-manager
-ExecStart=/usr/local/bin/docker run \
+ExecStartPre=/usr/bin/docker pull weaveworks/kubernetes-anywhere:controller-manager
+ExecStartPre=-/usr/bin/docker rm -f kube-controller-manager
+ExecStart=/usr/bin/docker run \
   --env=CLOUD_PROVIDER \
   --name=kube-controller-manager \
     weaveworks/kubernetes-anywhere:controller-manager

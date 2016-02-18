@@ -10,7 +10,7 @@ TimeoutStartSec=0
 EnvironmentFile=-/etc/kubernetes-anywhere.env
 ExecStartPre=/usr/local/bin/weave launch-router $WEAVE_INIT_PEER_COUNT $WEAVE_KNOW_PEERS
 ExecStartPre=/bin/bash -c '/usr/local/bin/weave connect $(docker run weaveworks/kubernetes-anywhere:tools find-weave-peers-by-ec2-tag)'
-ExecStart=/usr/local/bin/docker attach weave
+ExecStart=/usr/bin/docker attach weave
 Restart=on-failure
 ExecStop=/usr/local/bin/weave stop-router
 [Install]

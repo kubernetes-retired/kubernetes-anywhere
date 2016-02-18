@@ -5,9 +5,9 @@ Description=Kubernetes Proxy
 Documentation=http://kubernetes.io/
 [Service]
 EnvironmentFile=-/etc/kubernetes-anywhere.env
-ExecStartPre=/usr/local/bin/docker pull weaveworks/kubernetes-anywhere:proxy
-ExecStartPre=-/usr/local/bin/docker rm -f kube-proxy
-ExecStart=/usr/local/bin/docker run \
+ExecStartPre=/usr/bin/docker pull weaveworks/kubernetes-anywhere:proxy
+ExecStartPre=-/usr/bin/docker rm -f kube-proxy
+ExecStart=/usr/bin/docker run \
   --name=kube-proxy \
   --privileged=true --net=host --pid=host \
     weaveworks/kubernetes-anywhere:proxy

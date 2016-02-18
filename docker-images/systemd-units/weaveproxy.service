@@ -8,7 +8,7 @@ Documentation=http://docs.weave.works/
 [Service]
 EnvironmentFile=-/etc/kubernetes-anywhere.env
 ExecStartPre=/usr/local/bin/weave launch-proxy --rewrite-inspect
-ExecStart=/usr/local/bin/docker attach weaveproxy
+ExecStart=/usr/bin/docker attach weaveproxy
 Restart=on-failure
 ExecStop=/usr/local/bin/weave stop-proxy
 [Install]

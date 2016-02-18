@@ -6,9 +6,9 @@ Description=Kubernetes Scheduler
 Documentation=http://kubernetes.io/
 [Service]
 EnvironmentFile=-/etc/kubernetes-anywhere.env
-ExecStartPre=/usr/local/bin/docker pull weaveworks/kubernetes-anywhere:scheduler
-ExecStartPre=-/usr/local/bin/docker rm -f kube-scheduler
-ExecStart=/usr/local/bin/docker run \
+ExecStartPre=/usr/bin/docker pull weaveworks/kubernetes-anywhere:scheduler
+ExecStartPre=-/usr/bin/docker rm -f kube-scheduler
+ExecStart=/usr/bin/docker run \
   --name=kube-scheduler \
     weaveworks/kubernetes-anywhere:scheduler
 Restart=always
