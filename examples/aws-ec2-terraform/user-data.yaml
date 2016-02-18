@@ -50,7 +50,6 @@ write_files:
       DOCKER_DOWNLOAD_URL="https://get.docker.com/builds/Linux/x86_64/docker-1.10.1"
       ETCD_CLUSTER_SIZE="3"
       CLOUD_PROVIDER="aws"
-      DOCKER_HOST="unix:///var/run/weave/weave.sock"
       DOCKER_ARGS="--host=fd:// --storage-driver=overlay"
 
   - path: /etc/systemd/system/docker.socket
@@ -103,6 +102,9 @@ write_files:
       systemctl enable docker.service
       systemctl start docker.service
 
+      docker version
+      docker pull weaveworks/kubernetes-anywhere:tools
+      docker images
       docker run -v /etc/systemd/system:/host-systemd weaveworks/kubernetes-anywhere:tools install-basic-systemd-units
 
       systemctl daemon-reload
