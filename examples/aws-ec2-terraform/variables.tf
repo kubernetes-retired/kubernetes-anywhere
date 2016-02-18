@@ -1,11 +1,11 @@
 variable "cluster" {
    description = "Kubernetes cluster suffix"
-   default     = "a1"
+   default     = "a2"
 }
 
 variable "ec2_region" {
    description = "EC2 region"
-   default     = "eu-central-1"
+   default     = "eu-west-1"
 }
 
 variable "ami" {
@@ -13,7 +13,8 @@ variable "ami" {
    type        = "map"
 
    default     = {
-       "eu-central-1" = "ami-6da2ba01"
+       "eu-west-1"    = "ami-36289a45"
+       "eu-central-1" = "ami-30677d5c"
    }
 }
 
