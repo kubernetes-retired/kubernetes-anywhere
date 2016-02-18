@@ -93,7 +93,6 @@ write_files:
       set -o pipefail
       set -o nounset
 
-      echo "WEAVE_EXPOSE_ARGS=\"-h $(hostname).weave.local\"" >> /etc/kubernetes-anywhere.env
       echo "AWS_LOCAL_HOSTNAME=\"$(hostname -f)\"" >> /etc/kubernetes-anywhere.env
 
       systemctl daemon-reload
