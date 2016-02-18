@@ -45,9 +45,8 @@ write_files:
     permissions: '0600'
     owner: root
     content: |
-      WEAVE_DOWNLOAD_URL="git.io/weave"
       WEAVE_INIT_PEER_COUNT="--init-peer-count 7"
-      DOCKER_DOWNLOAD_URL="https://get.docker.com/builds/Linux/x86_64/docker-1.10.1"
+      WEAVE_SCRIPT_VERSION="v1.4.4"
       ETCD_CLUSTER_SIZE="3"
       CLOUD_PROVIDER="aws"
       DOCKER_ARGS="--host=fd:// --storage-driver=overlay"
