@@ -9,8 +9,9 @@ Requires=weave.service
 Type=oneshot
 RemainAfterExit=yes
 TimeoutStartSec=0
+Environment=WEAVE_EXPOSE_FQDN=%H.weave.local
 EnvironmentFile=-/etc/kubernetes-anywhere.env
-ExecStart=/usr/local/bin/weave expose $WEAVE_EXPOSE_ARGS
+ExecStart=/usr/local/bin/weave expose -h $WEAVE_EXPOSE_FQDN
 ExecStop=/usr/local/bin/weave hide
 [Install]
 WantedBy=weave-network.target
