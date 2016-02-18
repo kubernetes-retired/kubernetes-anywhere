@@ -6,14 +6,15 @@ Before=kube-controller-manager.service
 Description=Kubernetes API Server
 Documentation=http://kubernetes.io/
 [Service]
+Environment=KUBERNETES_ANYWHERE_APISERVER_IMAGE=weaveworks/kubernetes-anywhere:apiserver
 EnvironmentFile=-/etc/kubernetes-anywhere.env
-ExecStartPre=/usr/bin/docker pull weaveworks/kubernetes-anywhere:apiserver
+ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_APISERVER_IMAGE
 ExecStartPre=-/usr/bin/docker rm -f kube-apiserver
 ExecStart=/usr/bin/docker --host=unix:///var/run/weave/weave.sock run \
   --env=ETCD_CLUSTER_SIZE \
   --env=CLOUD_PROVIDER \
   --name=kube-apiserver \
-    weaveworks/kubernetes-anywhere:apiserver
+    $KUBERNETES_ANYWHERE_APISERVER_IMAGE
 Restart=always
 RestartSec=10
 [Install]
