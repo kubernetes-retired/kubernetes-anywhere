@@ -54,8 +54,8 @@ write_files:
       fi
 
       exec sudo docker --host="unix:///var/run/weave/weave.sock" run \
-        --tty --interactive ${args}
-        weaveworks/kubernetes-anywhere:tools $@
+        --tty --interactive ${args} \
+          weaveworks/kubernetes-anywhere:tools $@
 
   - path: /etc/kubernetes-anywhere.env
     permissions: '0600'
