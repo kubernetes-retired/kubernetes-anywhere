@@ -41,6 +41,22 @@ packages:
 
 write_files:
 
+  - path: /usr/local/bin/kubernetes-anywhere-toolbox
+    permissions: '0755'
+    owner: root
+    content: |
+      #!/bin/bash
+
+      args="--volume=/var/run/weave/weave.sock:/weave.sock"
+
+      if [ -n "${SSH_AUTH_SOCK}" ] ; then
+        args="${volumes} --volume=${SSH_AUTH_SOCK}:/agent.sock --env=SSH_AUTH_SOCK=/agent.sock"
+      fi
+
+      exec sudo docker --host="unix:///var/run/weave/weave.sock" run \
+        --tty --interactive ${args}
+        weaveworks/kubernetes-anywhere:tools $@
+
   - path: /etc/kubernetes-anywhere.env
     permissions: '0600'
     owner: root
