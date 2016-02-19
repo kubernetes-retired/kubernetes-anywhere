@@ -1,63 +1,85 @@
 # Example: Google Compute Engine
 
-Setting up a cluster in Google Compute Engine (GCE) might seem trivial at first, however
-if youtry to understand how it works exactly, if not that easy to read. This example is
-aimed to demonstrate how to deploy Kubernetes in GCE through a smallest number of steps.
+Although Google Compute Engine (GCE) may appear simple on the surface, configuring clusters is not a trivial task. With Kubernetes Anywhere, this learning curve is significantly shortened, enabling you to deploy clusters in GCE in just a few steps.
 
-Being part of Kubernetes Anywhere project, this example will utilise Wevae Net as management
-and apps network and all-Dockerized cluster components, thereby making it more portable
-and much easier to setup and operate.
+Kubernetes Anywhere makes use of the underlying technology in Weave Net and uses it as both a management and an apps network to deploy Dockerized cluster components. The result is a portable and simple way to configure and manage clusters onto any cloud provider.
 
-You will need to dowload the code first:
+###Before You Begin
+
+You will need to download the code:
+
 ```
 git clone https://github.com/weaveworks/weave-kubernetes-anywhere
 cd examples/google-compute-engine
 ```
+Create an account with Google Cloud Engine and specify a default project and zone.
 
-Make sure you have default project and zone setup, you can run `gcloud init` to do this.
+>>Note: If you didn't set up a default project and  you can run `gcloud init` to authenticate your profile with Google Cloud SDK from the command line before running `create-cluster.sh`.
 
-## Create the cluster
+## Create the Cluster
 
-This is as simple as:
+This is as simple as running:
+
 ```
 ./create-cluster.sh
 ```
 
-Once done, you can either go to the console or use your terminal. You need to login to
-_any_ of the instances and run the following commands.
+Once the script is finished, log on to any of the instances on GCE and run the following commands.
 
-First, you might like to check all nodes are on Weave Net. You can use `sudo weave status`
-for this and see if there 7 peers. You can also run `weave status dns` to see all the DNS
-records there are, the output should have `etcd1`, `etcd2`, `etcd3`, `kube-apiserver`,
-`kube-controller-manager` and `kube-scheduler` along with some records for each of the
-instances, which were created via [`weave expose -h $(hostname).weave.local`][weave_expose].
+First, check that all of the nodes are attached to `Weave Net`:
+
+```
+sudo weave status
+```
+
+There should be 7 peers with 42 connections.
+
+Next check the status of the `weavedns` entries by running:
+
+ ```
+ weave status dns`
+ ```
+
+Ensure that all DNS records have been captured. The output should have `etcd1`, `etcd2`, `etcd3`, `kube-apiserver`, `kube-controller-manager` and `kube-scheduler` as well as additional records for each of the instances.
+
+The instances were created using the `Weave Net` command, [`weave expose -h $(hostname).weave.local`][weave_expose]
 
 [weave_expose]: https://github.com/weaveworks/weave-kubernetes-anywhere/blob/1b6b29fc17d11a66007b572b5ee1d57677515c26/examples/google-compute-engine/provision.sh#L43
 
-Next you will need to fire-up the tools container like this:
+With the cluster deployed and running, you are now ready to launch the tools container in interactive mode:
+
 ```
 $ sudo -s
 # eval $(weave env)
 # docker run -ti weaveworks/kubernetes-anywhere:tools
 ```
 
-Inside this container you can check that there 3 nodes ready to take workload on board:
+Ensure that 3 nodes are ready to accept the workload:
+
 ```
 kubectl get nodes
 ```
 
-First, create the SkyDNS addon:
+Create the SkyDNS addon:
+
 ```
 kubectl create -f skydns-addon
 ```
 
-And now you can deploy the guestbook app:
+And now you are ready to deploy the guestbook app:
+
 ```
 kubectl create -f guestbook-example-LoadBalancer
 ```
 
-Run `kubectl get services --watch` and grab the external IP once it's shown.
+Run `kubectl get services --watch` and make a note of the external IP for the sample guestbook app. You can use this IP to launch the app into a browser.
 
 ## Visibility, Monitoring and Control with Weave Scope
 
-You can find Weave Scope UI on port 4040 on any of the instances.
+With everything up and running, visualize your Kubernetes setup using Weave Scope. Launch any of the instance IP's using port 4040 into the browser.
+
+###Further Reading
+
+ * [Kubernetes Anywhere](https://github.com/weaveworks/weave-kubernetes-anywhere/README.md)
+
+
