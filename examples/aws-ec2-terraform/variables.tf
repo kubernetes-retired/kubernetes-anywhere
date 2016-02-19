@@ -35,4 +35,5 @@ variable "etcd_instance_type" {
 
 variable "ec2_key_name" {
    description = "SSH key name to use for EC2 instances"
+   default     = "kubernetes-anywhere"
 }
