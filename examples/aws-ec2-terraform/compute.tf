@@ -28,15 +28,15 @@ resource "aws_autoscaling_group" "kubernetes-node-group" {
     vpc_zone_identifier       = ["${aws_subnet.kubernetes-subnet.id}"]
 
     tag {
-        key   = "KubernetesCluster"
-        value = "kubernetes"
-        propagate_at_launch = true
+        key                  = "KubernetesCluster"
+        value                = "kubernetes"
+        propagate_at_launch  = true
     }
 
     tag {
-        key   = "Name"
-        value = "kubernetes-node"
-        propagate_at_launch = true
+        key                  = "Name"
+        value                = "kubernetes-node"
+        propagate_at_launch  = true
     }
 }
 
@@ -49,14 +49,12 @@ resource "aws_instance" "kubernetes-master" {
     subnet_id                   = "${aws_subnet.kubernetes-subnet.id}"
     vpc_security_group_ids      = ["${aws_security_group.kubernetes-master.id}"]
     associate_public_ip_address = true
-    #private_ip                  = "172.20.0.9"
     source_dest_check           = true
     iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-master.name}"
     user_data                   = "${file("user-data.yaml")}"
 
     ebs_block_device {
         device_name           = "/dev/sdb"
-        snapshot_id           = ""
         volume_type           = "gp2"
         volume_size           = 20
         delete_on_termination = true
@@ -70,7 +68,7 @@ resource "aws_instance" "kubernetes-master" {
 
     tags {
         "KubernetesCluster" = "kubernetes"
-        "Name" = "kubernetes-master"
+        "Name"              = "kubernetes-master"
     }
 }
 
@@ -85,12 +83,12 @@ resource "aws_instance" "kubernetes-etcd" {
     vpc_security_group_ids      = ["${aws_security_group.kubernetes-master.id}"]
     associate_public_ip_address = true
     source_dest_check           = true
+    ## TODO: probably needs a more restrictive role
     iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-master.name}"
     user_data                   = "${file("user-data.yaml")}"
 
     ebs_block_device {
         device_name           = "/dev/sdb"
-        snapshot_id           = ""
         volume_type           = "gp2"
         volume_size           = 20
         delete_on_termination = true
@@ -103,8 +101,8 @@ resource "aws_instance" "kubernetes-etcd" {
     }
 
     tags {
-        "KubernetesCluster" = "kubernetes"
-        "Name" = "kubernetes-etcd"
+        "KubernetesCluster"      = "kubernetes"
+        "Name"                   = "kubernetes-etcd"
         "KubernetesEtcdNodeName" = "etcd${count.index + 1}"
     }
 }

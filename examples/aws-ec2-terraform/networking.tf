@@ -6,12 +6,16 @@ resource "aws_vpc" "kubernetes-vpc" {
 
     tags {
         "KubernetesCluster" = "kubernetes"
-        "Name" = "kubernetes-vpc"
+        "Name"              = "kubernetes-vpc"
     }
 }
 
 resource "aws_internet_gateway" "kubernetes-igw" {
     vpc_id = "${aws_vpc.kubernetes-vpc.id}"
+
+    tags {
+        "KubernetesCluster" = "kubernetes"
+    }
 }
 
 resource "aws_security_group" "kubernetes-master" {
@@ -19,6 +23,7 @@ resource "aws_security_group" "kubernetes-master" {
     description = "Kubernetes security group applied to master nodes"
     vpc_id      = "${aws_vpc.kubernetes-vpc.id}"
 
+    ## TODO: figure out whether these are red herrings or what
     ingress {
         from_port       = 0
         to_port         = 0
@@ -141,6 +146,7 @@ resource "aws_network_acl" "kubernetes-acl" {
     }
 
     tags {
+        "KubernetesCluster" = "kubernetes"
     }
 }
 
@@ -160,10 +166,6 @@ resource "aws_route_table" "kubernetes-routes" {
     route {
         cidr_block = "0.0.0.0/0"
         gateway_id = "${aws_internet_gateway.kubernetes-igw.id}"
-    }
-
-    tags {
-        "KubernetesCluster" = "kubernetes"
     }
 }
 
