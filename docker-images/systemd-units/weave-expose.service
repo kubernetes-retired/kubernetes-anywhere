@@ -14,4 +14,4 @@ EnvironmentFile=-/etc/kubernetes-anywhere.env
 ExecStart=/usr/local/bin/weave expose -h $WEAVE_EXPOSE_FQDN
 ExecStop=/usr/local/bin/weave hide
 [Install]
-WantedBy=weave-network.target
+WantedBy=kube-proxy.service
