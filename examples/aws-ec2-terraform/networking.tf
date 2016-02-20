@@ -24,7 +24,6 @@ resource "aws_security_group" "kubernetes-master" {
     description = "Kubernetes security group applied to master nodes"
     vpc_id      = "${aws_vpc.kubernetes-vpc.id}"
 
-    ## TODO: figure out whether these are red herrings or what
     ingress {
         from_port       = 0
         to_port         = 0
