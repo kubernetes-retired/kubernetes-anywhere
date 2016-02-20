@@ -19,9 +19,9 @@ resource "aws_internet_gateway" "kubernetes-igw" {
     }
 }
 
-resource "aws_security_group" "kubernetes-master" {
+resource "aws_security_group" "kubernetes-main" {
     name        = "kubernetes-master-kubernetes"
-    description = "Kubernetes security group applied to master nodes"
+    description = "Kubernetes Anywhere security group applied to all nodes"
     vpc_id      = "${aws_vpc.kubernetes-vpc.id}"
 
     ingress {
@@ -68,60 +68,7 @@ resource "aws_security_group" "kubernetes-master" {
 
     tags {
         "KubernetesCluster" = "kubernetes"
-        "Name"              = "kubernetes-master-sg"
-    }
-}
-
-resource "aws_security_group" "kubernetes-node" {
-    name        = "kubernetes-node"
-    description = "Kubernetes security group applied to minion nodes"
-    vpc_id      = "${aws_vpc.kubernetes-vpc.id}"
-
-    ingress {
-        from_port       = 0
-        to_port         = 0
-        protocol        = "-1"
-        self            = true
-    }
-
-    ingress {
-        from_port       = 22
-        to_port         = 22
-        protocol        = "tcp"
-        cidr_blocks     = ["0.0.0.0/0"]
-    }
-
-    ingress {
-        from_port       = 4040
-        to_port         = 4040
-        protocol        = "tcp"
-        cidr_blocks     = ["0.0.0.0/0"]
-    }
-
-    ingress {
-        from_port       = 6783
-        to_port         = 6783
-        protocol        = "tcp"
-        cidr_blocks     = ["172.20.0.0/16"]
-    }
-
-    ingress {
-        from_port       = 6783
-        to_port         = 6784
-        protocol        = "udp"
-        cidr_blocks     = ["172.20.0.0/16"]
-    }
-
-    egress {
-        from_port       = 0
-        to_port         = 0
-        protocol        = "-1"
-        cidr_blocks     = ["0.0.0.0/0"]
-    }
-
-    tags {
-        "KubernetesCluster" = "kubernetes"
-        "Name"              = "kubernetes-node-sg"
+        "Name"              = "kubernetes-main-sg"
     }
 }
 

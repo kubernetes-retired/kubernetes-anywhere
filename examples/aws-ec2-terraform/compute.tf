@@ -6,7 +6,7 @@ resource "aws_launch_configuration" "kubernetes-node-group" {
     ebs_optimized               = false
     enable_monitoring           = true
     key_name                    = "${var.ec2_key_name}"
-    security_groups             = ["${aws_security_group.kubernetes-node.id}"]
+    security_groups             = ["${aws_security_group.kubernetes-main.id}"]
     associate_public_ip_address = true
     user_data                   = "${file("user-data.yaml")}"
 
@@ -47,7 +47,7 @@ resource "aws_instance" "kubernetes-master" {
     monitoring                  = false
     key_name                    = "${var.ec2_key_name}"
     subnet_id                   = "${aws_subnet.kubernetes-subnet.id}"
-    vpc_security_group_ids      = ["${aws_security_group.kubernetes-master.id}"]
+    vpc_security_group_ids      = ["${aws_security_group.kubernetes-main.id}"]
     associate_public_ip_address = true
     source_dest_check           = true
     iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-master.name}"
@@ -80,7 +80,7 @@ resource "aws_instance" "kubernetes-etcd" {
     monitoring                  = false
     key_name                    = "${var.ec2_key_name}"
     subnet_id                   = "${aws_subnet.kubernetes-subnet.id}"
-    vpc_security_group_ids      = ["${aws_security_group.kubernetes-master.id}"]
+    vpc_security_group_ids      = ["${aws_security_group.kubernetes-main.id}"]
     associate_public_ip_address = true
     source_dest_check           = true
     iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-etcd.name}"
