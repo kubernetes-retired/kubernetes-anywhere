@@ -10,42 +10,41 @@ resource "aws_iam_instance_profile" "kubernetes-node" {
     roles = ["${aws_iam_role.kubernetes-node.name}"]
 }
 
+resource "aws_iam_instance_profile" "kubernetes-etcd" {
+    name  = "kubernetes-etcd-${var.cluster}"
+    path  = "/"
+    roles = ["${aws_iam_role.kubernetes-etcd.name}"]
+}
+
+variable "iam_common_assume_role_policy" {
+   default = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+     "Effect": "Allow",
+     "Principal": { "Service": "ec2.amazonaws.com" },
+     "Action": "sts:AssumeRole"
+  }]
+}
+POLICY
+}
+
 resource "aws_iam_role" "kubernetes-master" {
     name               = "kubernetes-master-${var.cluster}"
     path               = "/"
-    assume_role_policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-POLICY
+    assume_role_policy = "${var.iam_common_assume_role_policy}"
 }
 
 resource "aws_iam_role" "kubernetes-node" {
     name               = "kubernetes-node-${var.cluster}"
     path               = "/"
-    assume_role_policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
+    assume_role_policy = "${var.iam_common_assume_role_policy}"
 }
-POLICY
+
+resource "aws_iam_role" "kubernetes-etcd" {
+    name               = "kubernetes-etcd-${var.cluster}"
+    path               = "/"
+    assume_role_policy = "${var.iam_common_assume_role_policy}"
 }
 
 resource "aws_iam_role_policy" "kubernetes-master" {
@@ -54,38 +53,11 @@ resource "aws_iam_role_policy" "kubernetes-master" {
     policy = <<POLICY
 {
   "Version": "2012-10-17",
-  "Statement": [
-    {
+  "Statement": [{
       "Effect": "Allow",
-      "Action": [
-        "ec2:*"
-      ],
-      "Resource": [
-        "*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "elasticloadbalancing:*"
-      ],
-      "Resource": [
-        "*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": "ec2:Describe*",
+      "Action": [ "ec2:*", "elasticloadbalancing:*" ],
       "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": "s3:*",
-      "Resource": [
-        "arn:aws:s3:::kubernetes-*"
-      ]
-    }
-  ]
+   }]
 }
 POLICY
 }
@@ -96,30 +68,24 @@ resource "aws_iam_role_policy" "kubernetes-node" {
     policy = <<POLICY
 {
   "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "s3:*",
-      "Resource": [
-        "arn:aws:s3:::kubernetes-*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": "ec2:Describe*",
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": "ec2:AttachVolume",
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": "ec2:DetachVolume",
-      "Resource": "*"
-    }
-  ]
+  "Statement": [{
+    "Effect": "Allow",
+    "Action": [ "ec2:Describe*", "ec2:AttachVolume", "ec2:DetachVolume" ],
+    "Resource": "*"
+  }]
+}
+POLICY
+}
+
+resource "aws_iam_role_policy" "kubernetes-etcd" {
+    name   = "kubernetes-etcd-${var.cluster}"
+    role   = "${aws_iam_role.kubernetes-etcd.name}"
+    policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow", "Action": "ec2:Describe*", "Resource": "*"
+  }]
 }
 POLICY
 }

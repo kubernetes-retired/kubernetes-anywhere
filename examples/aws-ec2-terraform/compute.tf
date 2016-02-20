@@ -83,8 +83,7 @@ resource "aws_instance" "kubernetes-etcd" {
     vpc_security_group_ids      = ["${aws_security_group.kubernetes-master.id}"]
     associate_public_ip_address = true
     source_dest_check           = true
-    ## TODO: probably needs a more restrictive role
-    iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-master.name}"
+    iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-etcd.name}"
     user_data                   = "${file("user-data.yaml")}"
 
     ebs_block_device {
