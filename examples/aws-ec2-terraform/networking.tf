@@ -15,6 +15,7 @@ resource "aws_internet_gateway" "kubernetes-igw" {
 
     tags {
         "KubernetesCluster" = "kubernetes"
+        "Name"              = "kubernetes-igw"
     }
 }
 
@@ -68,6 +69,7 @@ resource "aws_security_group" "kubernetes-master" {
 
     tags {
         "KubernetesCluster" = "kubernetes"
+        "Name"              = "kubernetes-master-sg"
     }
 }
 
@@ -120,6 +122,7 @@ resource "aws_security_group" "kubernetes-node" {
 
     tags {
         "KubernetesCluster" = "kubernetes"
+        "Name"              = "kubernetes-node-sg"
     }
 }
 
@@ -147,6 +150,7 @@ resource "aws_network_acl" "kubernetes-acl" {
 
     tags {
         "KubernetesCluster" = "kubernetes"
+        "Name"              = "kubernetes-acl"
     }
 }
 
@@ -157,6 +161,7 @@ resource "aws_subnet" "kubernetes-subnet" {
 
     tags {
         "KubernetesCluster" = "kubernetes"
+        "Name"              = "kubernetes-subnet"
     }
 }
 
