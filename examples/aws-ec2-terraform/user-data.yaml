@@ -47,7 +47,7 @@ write_files:
     content: |
       #!/bin/bash
 
-      args="--volume=/var/run/weave/weave.sock:/weave.sock"
+      args="--volume=/var/run/weave/weave.sock:/docker.sock"
 
       if [ -n "${SSH_AUTH_SOCK}" ] ; then
         args="${volumes} --volume=${SSH_AUTH_SOCK}:/agent.sock --env=SSH_AUTH_SOCK=/agent.sock"

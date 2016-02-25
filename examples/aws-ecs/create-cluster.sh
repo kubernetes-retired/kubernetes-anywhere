@@ -187,7 +187,7 @@ do echo $i:
   ssh $SSH_FLAGS ec2-user@$i \
     docker -H unix:///var/run/weave/weave.sock run \
       --volume="/:/rootfs" \
-      --volume="/var/run/weave/weave.sock:/weave.sock" \
+      --volume="/var/run/weave/weave.sock:/docker.sock" \
       weaveworks/kubernetes-anywhere:tools \
       setup-kubelet-volumes
   ssh $SSH_FLAGS ec2-user@$i \

@@ -1,7 +1,7 @@
 FROM centos:7
 LABEL works.weave.role=system
 
-ENV DOCKER_HOST=unix:///weave.sock
+ENV DOCKER_HOST=unix:///docker.sock
 
 ENV WD=/etc/resources
 

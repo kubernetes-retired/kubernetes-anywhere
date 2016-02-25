@@ -28,7 +28,7 @@ eval $(weave env)
 ### Deploy Kubernetes services
 
 ```
-$ docker run -ti -v /:/rootfs -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools bash -l
+$ docker run -ti -v /:/rootfs -v /var/run/weave/weave.sock:/docker.sock weaveworks/kubernetes-anywhere:tools bash -l
 # setup-kubelet-volumes
 # compose -p kube up -d
 # exit
@@ -154,7 +154,7 @@ On `$KUBE_WORKER_1` & `$KUBE_WORKER_2`, start kubelet and proxy like this:
 ```
 docker run \
       --volume="/:/rootfs" \
-      --volume="/var/run/weave/weave.sock:/weave.sock" \
+      --volume="/var/run/docker.sock:/docker.sock" \
       weaveworks/kubernetes-anywhere:tools \
       setup-kubelet-volumes
 docker run -d \
@@ -222,7 +222,7 @@ If one assumes that their registry is a secure place, TLS configuration can be d
 First run [a helper script](https://github.com/weaveworks/weave-kubernetes-anywhere/blob/master/docker-images/setup-secure-cluster-config-volumes.sh) shipped in the `weaveworks/kubernetes-anywhere:tools`:
 
 ```
-docker run -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools setup-secure-cluster-config-volumes
+docker run -v /var/run/docker.sock:/docker.sock weaveworks/kubernetes-anywhere:tools setup-secure-cluster-config-volumes
 ```
 
 which results in a number of containers tagged `kubernetes-anywhere:<component>-secure-config`, e.g.
@@ -249,7 +249,7 @@ docker run -d --name=kube-apiserver --volumes-from=kube-apiserver-secure-config 
 
 ### Kubelet
 ```
-docker run -v /:/rootfs -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools setup-kubelet-volumes
+docker run -v /:/rootfs -v /var/run/docker.sock:/docker.sock weaveworks/kubernetes-anywhere:tools setup-kubelet-volumes
 docker run --name=kubelet-secure-config kubernetes-anywhere:kubelet-secure-config
 docker run -d --name=kubelet  --privileged=true --net=host --pid=host --volumes-from=kubelet-volumes --volumes-from=kubelet-secure-config weaveworks/kubernetes-anywhere:kubelet
 ```

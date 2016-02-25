@@ -18,7 +18,7 @@ then ## TODO: check if not needed with v1.2.0 is out (see kubernetes/kubernetes#
 fi
 
 exec /hyperkube kubelet ${args} \
-  --docker-endpoint="unix:/weave.sock" \
+  --docker-endpoint="unix:/docker.sock" \
   --cluster-dns="10.16.0.3" \
   --resolv-conf="/dev/null" \
   --cluster-domain="cluster.local" \
