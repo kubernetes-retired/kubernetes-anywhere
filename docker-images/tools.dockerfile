@@ -5,7 +5,7 @@ ENV DOCKER_HOST=unix:///docker.sock
 
 ENV WD=/etc/resources
 
-ENV KUBE_RELEASE=v1.1.7
+ENV KUBE_RELEASE=v1.1.8
 
 RUN yum --assumeyes --quiet install openssl python-setuptools git-core
 
@@ -17,7 +17,7 @@ RUN curl --silent --location \
   && chmod +x /usr/bin/jq ;
 
 RUN curl --silent --location \
-  https://get.docker.com/builds/Linux/x86_64/docker-1.10.1 \
+  https://get.docker.com/builds/Linux/x86_64/docker-1.10.2 \
   --output /usr/bin/docker \
   && chmod +x /usr/bin/docker ;
 
@@ -56,7 +56,7 @@ RUN cp -a $WD/skydns-addon $WD/skydns-addon-secure ; \
   sed 's|\(- -kube_master_url=http://kube-apiserver.weave.local:8080\)$|# \1|' -i $WD/skydns-addon-secure/controller.yaml
 
 RUN curl --silent --location \
-  https://github.com/docker/compose/releases/download/1.6.0/docker-compose-Linux-x86_64 \
+  https://github.com/docker/compose/releases/download/1.6.2/docker-compose-Linux-x86_64 \
   --output /usr/bin/compose \
   && chmod +x /usr/bin/compose ;
 
