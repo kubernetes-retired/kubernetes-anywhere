@@ -1,5 +1,5 @@
 resource "aws_launch_configuration" "kubernetes-node-group" {
-    name                        = "kubernetes-node-group"
+    name                        = "kubernetes-node-group-${var.cluster}"
     image_id                    = "${lookup(var.ami, var.ec2_region)}"
     instance_type               = "${var.node_instance_type}"
     iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-node.name}"
@@ -18,18 +18,18 @@ resource "aws_launch_configuration" "kubernetes-node-group" {
 }
 
 resource "aws_autoscaling_group" "kubernetes-node-group" {
-    desired_capacity          = 3
-    health_check_grace_period = 0
-    health_check_type         = "EC2"
+    name                      = "kubernetes-node-group-${var.cluster}"
     launch_configuration      = "${aws_launch_configuration.kubernetes-node-group.name}"
+    vpc_zone_identifier       = ["${aws_subnet.kubernetes-subnet.id}"]
+    desired_capacity          = 3
     max_size                  = 3
     min_size                  = 3
-    name                      = "kubernetes-node-group"
-    vpc_zone_identifier       = ["${aws_subnet.kubernetes-subnet.id}"]
+    health_check_grace_period = 0
+    health_check_type         = "EC2"
 
     tag {
         key                  = "KubernetesCluster"
-        value                = "kubernetes"
+        value                = "kubernetes-${var.cluster}"
         propagate_at_launch  = true
     }
 
@@ -67,7 +67,7 @@ resource "aws_instance" "kubernetes-master" {
     }
 
     tags {
-        "KubernetesCluster" = "kubernetes"
+        "KubernetesCluster" = "kubernetes-${var.cluster}"
         "Name"              = "kubernetes-master"
     }
 }
@@ -100,7 +100,7 @@ resource "aws_instance" "kubernetes-etcd" {
     }
 
     tags {
-        "KubernetesCluster"      = "kubernetes"
+        "KubernetesCluster"      = "kubernetes-${var.cluster}"
         "Name"                   = "kubernetes-etcd"
         "KubernetesEtcdNodeName" = "etcd${count.index + 1}"
     }
