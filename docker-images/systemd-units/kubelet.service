@@ -7,6 +7,7 @@ Documentation=http://kubernetes.io/
 Environment=KUBERNETES_ANYWHERE_TOOLS_IMAGE=weaveworks/kubernetes-anywhere:tools
 Environment=KUBERNETES_ANYWHERE_KUBELET_IMAGE=weaveworks/kubernetes-anywhere:kubelet
 EnvironmentFile=-/etc/kubernetes-anywhere.env
+ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_TOOLS_IMAGE
 ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_KUBELET_IMAGE
 ExecStartPre=-/usr/bin/docker rm -f kubelet
 ExecStartPre=-/usr/bin/docker run \
