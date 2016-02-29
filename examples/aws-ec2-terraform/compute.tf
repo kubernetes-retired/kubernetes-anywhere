@@ -1,6 +1,6 @@
 resource "aws_launch_configuration" "kubernetes-node-group" {
     name                        = "kubernetes-node-group-${var.cluster}"
-    image_id                    = "${module.ubuntu_ami.ami_id}"
+    image_id                    = "${module.ami.ami_id}"
     instance_type               = "${var.node_instance_type}"
     iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-node.name}"
     ebs_optimized               = false
@@ -41,7 +41,7 @@ resource "aws_autoscaling_group" "kubernetes-node-group" {
 }
 
 resource "aws_instance" "kubernetes-master" {
-    ami                         = "${module.ubuntu_ami.ami_id}"
+    ami                         = "${module.ami.ami_id}"
     ebs_optimized               = false
     instance_type               = "${var.master_instance_type}"
     monitoring                  = false
@@ -74,7 +74,7 @@ resource "aws_instance" "kubernetes-master" {
 
 resource "aws_instance" "kubernetes-etcd" {
     count                       = 3
-    ami                         = "${module.ubuntu_ami.ami_id}"
+    ami                         = "${module.ami.ami_id}"
     ebs_optimized               = false
     instance_type               = "${var.etcd_instance_type}"
     monitoring                  = false
