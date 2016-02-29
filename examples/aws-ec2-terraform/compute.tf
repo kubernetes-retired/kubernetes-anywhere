@@ -8,7 +8,7 @@ resource "aws_launch_configuration" "kubernetes-node-group" {
     key_name                    = "${var.ec2_key_name}"
     security_groups             = ["${aws_security_group.kubernetes-main.id}"]
     associate_public_ip_address = true
-    user_data                   = "${file("user-data.yaml")}"
+    user_data                   = "${file("${path.module}/user-data.yaml")}"
 
     root_block_device {
         volume_type           = "gp2"
@@ -51,7 +51,7 @@ resource "aws_instance" "kubernetes-master" {
     associate_public_ip_address = true
     source_dest_check           = true
     iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-master.name}"
-    user_data                   = "${file("user-data.yaml")}"
+    user_data                   = "${file("${path.module}/user-data.yaml")}"
 
     ebs_block_device {
         device_name           = "/dev/sdb"
@@ -84,7 +84,7 @@ resource "aws_instance" "kubernetes-etcd" {
     associate_public_ip_address = true
     source_dest_check           = true
     iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-etcd.name}"
-    user_data                   = "${file("user-data.yaml")}"
+    user_data                   = "${file("${path.module}/user-data.yaml")}"
 
     ebs_block_device {
         device_name           = "/dev/sdb"
