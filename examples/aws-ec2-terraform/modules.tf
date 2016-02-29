@@ -4,5 +4,5 @@ module "ubuntu_ami" {
     distribution = "willy"
     architecture = "amd64"
     virttype     = "hvm"
-    storagetype  = "ssd"
+    storagetype  = "ebs-ssd"
 }
