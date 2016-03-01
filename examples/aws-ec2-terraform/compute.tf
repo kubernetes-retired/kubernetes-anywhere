@@ -105,3 +105,11 @@ resource "aws_instance" "kubernetes-etcd" {
         "KubernetesEtcdNodeName" = "etcd${count.index + 1}"
     }
 }
+
+resource "aws_ecr_repository" "kubernetes-master-secure-config-registry" {
+  name = "kubernetes-anywhere-${var.cluster}-master-secure-config-registry"
+}
+
+resource "aws_ecr_repository" "kubernetes-node-secure-config-registry" {
+  name = "kubernetes-anywhere-${var.cluster}-node-secure-config-registry"
+}
