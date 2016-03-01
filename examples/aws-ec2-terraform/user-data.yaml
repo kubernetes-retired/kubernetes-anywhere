@@ -50,7 +50,7 @@ write_files:
       args="--volume=/var/run/weave/weave.sock:/docker.sock"
 
       if [ -n "${SSH_AUTH_SOCK}" ] ; then
-        args="${volumes} --volume=${SSH_AUTH_SOCK}:/agent.sock --env=SSH_AUTH_SOCK=/agent.sock"
+        args="${args} --volume=${SSH_AUTH_SOCK}:/agent.sock --env=SSH_AUTH_SOCK=/agent.sock"
       fi
 
       exec sudo docker --host="unix:///var/run/weave/weave.sock" run \
