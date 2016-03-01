@@ -30,15 +30,19 @@ image_prefix=${registry}/${instance_kubernetescluster_tag}
 
 print_image_variable() {
   u=${1^^};
-  echo KUBERNETES_ANYWHERE_${u/-/_}_SECURE_CONFIG_IMAGE=\"${image_prefix}/master/secure-config:${1}\"
+  echo KUBERNETES_ANYWHERE_${u/-/_}_SECURE_CONFIG_IMAGE=\"${2}\"
 }
 
 for i in apiserver controller-manager scheduler ; do
-  docker tag kubernetes-anywhere:${i}-secure-config ${image_prefix}/master/secure-config:${i}
-  print_image_variable $i >> /kubernetes-anywhere.env
+  t="${image_prefix}/master/secure-config:${i}"
+  docker tag kubernetes-anywhere:${i}-secure-config $t
+  docker push $t
+  print_image_variable $i $t >> /kubernetes-anywhere.env
 done
 
 for i in kubelet proxy tools ; do
-  docker tag kubernetes-anywhere:${i}-secure-config ${image_prefix}/node/secure-config:${i}
-  print_image_variable $i >> /kubernetes-anywhere.env
+  t="${image_prefix}/master/secure-config:${i}"
+  docker tag kubernetes-anywhere:${i}-secure-config $t
+  docker push $t
+  print_image_variable $i $t >> /kubernetes-anywhere.env
 done
