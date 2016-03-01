@@ -61,7 +61,25 @@ resource "aws_iam_role_policy" "kubernetes-master" {
     },
     {
       "Effect": "Allow",
-      "Action": [ "ecr:*" ],
+      "Action": [
+        "ecr:GetAuthorizationToken",
+        "ecr:GetRepositoryPolicy",
+        "ecr:DescribeRepositories"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:ListImages",
+        "ecr:BatchGetImage",
+        "ecr:InitiateLayerUpload",
+        "ecr:UploadLayerPart",
+        "ecr:CompleteLayerUpload",
+        "ecr:PutImage"
+      ],
       "Resource": [
         "${aws_ecr_repository.kubernetes-master-secure-config-registry.arn}",
         "${aws_ecr_repository.kubernetes-node-secure-config-registry.arn}"
@@ -81,10 +99,15 @@ resource "aws_iam_role_policy" "kubernetes-node" {
   "Statement": [
     {
       "Effect": "Allow",
+      "Action": [ "ec2:Describe*", "ec2:AttachVolume", "ec2:DetachVolume" ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
       "Action": [
-        "ec2:Describe*",
-        "ec2:AttachVolume",
-        "ec2:DetachVolume"
+        "ecr:GetAuthorizationToken",
+        "ecr:GetRepositoryPolicy",
+        "ecr:DescribeRepositories"
       ],
       "Resource": "*"
     },
@@ -93,8 +116,6 @@ resource "aws_iam_role_policy" "kubernetes-node" {
       "Action": [
         "ecr:BatchCheckLayerAvailability",
         "ecr:BatchGetImage",
-        "ecr:DescribeRepositories",
-        "ecr:GetAuthorizationToken",
         "ecr:GetDownloadUrlForLayer",
         "ecr:GetRepositoryPolicy",
         "ecr:ListImages"
