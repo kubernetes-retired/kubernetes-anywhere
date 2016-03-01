@@ -7,8 +7,9 @@ Documentation=http://kubernetes.io/
 Environment=KUBERNETES_ANYWHERE_PROXY_IMAGE=weaveworks/kubernetes-anywhere:proxy
 Environment=KUBERNETES_ANYWHERE_PROXY_SECURE_CONFIG_IMAGE=kubernetes-anywhere:proxy-secure-config
 EnvironmentFile=-/etc/kubernetes-anywhere.env
+EnvironmentFile=-/etc/kubernetes-anywhere-secure-config-images.env
 ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_PROXY_IMAGE
-ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_PROXY_SECURE_CONFIG_IMAGE
+ExecStartPre=-/usr/bin/docker pull $KUBERNETES_ANYWHERE_PROXY_SECURE_CONFIG_IMAGE
 ExecStartPre=-/usr/bin/docker rm -f kube-proxy
 ExecStartPre=-/usr/bin/docker rm -f kube-proxy-secure-config
 ExecStartPre=-/usr/bin/docker run \

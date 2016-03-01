@@ -8,9 +8,10 @@ Environment=KUBERNETES_ANYWHERE_TOOLS_IMAGE=weaveworks/kubernetes-anywhere:tools
 Environment=KUBERNETES_ANYWHERE_KUBELET_IMAGE=weaveworks/kubernetes-anywhere:kubelet
 Environment=KUBERNETES_ANYWHERE_KUBELET_SECURE_CONFIG_IMAGE=kubernetes-anywhere:kubelet-secure-config
 EnvironmentFile=-/etc/kubernetes-anywhere.env
+EnvironmentFile=-/etc/kubernetes-anywhere-secure-config-images.env
 ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_TOOLS_IMAGE
 ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_KUBELET_IMAGE
-ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_KUBELET_SECURE_CONFIG_IMAGE
+ExecStartPre=-/usr/bin/docker pull $KUBERNETES_ANYWHERE_KUBELET_SECURE_CONFIG_IMAGE
 ExecStartPre=-/usr/bin/docker rm -f kubelet
 ExecStartPre=-/usr/bin/docker rm -f kubelet-secure-config
 ExecStartPre=-/usr/bin/docker run \

@@ -8,8 +8,9 @@ Documentation=http://kubernetes.io/
 Environment=KUBERNETES_ANYWHERE_SCHEDULER_IMAGE=weaveworks/kubernetes-anywhere:scheduler
 Environment=KUBERNETES_ANYWHERE_SCHEDULER_SECURE_CONFIG_IMAGE=kubernetes-anywhere:scheduler-secure-config
 EnvironmentFile=-/etc/kubernetes-anywhere.env
+EnvironmentFile=-/etc/kubernetes-anywhere-secure-config-images.env
 ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_SCHEDULER_IMAGE
-ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_SCHEDULER_SECURE_CONFIG_IMAGE
+ExecStartPre=-/usr/bin/docker pull $KUBERNETES_ANYWHERE_SCHEDULER_SECURE_CONFIG_IMAGE
 ExecStartPre=-/usr/bin/docker rm -f kube-scheduler
 ExecStartPre=-/usr/bin/docker rm -f kube-scheduler-secure-config
 ExecStartPre=-/usr/bin/docker run \

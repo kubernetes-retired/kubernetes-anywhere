@@ -8,8 +8,9 @@ Documentation=http://kubernetes.io/
 Environment=KUBERNETES_ANYWHERE_CONTROLLER_MANAGER_IMAGE=weaveworks/kubernetes-anywhere:controller-manager
 Environment=KUBERNETES_ANYWHERE_CONTROLLER_MANAGER_SECURE_CONFIG_IMAGE=kubernetes-anywhere:controller-manager-secure-config
 EnvironmentFile=-/etc/kubernetes-anywhere.env
+EnvironmentFile=-/etc/kubernetes-anywhere-secure-config-images.env
 ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_CONTROLLER_MANAGER_IMAGE
-ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_CONTROLLER_MANAGER_SECURE_CONFIG_IMAGE
+ExecStartPre=-/usr/bin/docker pull $KUBERNETES_ANYWHERE_CONTROLLER_MANAGER_SECURE_CONFIG_IMAGE
 ExecStartPre=-/usr/bin/docker rm -f kube-controller-manager
 ExecStartPre=-/usr/bin/docker rm -f kube-controller-manager-secure-config
 ExecStartPre=-/usr/bin/docker run \
