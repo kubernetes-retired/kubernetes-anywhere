@@ -30,3 +30,8 @@ variable "aws_region" {
    description = "The EC2 region where to deploy Kubernetes cluster"
    default     = "us-east-1"
 }
+
+variable "cluster_config_flavour" {
+   description = "Flavour of the cluster config (secure or simple)"
+   default     = "simple"
+}
