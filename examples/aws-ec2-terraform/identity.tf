@@ -70,7 +70,12 @@ resource "aws_iam_role_policy" "kubernetes-node" {
   "Version": "2012-10-17",
   "Statement": [{
     "Effect": "Allow",
-    "Action": [ "ec2:Describe*", "ec2:AttachVolume", "ec2:DetachVolume" ],
+    "Action": [
+      "ec2:Describe*", "ec2:AttachVolume", "ec2:DetachVolume",
+      "ecr:BatchCheckLayerAvailability", "ecr:BatchGetImage",
+      "ecr:DescribeRepositories", "ecr:GetDownloadUrlForLayer",
+      "ecr:GetRepositoryPolicy", "ecr:ListImages"
+    ],
     "Resource": "*"
   }]
 }
