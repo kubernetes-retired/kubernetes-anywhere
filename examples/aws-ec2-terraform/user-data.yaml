@@ -120,7 +120,7 @@ write_files:
       docker version
       docker pull weaveworks/kubernetes-anywhere:tools
       docker images
-      docker run -v /etc/systemd/system:/host-systemd weaveworks/kubernetes-anywhere:tools install-basic-systemd-units
+      docker run -v /etc/systemd/system:/host-systemd weaveworks/kubernetes-anywhere:tools install-simple-systemd-units
 
       systemctl daemon-reload
 

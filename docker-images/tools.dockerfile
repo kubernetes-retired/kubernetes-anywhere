@@ -67,10 +67,11 @@ ADD setup-secure-cluster-config-volumes.sh /usr/bin/setup-secure-cluster-config-
 
 ADD find-weave-peers-by-ec2-tag.sh /usr/bin/find-weave-peers-by-ec2-tag
 ADD describe-ec2-node.sh /usr/bin/describe-ec2-node
-ADD install-basic-systemd-units.sh /usr/bin/install-basic-systemd-units
+ADD install-simple-systemd-units.sh /usr/bin/install-simple-systemd-units
 ADD install-secure-systemd-units.sh /usr/bin/install-secure-systemd-units
 
-ADD systemd-units-basic /usr/share/systemd-units-basic/
-ADD systemd-units-secure /usr/share/systemd-units-secure/
+ADD systemd-units-common /usr/share/kubernetes-anywhere-systemd-units-common/
+ADD systemd-units-simple /usr/share/kubernetes-anywhere-systemd-units-simple/
+ADD systemd-units-secure /usr/share/kubernetes-anywhere-systemd-units-secure/
 
 WORKDIR $WD
