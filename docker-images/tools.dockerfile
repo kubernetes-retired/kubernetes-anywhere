@@ -66,6 +66,7 @@ ADD setup-kubelet-volumes.sh /usr/bin/setup-kubelet-volumes
 ADD setup-secure-cluster-config-volumes.sh /usr/bin/setup-secure-cluster-config-volumes
 ADD make-ecr-secure-config-images.sh /usr/bin/make-ecr-secure-config-images
 ADD find-ecr-secure-config-images.sh /usr/bin/find-ecr-secure-config-images
+ADD ecr-login.sh /usr/bin/ecr-login
 
 ADD find-weave-peers-by-ec2-tag.sh /usr/bin/find-weave-peers-by-ec2-tag
 ADD describe-ec2-node.sh /usr/bin/describe-ec2-node
