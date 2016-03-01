@@ -34,6 +34,6 @@ for i in apiserver controller-manager scheduler
 do tag_and_push master $i
 done
 
-for i in kubelet proxy tools ; do
+for i in kubelet proxy tools
 do tag_and_push node $i
 done
