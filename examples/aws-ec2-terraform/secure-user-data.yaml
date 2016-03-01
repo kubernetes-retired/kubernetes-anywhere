@@ -159,7 +159,6 @@ write_files:
               weaveworks/kubernetes-anywhere:tools make-ecr-secure-config-images
 
           docker run \
-            -v /var/run/docker.sock:/docker.sock \
               weaveworks/kubernetes-anywhere:tools find-ecr-secure-config-images \
               > /etc/kubernetes-anywhere-secure-config-images.env
 
@@ -179,7 +178,6 @@ write_files:
               weaveworks/kubernetes-anywhere:tools ecr-login
 
           docker run \
-            -v /var/run/docker.sock:/docker.sock \
               weaveworks/kubernetes-anywhere:tools find-ecr-secure-config-images \
               > /etc/kubernetes-anywhere-secure-config-images.env
 
