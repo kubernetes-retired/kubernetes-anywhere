@@ -66,7 +66,7 @@ resource "aws_iam_role_policy" "kubernetes-master" {
         "${aws_ecr_repository.kubernetes-master-secure-config-registry.arn}",
         "${aws_ecr_repository.kubernetes-node-secure-config-registry.arn}"
       ]
-    },
+    }
   ]
 }
 POLICY
@@ -100,7 +100,7 @@ resource "aws_iam_role_policy" "kubernetes-node" {
         "ecr:ListImages"
       ],
       "Resource": "${aws_ecr_repository.kubernetes-node-secure-config-registry.arn}"
-    },
+    }
   ]
 }
 POLICY
