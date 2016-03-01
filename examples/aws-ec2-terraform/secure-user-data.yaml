@@ -46,8 +46,14 @@ write_files:
     owner: root
     content: |
       #!/bin/bash
+      source /etc/kubernetes-anywhere.env
 
-      args="--volume=/var/run/weave/weave.sock:/docker.sock"
+      sudo docker pull ${KUBERNETES_ANYWHERE_TOOLS_SECURE_CONFIG_IMAGE}
+
+      ## TODO: find a way to avoid garbage
+      secure_config_container=$(sudo docker run ${KUBERNETES_ANYWHERE_TOOLS_SECURE_CONFIG_IMAGE})
+
+      args="--volume=/var/run/weave/weave.sock:/docker.sock --volume-from=${secure_config_container}"
 
       if [ -n "${SSH_AUTH_SOCK}" ] ; then
         args="${args} --volume=${SSH_AUTH_SOCK}:/agent.sock --env=SSH_AUTH_SOCK=/agent.sock"
@@ -135,7 +141,10 @@ write_files:
           systemctl start etcd.service
           ;;
         kubernetes-master)
-          docker run -v /etc/kubernetes-anywhere.env:/kubernetes-anywhere.env weaveworks/kubernetes-anywhere:tools build-and-push-secure-cluster-config-volumes-to-ecr
+          docker run \
+            -v /var/run/docker.sock:/docker.sock \
+            -v /etc/kubernetes-anywhere.env:/kubernetes-anywhere.env \
+              weaveworks/kubernetes-anywhere:tools build-and-push-secure-cluster-config-volumes-to-ecr
           systemctl enable kube-apiserver.service kube-scheduler.service kube-controller-manager.service kubernetes-master.target
           systemctl start kubernetes-master.target
           ;;
