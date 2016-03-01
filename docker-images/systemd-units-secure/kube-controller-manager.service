@@ -1,0 +1,26 @@
+[Unit]
+Wants=weave-network.target
+After=weave-network.target
+After=kube-apiserver.service
+Description=Kubernetes Controller Manager
+Documentation=http://kubernetes.io/
+[Service]
+Environment=KUBERNETES_ANYWHERE_CONTROLLER_MANAGER_IMAGE=weaveworks/kubernetes-anywhere:controller-manager
+Environment=KUBERNETES_ANYWHERE_CONTROLLER_MANAGER_SECURE_CONFIG_IMAGE=kubernetes-anywhere:controller-manager-secure-config
+EnvironmentFile=-/etc/kubernetes-anywhere.env
+ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_CONTROLLER_MANAGER_IMAGE
+ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_CONTROLLER_MANAGER_SECURE_CONFIG_IMAGE
+ExecStartPre=-/usr/bin/docker rm -f kube-controller-manager
+ExecStartPre=-/usr/bin/docker rm -f kube-controller-manager-secure-config
+ExecStartPre=-/usr/bin/docker run \
+  --name=kube-controller-manager-secure-config \
+    $KUBERNETES_ANYWHERE_CONTROLLER_MANAGER_SECURE_CONFIG_IMAGE
+ExecStart=/usr/bin/docker --host=unix:///var/run/weave/weave.sock run \
+  --env=CLOUD_PROVIDER \
+  --name=kube-controller-manager \
+  --volumes-from=kube-controller-manager-secure-config \
+    $KUBERNETES_ANYWHERE_CONTROLLER_MANAGER_IMAGE
+Restart=always
+RestartSec=10
+[Install]
+WantedBy=kubernetes-master.target

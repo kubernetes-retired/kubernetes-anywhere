@@ -1,0 +1,21 @@
+[Unit]
+Wants=weave-network.target
+After=weave-network.target
+[Service]
+Environment=SCOPE_IMAGE_TAG=latest
+Environment=KUBE_APISERVER_URL=http://kube-apiserver.weave.local:8080
+EnvironmentFile=-/etc/kubernetes-anywhere.env
+ExecStartPre=/usr/bin/docker pull weaveworks/scope:${SCOPE_IMAGE_TAG}
+ExecStartPre=-/usr/bin/docker rm -f weavescope
+ExecStart=/usr/bin/docker --host=unix:///var/run/weave/weave.sock run \
+  --privileged=true --net=host --pid=host \
+  --volume="/var/run/docker.sock:/var/run/docker.sock" \
+  --name=weavescope \
+    weaveworks/scope:${SCOPE_IMAGE_TAG} \
+    --probe.docker true \
+    --probe.kubernetes true \
+    --probe.kubernetes.api $KUBE_APISERVER_URL
+Restart=always
+RestartSec=10
+[Install]
+WantedBy=multi-user.target

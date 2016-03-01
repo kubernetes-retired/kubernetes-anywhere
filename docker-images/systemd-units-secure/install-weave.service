@@ -1,0 +1,27 @@
+[Unit]
+After=network-online.target
+After=docker.service
+Before=weave.service
+Requires=docker.service
+Requires=network-online.target
+Description=Install Weave
+Documentation=http://docs.weave.works/
+ConditionFileNotEmpty=!/usr/local/bin/weave-${WEAVE_SCRIPT_VERSION}
+ConditionFileIsExecutable=!/usr/local/bin/weave-${WEAVE_SCRIPT_VERSION}
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+TimeoutStartSec=0
+Environment=WEAVE_SCRIPT_VERSION=latest_release
+EnvironmentFile=-/etc/kubernetes-anywhere.env
+ExecStartPre=/usr/bin/curl \
+  --silent \
+  --location \
+  https://github.com/weaveworks/weave/releases/download/${WEAVE_SCRIPT_VERSION}/weave \
+  --output /usr/local/bin/weave-${WEAVE_SCRIPT_VERSION}
+ExecStartPre=/bin/chmod +x /usr/local/bin/weave-${WEAVE_SCRIPT_VERSION}
+ExecStartPre=/bin/ln -s -f /usr/local/bin/weave-${WEAVE_SCRIPT_VERSION} /usr/local/bin/weave
+ExecStart=/usr/local/bin/weave setup
+[Install]
+WantedBy=weave-network.target
+WantedBy=weave.service
