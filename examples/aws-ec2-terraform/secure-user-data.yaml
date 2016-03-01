@@ -46,14 +46,16 @@ write_files:
     owner: root
     content: |
       #!/bin/bash
-      source /etc/kubernetes-anywhere.env
+      source /etc/kubernetes-anywhere-secure-config-images.env
+
+      export HOME=/root
 
       sudo docker pull ${KUBERNETES_ANYWHERE_TOOLS_SECURE_CONFIG_IMAGE}
 
       ## TODO: find a way to avoid garbage
-      secure_config_container=$(sudo docker run ${KUBERNETES_ANYWHERE_TOOLS_SECURE_CONFIG_IMAGE})
+      secure_config_container=$(sudo docker run --detach ${KUBERNETES_ANYWHERE_TOOLS_SECURE_CONFIG_IMAGE})
 
-      args="--volume=/var/run/weave/weave.sock:/docker.sock --volume-from=${secure_config_container}"
+      args="--volume=/var/run/weave/weave.sock:/docker.sock --volumes-from=${secure_config_container}"
 
       if [ -n "${SSH_AUTH_SOCK}" ] ; then
         args="${args} --volume=${SSH_AUTH_SOCK}:/agent.sock --env=SSH_AUTH_SOCK=/agent.sock"
