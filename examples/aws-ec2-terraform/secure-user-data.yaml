@@ -147,9 +147,10 @@ write_files:
           ;;
         kubernetes-master)
 
+          mkdir -p /root/.docker/
           docker run \
             -v /etc/systemd/system:/host-systemd \
-            -v /root/.docker/config.json:/root/.docker/config.json \
+            -v /root/.docker/:/root/.docker/ \
               weaveworks/kubernetes-anywhere:tools ecr-login
 
           docker run \
@@ -170,9 +171,10 @@ write_files:
           ;;
         kubernetes-node)
 
+          mkdir -p /root/.docker/
           docker run \
             -v /etc/systemd/system:/host-systemd \
-            -v /root/.docker/config.json:/root/.docker/config.json \
+            -v /root/.docker/:/root/.docker/ \
               weaveworks/kubernetes-anywhere:tools ecr-login
 
           docker run \
