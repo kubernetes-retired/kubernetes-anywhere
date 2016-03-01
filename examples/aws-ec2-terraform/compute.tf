@@ -107,9 +107,9 @@ resource "aws_instance" "kubernetes-etcd" {
 }
 
 resource "aws_ecr_repository" "kubernetes-master-secure-config-repository" {
-  name = "kubernetes-anywhere-${var.cluster}-master-secure-config-registry"
+  name = "kubernetes-${var.cluster}/master/secure-config"
 }
 
 resource "aws_ecr_repository" "kubernetes-node-secure-config-repository" {
-  name = "kubernetes-anywhere-${var.cluster}-node-secure-config-registry"
+  name = "kubernetes-${var.cluster}/node/secure-config"
 }
