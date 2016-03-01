@@ -19,8 +19,6 @@ instance_kubernetescluster_tag=$(
   | jq -r '.Reservations[].Instances[].Tags[] | select(.Key=="KubernetesCluster") .Value'
 )
 
-eval $(aws ecr get-login)
-
 registry=$(printf "%s.dkr.ecr.%s.amazonaws.com" \
   $(printf "${doc}" | jq -r .accountId) \
   $(printf "${doc}" | jq -r .region) \
