@@ -64,7 +64,8 @@ ADD docker-compose.yml $WD/
 
 ADD setup-kubelet-volumes.sh /usr/bin/setup-kubelet-volumes
 ADD setup-secure-cluster-config-volumes.sh /usr/bin/setup-secure-cluster-config-volumes
-ADD build-and-push-secure-cluster-config-volumes-to-ecr.sh /usr/bin/build-and-push-secure-cluster-config-volumes-to-ecr
+ADD make-ecr-secure-config-images.sh /usr/bin/make-ecr-secure-config-images
+ADD find-ecr-secure-config-images.sh /usr/bin/find-ecr-secure-config-images
 
 ADD find-weave-peers-by-ec2-tag.sh /usr/bin/find-weave-peers-by-ec2-tag
 ADD describe-ec2-node.sh /usr/bin/describe-ec2-node

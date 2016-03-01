@@ -24,23 +24,16 @@ registry=$(printf "%s.dkr.ecr.%s.amazonaws.com" \
   $(printf "${doc}" | jq -r .region) \
 )
 
-image_prefix=${registry}/${instance_kubernetescluster_tag}
-
-print_image_variable() {
-  u=${1^^};
-  echo KUBERNETES_ANYWHERE_${u/-/_}_SECURE_CONFIG_IMAGE=\"${2}\"
+tag_and_push() {
+  local ecr_tag="${registry}/${instance_kubernetescluster_tag}/${1}/secure-config:${2}"
+  docker tag kubernetes-anywhere:${2}-secure-config $ecr_tag
+  docker push $tag
 }
 
-for i in apiserver controller-manager scheduler ; do
-  t="${image_prefix}/master/secure-config:${i}"
-  docker tag kubernetes-anywhere:${i}-secure-config $t
-  docker push $t
-  print_image_variable $i $t >> /kubernetes-anywhere.env
+for i in apiserver controller-manager scheduler
+do tag_and_push master $i
 done
 
 for i in kubelet proxy tools ; do
-  t="${image_prefix}/master/secure-config:${i}"
-  docker tag kubernetes-anywhere:${i}-secure-config $t
-  docker push $t
-  print_image_variable $i $t >> /kubernetes-anywhere.env
+do tag_and_push node $i
 done

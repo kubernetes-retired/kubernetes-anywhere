@@ -131,11 +131,6 @@ write_files:
 
       docker run \
         -v /etc/systemd/system:/host-systemd \
-        -v /root/.docker/config.json:/root/.docker/config.json
-          weaveworks/kubernetes-anywhere:tools ecr-login
-
-      docker run \
-        -v /etc/systemd/system:/host-systemd \
           weaveworks/kubernetes-anywhere:tools install-secure-systemd-units
 
       systemctl daemon-reload
@@ -151,15 +146,44 @@ write_files:
           systemctl start etcd.service
           ;;
         kubernetes-master)
+
+          docker run \
+            -v /etc/systemd/system:/host-systemd \
+            -v /root/.docker/config.json:/root/.docker/config.json
+              weaveworks/kubernetes-anywhere:tools ecr-login
+
           docker run \
             -v /var/run/docker.sock:/docker.sock \
-            -v /etc/kubernetes-anywhere.env:/kubernetes-anywhere.env \
-              weaveworks/kubernetes-anywhere:tools build-and-push-secure-cluster-config-volumes-to-ecr
-          systemctl enable kube-apiserver.service kube-scheduler.service kube-controller-manager.service kubernetes-master.target
+              weaveworks/kubernetes-anywhere:tools make-ecr-secure-config-images
+
+          docker run \
+            -v /var/run/docker.sock:/docker.sock \
+              weaveworks/kubernetes-anywhere:tools find-ecr-secure-config-images \
+              > /etc/kubernetes-anywhere-secure-config-images.env
+
+          systemctl enable \
+            kube-apiserver.service \
+            kube-scheduler.service \
+            kube-controller-manager.service \
+            kubernetes-master.target
           systemctl start kubernetes-master.target
           ;;
         kubernetes-node)
-          systemctl enable kubelet.service kube-proxy.service kubernetes-node.target
+
+          docker run \
+            -v /etc/systemd/system:/host-systemd \
+            -v /root/.docker/config.json:/root/.docker/config.json
+              weaveworks/kubernetes-anywhere:tools ecr-login
+
+          docker run \
+            -v /var/run/docker.sock:/docker.sock \
+              weaveworks/kubernetes-anywhere:tools find-ecr-secure-config-images \
+              > /etc/kubernetes-anywhere-secure-config-images.env
+
+          systemctl enable \
+            kubelet.service \
+            kube-proxy.service \
+            kubernetes-node.target
           systemctl start kubernetes-node.target
           ;;
       esac
