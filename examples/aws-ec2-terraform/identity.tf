@@ -81,8 +81,8 @@ resource "aws_iam_role_policy" "kubernetes-master" {
         "ecr:PutImage"
       ],
       "Resource": [
-        "${aws_ecr_repository.kubernetes-master-secure-config-registry.arn}",
-        "${aws_ecr_repository.kubernetes-node-secure-config-registry.arn}"
+        "${aws_ecr_repository.kubernetes-master-secure-config-repository.arn}",
+        "${aws_ecr_repository.kubernetes-node-secure-config-repository.arn}"
       ]
     }
   ]
@@ -120,7 +120,7 @@ resource "aws_iam_role_policy" "kubernetes-node" {
         "ecr:GetRepositoryPolicy",
         "ecr:ListImages"
       ],
-      "Resource": "${aws_ecr_repository.kubernetes-node-secure-config-registry.arn}"
+      "Resource": "${aws_ecr_repository.kubernetes-node-secure-config-repository.arn}"
     }
   ]
 }
