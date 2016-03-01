@@ -34,6 +34,6 @@ for i in apiserver controller-manager scheduler
 do print_image_variable master $i
 done
 
-for i in kubelet proxy tools ; do
+for i in kubelet proxy tools
 do print_image_variable node $i
 done
