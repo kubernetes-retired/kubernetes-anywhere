@@ -149,7 +149,7 @@ write_files:
 
           docker run \
             -v /etc/systemd/system:/host-systemd \
-            -v /root/.docker/config.json:/root/.docker/config.json
+            -v /root/.docker/config.json:/root/.docker/config.json \
               weaveworks/kubernetes-anywhere:tools ecr-login
 
           docker run \
@@ -172,7 +172,7 @@ write_files:
 
           docker run \
             -v /etc/systemd/system:/host-systemd \
-            -v /root/.docker/config.json:/root/.docker/config.json
+            -v /root/.docker/config.json:/root/.docker/config.json \
               weaveworks/kubernetes-anywhere:tools ecr-login
 
           docker run \
