@@ -149,8 +149,8 @@ write_files:
 
           mkdir -p /root/.docker/
           docker run \
-            -v /etc/systemd/system:/host-systemd \
             -v /root/.docker/:/root/.docker/ \
+            -v /var/run/docker.sock:/docker.sock \
               weaveworks/kubernetes-anywhere:tools ecr-login
 
           docker run \
@@ -173,8 +173,8 @@ write_files:
 
           mkdir -p /root/.docker/
           docker run \
-            -v /etc/systemd/system:/host-systemd \
             -v /root/.docker/:/root/.docker/ \
+            -v /var/run/docker.sock:/docker.sock \
               weaveworks/kubernetes-anywhere:tools ecr-login
 
           docker run \
