@@ -12,6 +12,23 @@ You no longer have to care about the IP address of the API server or any of thos
 
 All you need is one or more Docker hosts.
 
+## Using Terraform in EC2
+
+```HCL
+module "kubernetes-anywhere-aws-ec2" {
+    source         = "github.com/weaveworks/weave-kubernetes-anywhere/examples/aws-ec2-terraform"
+    aws_access_key = "${var.aws_access_key}"
+    aws_secret_key = "${var.aws_secret_key}"
+    aws_region     = "us-east-1" # currently the only supported region as it uses ECR
+
+    cluster                = "devx"
+    cluster_config_flavour = "secure" # or simple, if you don't need TLS
+    
+    # You can also set instance types with node_instance_type/master_instance_type/etcd_instance_type
+    # For SSH access, you will need to create a key named kubernetes-anywhere or set ec2_key_name
+}
+```
+
 ## Get started using a single Docker host
 
 ### Launch Weave
