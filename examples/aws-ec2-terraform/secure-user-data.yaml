@@ -69,7 +69,6 @@ write_files:
     permissions: '0600'
     owner: root
     content: |
-      WEAVE_DEBUG=1
       WEAVE_VERSION="awh1"
       WEAVEPROXY_ARGS="--log-level=debug"
       WEAVE_INIT_PEER_COUNT="--init-peer-count 7"
