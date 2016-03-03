@@ -62,6 +62,8 @@ RUN curl --silent --location \
 
 ADD docker-compose.yml $WD/
 
+ADD run-e2e-tests-ec2.sh /usr/bin/run-e2e-tests-ec2
+
 ADD setup-kubelet-volumes.sh /usr/bin/setup-kubelet-volumes
 ADD setup-secure-cluster-config-volumes.sh /usr/bin/setup-secure-cluster-config-volumes
 ADD make-ecr-secure-config-images.sh /usr/bin/make-ecr-secure-config-images
