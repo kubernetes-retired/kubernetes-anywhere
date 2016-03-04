@@ -46,9 +46,17 @@ write_files:
     owner: root
     content: |
       #!/bin/bash
+      source /etc/kubernetes-anywhere.env
       source /etc/kubernetes-anywhere-secure-config-images.env
 
       export HOME=/root
+
+      tools=${KUBERNETES_ANYWHERE_TOOLS_IMAGE:"weaveworks/kubernetes-anywhere:tools"}
+      sudo docker pull $tools
+      docker run \
+        -v /root/.docker/:/root/.docker/ \
+        -v /var/run/docker.sock:/docker.sock \
+          $tools ecr-login
 
       sudo docker pull ${KUBERNETES_ANYWHERE_TOOLS_SECURE_CONFIG_IMAGE}
 
@@ -60,6 +68,7 @@ write_files:
       if [ -n "${SSH_AUTH_SOCK}" ] ; then
         args="${args} --volume=${SSH_AUTH_SOCK}:/agent.sock --env=SSH_AUTH_SOCK=/agent.sock"
       fi
+
 
       exec sudo docker --host="unix:///var/run/weave/weave.sock" run \
         --tty --interactive ${args} \
