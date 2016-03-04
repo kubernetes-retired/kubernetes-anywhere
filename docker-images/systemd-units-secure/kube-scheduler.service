@@ -1,0 +1,26 @@
+[Unit]
+Wants=weave-network.target
+After=weave-network.target
+After=kube-apiserver.service
+Description=Kubernetes Scheduler
+Documentation=http://kubernetes.io/
+[Service]
+Environment=KUBERNETES_ANYWHERE_SCHEDULER_IMAGE=weaveworks/kubernetes-anywhere:scheduler
+Environment=KUBERNETES_ANYWHERE_SCHEDULER_SECURE_CONFIG_IMAGE=kubernetes-anywhere:scheduler-secure-config
+EnvironmentFile=-/etc/kubernetes-anywhere.env
+EnvironmentFile=-/etc/kubernetes-anywhere-secure-config-images.env
+ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_SCHEDULER_IMAGE
+ExecStartPre=-/usr/bin/docker pull $KUBERNETES_ANYWHERE_SCHEDULER_SECURE_CONFIG_IMAGE
+ExecStartPre=-/usr/bin/docker rm -f kube-scheduler
+ExecStartPre=-/usr/bin/docker rm -f kube-scheduler-secure-config
+ExecStartPre=-/usr/bin/docker run \
+  --name=kube-scheduler-secure-config \
+    $KUBERNETES_ANYWHERE_SCHEDULER_SECURE_CONFIG_IMAGE
+ExecStart=/usr/bin/docker --host=unix:///var/run/weave/weave.sock run \
+  --name=kube-scheduler \
+  --volumes-from=kube-scheduler-secure-config \
+    $KUBERNETES_ANYWHERE_SCHEDULER_IMAGE
+Restart=always
+RestartSec=10
+[Install]
+WantedBy=kubernetes-master.target

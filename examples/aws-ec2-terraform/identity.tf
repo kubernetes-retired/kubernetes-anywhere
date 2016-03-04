@@ -53,11 +53,39 @@ resource "aws_iam_role_policy" "kubernetes-master" {
     policy = <<POLICY
 {
   "Version": "2012-10-17",
-  "Statement": [{
+  "Statement": [
+    {
       "Effect": "Allow",
       "Action": [ "ec2:*", "elasticloadbalancing:*" ],
       "Resource": "*"
-   }]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecr:GetAuthorizationToken",
+        "ecr:GetRepositoryPolicy",
+        "ecr:DescribeRepositories"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:ListImages",
+        "ecr:BatchGetImage",
+        "ecr:InitiateLayerUpload",
+        "ecr:UploadLayerPart",
+        "ecr:CompleteLayerUpload",
+        "ecr:PutImage"
+      ],
+      "Resource": [
+        "${aws_ecr_repository.kubernetes-master-secure-config-repository.arn}",
+        "${aws_ecr_repository.kubernetes-node-secure-config-repository.arn}"
+      ]
+    }
+  ]
 }
 POLICY
 }
@@ -68,11 +96,33 @@ resource "aws_iam_role_policy" "kubernetes-node" {
     policy = <<POLICY
 {
   "Version": "2012-10-17",
-  "Statement": [{
-    "Effect": "Allow",
-    "Action": [ "ec2:Describe*", "ec2:AttachVolume", "ec2:DetachVolume" ],
-    "Resource": "*"
-  }]
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [ "ec2:Describe*", "ec2:AttachVolume", "ec2:DetachVolume" ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecr:GetAuthorizationToken",
+        "ecr:GetRepositoryPolicy",
+        "ecr:DescribeRepositories"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:BatchGetImage",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:GetRepositoryPolicy",
+        "ecr:ListImages"
+      ],
+      "Resource": "${aws_ecr_repository.kubernetes-node-secure-config-repository.arn}"
+    }
+  ]
 }
 POLICY
 }

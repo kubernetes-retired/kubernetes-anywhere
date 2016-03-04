@@ -7,7 +7,7 @@ Description=Weave Net proxy for Docker API
 Documentation=http://docs.weave.works/
 [Service]
 EnvironmentFile=-/etc/kubernetes-anywhere.env
-ExecStartPre=/usr/local/bin/weave launch-proxy --rewrite-inspect
+ExecStartPre=/usr/local/bin/weave launch-proxy --rewrite-inspect $WEAVEPROXY_ARGS
 ExecStart=/usr/bin/docker attach weaveproxy
 Restart=on-failure
 ExecStop=/usr/local/bin/weave stop-proxy

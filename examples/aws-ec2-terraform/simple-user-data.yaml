@@ -47,10 +47,10 @@ write_files:
     content: |
       #!/bin/bash
 
-      args="--volume=/var/run/weave/weave.sock:/weave.sock"
+      args="--volume=/var/run/weave/weave.sock:/docker.sock"
 
       if [ -n "${SSH_AUTH_SOCK}" ] ; then
-        args="${volumes} --volume=${SSH_AUTH_SOCK}:/agent.sock --env=SSH_AUTH_SOCK=/agent.sock"
+        args="${args} --volume=${SSH_AUTH_SOCK}:/agent.sock --env=SSH_AUTH_SOCK=/agent.sock"
       fi
 
       exec sudo docker --host="unix:///var/run/weave/weave.sock" run \
@@ -61,6 +61,7 @@ write_files:
     permissions: '0600'
     owner: root
     content: |
+      WEAVE_DEBUG=1
       WEAVE_INIT_PEER_COUNT="--init-peer-count 7"
       WEAVE_SCRIPT_VERSION="v1.4.4"
       ETCD_CLUSTER_SIZE="3"
@@ -119,7 +120,7 @@ write_files:
       docker version
       docker pull weaveworks/kubernetes-anywhere:tools
       docker images
-      docker run -v /etc/systemd/system:/host-systemd weaveworks/kubernetes-anywhere:tools install-basic-systemd-units
+      docker run -v /etc/systemd/system:/host-systemd weaveworks/kubernetes-anywhere:tools install-simple-systemd-units
 
       systemctl daemon-reload
 

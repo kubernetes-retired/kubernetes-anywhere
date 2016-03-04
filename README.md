@@ -11,6 +11,24 @@ Once deployed, you can configure all of the cluster components to have fixed DNS
 
 All you need is one or more Docker hosts.
 
+
+## Using Terraform in EC2
+
+```HCL
+module "kubernetes-anywhere-aws-ec2" {
+    source         = "github.com/weaveworks/weave-kubernetes-anywhere/examples/aws-ec2-terraform"
+    aws_access_key = "${var.aws_access_key}"
+    aws_secret_key = "${var.aws_secret_key}"
+    aws_region     = "us-east-1" # currently the only supported region as it uses ECR
+
+    cluster                = "devx"
+    cluster_config_flavour = "secure" # or simple, if you don't need TLS
+    
+    # You can also set instance types with node_instance_type/master_instance_type/etcd_instance_type
+    # For SSH access, you will need to create a key named kubernetes-anywhere or set ec2_key_name
+}
+```
+
 ## Getting Started on a Single Docker Host
 
 ### Launching Weave
@@ -27,7 +45,7 @@ eval $(weave env)
 ### Deploying the Kubernetes Services
 
 ```
-$ docker run -ti -v /:/rootfs -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools bash -l
+$ docker run -ti -v /:/rootfs -v /var/run/weave/weave.sock:/docker.sock weaveworks/kubernetes-anywhere:tools bash -l
 # setup-kubelet-volumes
 # compose -p kube up -d
 # exit
@@ -159,7 +177,7 @@ On `$KUBE_WORKER_1` & `$KUBE_WORKER_2`, start the kubelet and the kube proxy:
 ```
 docker run \
       --volume="/:/rootfs" \
-      --volume="/var/run/weave/weave.sock:/weave.sock" \
+      --volume="/var/run/docker.sock:/docker.sock" \
       weaveworks/kubernetes-anywhere:tools \
       setup-kubelet-volumes
 docker run -d \
@@ -225,7 +243,7 @@ If one assumes that their registry is a secure place, TLS configuration can be d
 First run [a helper script](https://github.com/weaveworks/weave-kubernetes-anywhere/blob/master/docker-images/setup-secure-cluster-config-volumes.sh) bundled in `weaveworks/kubernetes-anywhere:tools`:
 
 ```
-docker run -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools setup-secure-cluster-config-volumes
+docker run -v /var/run/docker.sock:/docker.sock weaveworks/kubernetes-anywhere:tools setup-secure-cluster-config-volumes
 ```
 
 which results in a number of containers tagged `kubernetes-anywhere:<component>-secure-config`, for example:
@@ -252,7 +270,7 @@ docker run -d --name=kube-apiserver --volumes-from=kube-apiserver-secure-config 
 
 ### Kubelet
 ```
-docker run -v /:/rootfs -v /var/run/weave/weave.sock:/weave.sock weaveworks/kubernetes-anywhere:tools setup-kubelet-volumes
+docker run -v /:/rootfs -v /var/run/docker.sock:/docker.sock weaveworks/kubernetes-anywhere:tools setup-kubelet-volumes
 docker run --name=kubelet-secure-config kubernetes-anywhere:kubelet-secure-config
 docker run -d --name=kubelet  --privileged=true --net=host --pid=host --volumes-from=kubelet-volumes --volumes-from=kubelet-secure-config weaveworks/kubernetes-anywhere:kubelet
 ```

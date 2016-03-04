@@ -97,7 +97,7 @@ docker_on 'kube-3' ${weaveproxy_socket} run --detach \
 master_config=$(docker-machine config 'kube-4')
 
 docker ${master_config} run \
-  -v /var/run/weave/weave.sock:/weave.sock \
+  -v /var/run/docker.sock:/docker.sock \
   weaveworks/kubernetes-anywhere:tools setup-secure-cluster-config-volumes
 
 ## Run intermediate containers to export the TLS config volumes for master components
@@ -153,7 +153,7 @@ for m in 'kube-5' 'kube-6' 'kube-7' ; do
     kubernetes-anywhere:kubelet-secure-config
   docker_on ${m} ${weaveproxy_socket} run \
     --volume="/:/rootfs" \
-    --volume="/var/run/weave/weave.sock:/weave.sock" \
+    --volume="/var/run/docker.sock:/docker.sock" \
     weaveworks/kubernetes-anywhere:tools \
     setup-kubelet-volumes
   ## Start the kubelete itself now

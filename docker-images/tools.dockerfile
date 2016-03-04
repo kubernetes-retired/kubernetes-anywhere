@@ -1,11 +1,11 @@
 FROM centos:7
 LABEL works.weave.role=system
 
-ENV DOCKER_HOST=unix:///weave.sock
+ENV DOCKER_HOST=unix:///docker.sock
 
 ENV WD=/etc/resources
 
-ENV KUBE_RELEASE=v1.1.7
+ENV KUBE_RELEASE=v1.1.8
 
 RUN yum --assumeyes --quiet install openssl python-setuptools git-core
 
@@ -17,7 +17,7 @@ RUN curl --silent --location \
   && chmod +x /usr/bin/jq ;
 
 RUN curl --silent --location \
-  https://get.docker.com/builds/Linux/x86_64/docker-1.10.1 \
+  https://get.docker.com/builds/Linux/x86_64/docker-1.10.2 \
   --output /usr/bin/docker \
   && chmod +x /usr/bin/docker ;
 
@@ -56,19 +56,27 @@ RUN cp -a $WD/skydns-addon $WD/skydns-addon-secure ; \
   sed 's|\(- -kube_master_url=http://kube-apiserver.weave.local:8080\)$|# \1|' -i $WD/skydns-addon-secure/controller.yaml
 
 RUN curl --silent --location \
-  https://github.com/docker/compose/releases/download/1.6.0/docker-compose-Linux-x86_64 \
+  https://github.com/docker/compose/releases/download/1.6.2/docker-compose-Linux-x86_64 \
   --output /usr/bin/compose \
   && chmod +x /usr/bin/compose ;
 
 ADD docker-compose.yml $WD/
 
+ADD run-e2e-tests-ec2.sh /usr/bin/run-e2e-tests-ec2
+
 ADD setup-kubelet-volumes.sh /usr/bin/setup-kubelet-volumes
 ADD setup-secure-cluster-config-volumes.sh /usr/bin/setup-secure-cluster-config-volumes
+ADD make-ecr-secure-config-images.sh /usr/bin/make-ecr-secure-config-images
+ADD find-ecr-secure-config-images.sh /usr/bin/find-ecr-secure-config-images
+ADD ecr-login.sh /usr/bin/ecr-login
 
 ADD find-weave-peers-by-ec2-tag.sh /usr/bin/find-weave-peers-by-ec2-tag
 ADD describe-ec2-node.sh /usr/bin/describe-ec2-node
-ADD install-basic-systemd-units.sh /usr/bin/install-basic-systemd-units
+ADD install-simple-systemd-units.sh /usr/bin/install-simple-systemd-units
+ADD install-secure-systemd-units.sh /usr/bin/install-secure-systemd-units
 
-ADD systemd-units /usr/share/systemd-units/
+ADD systemd-units-common /usr/share/kubernetes-anywhere-systemd-units-common/
+ADD systemd-units-simple /usr/share/kubernetes-anywhere-systemd-units-simple/
+ADD systemd-units-secure /usr/share/kubernetes-anywhere-systemd-units-secure/
 
 WORKDIR $WD

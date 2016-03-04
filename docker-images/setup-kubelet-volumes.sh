@@ -2,7 +2,7 @@
 
 KUBERNETES_ANYWHERE_TOOLS_IMAGE=${KUBERNETES_ANYWHERE_TOOLS_IMAGE:-'weaveworks/kubernetes-anywhere:tools'}
 
-if [[ $(docker inspect --format='{{.State.Status}}' kubelet-volumes) = 'exited' ]]
+if [[ $(docker inspect --format='{{.State.Status}}' kubelet-volumes) = 'created' ]]
 then
   exit
 else
@@ -42,14 +42,14 @@ else
     --privileged="true" \
     ${KUBERNETES_ANYWHERE_TOOLS_IMAGE} nsenter --mount=/proc/1/ns/mnt -- mount --make-rshared /
 
-  docker run \
+  docker create \
     --volume="/:/rootfs:ro" \
     --volume="/sys:/sys:ro" \
     --volume="/dev:/dev" \
     --volume="/var/run:/var/run:rw" \
     ${kubelet_root_vol} \
     ${docker_root_vol} \
-    --volume="/var/run/weave/weave.sock:/weave.sock" \
+    --volume="/var/run/weave/weave.sock:/docker.sock" \
     --name="kubelet-volumes" \
     ${KUBERNETES_ANYWHERE_TOOLS_IMAGE} true
 fi

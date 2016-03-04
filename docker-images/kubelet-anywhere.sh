@@ -12,19 +12,16 @@ else
   args="--api-servers=http://${master}:8080"
 fi
 
-weave_ip=$(hostname -i)
-
 if [ ${CLOUD_PROVIDER} = 'aws' ]
 then ## TODO: check if not needed with v1.2.0 is out (see kubernetes/kubernetes#11543)
   args="${args} --hostname-override=${AWS_LOCAL_HOSTNAME}"
 fi
 
 exec /hyperkube kubelet ${args} \
-  --docker-endpoint="unix:/weave.sock" \
+  --docker-endpoint="unix:/docker.sock" \
   --cluster-dns="10.16.0.3" \
   --resolv-conf="/dev/null" \
   --cluster-domain="cluster.local" \
-  --address=${weave_ip}
   --cloud-provider="${CLOUD_PROVIDER}" \
   --allow-privileged="true" \
   --logtostderr="true"

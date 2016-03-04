@@ -4,10 +4,21 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-export AWS_DEFAULT_REGION=$(curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)
+doc=$(curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document)
+export AWS_DEFAULT_REGION=$(printf "${doc}" | jq -r .region)
+
+instance_description=$(
+  aws ec2 describe-instances \
+    --instance-ids $(printf "${doc}" | jq -r .instanceId)
+)
+
+instance_kubernetescluster_tag=$(
+  printf "${instance_description}" \
+  | jq -r '.Reservations[].Instances[].Tags[] | select(.Key=="KubernetesCluster") .Value'
+)
 
 aws ec2 describe-instances --filters \
-    'Name=tag:KubernetesCluster,Values=kubernetes' \
-    'Name=instance-state-name,Values=running,pending' \
+    "Name=tag:KubernetesCluster,Values=${instance_kubernetescluster_tag}" \
+    "Name=instance-state-name,Values=running,pending" \
   | jq -r '.Reservations[].Instances[].PrivateIpAddress | if . != null then . else empty end' \
   | xargs

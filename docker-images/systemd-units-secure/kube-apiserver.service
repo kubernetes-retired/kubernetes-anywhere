@@ -1,0 +1,29 @@
+[Unit]
+Wants=weave-network.target
+After=weave-network.target
+Before=kube-scheduler.service
+Before=kube-controller-manager.service
+Description=Kubernetes API Server
+Documentation=http://kubernetes.io/
+[Service]
+Environment=KUBERNETES_ANYWHERE_APISERVER_IMAGE=weaveworks/kubernetes-anywhere:apiserver
+Environment=KUBERNETES_ANYWHERE_APISERVER_SECURE_CONFIG_IMAGE=kubernetes-anywhere:apiserver-secure-config
+EnvironmentFile=-/etc/kubernetes-anywhere.env
+EnvironmentFile=-/etc/kubernetes-anywhere-secure-config-images.env
+ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_APISERVER_IMAGE
+ExecStartPre=-/usr/bin/docker pull $KUBERNETES_ANYWHERE_APISERVER_SECURE_CONFIG_IMAGE
+ExecStartPre=-/usr/bin/docker rm -f kube-apiserver
+ExecStartPre=-/usr/bin/docker rm -f kube-apiserver-secure-config
+ExecStartPre=-/usr/bin/docker run \
+  --name=kube-apiserver-secure-config \
+    $KUBERNETES_ANYWHERE_APISERVER_SECURE_CONFIG_IMAGE
+ExecStart=/usr/bin/docker --host=unix:///var/run/weave/weave.sock run \
+  --env=ETCD_CLUSTER_SIZE \
+  --env=CLOUD_PROVIDER \
+  --name=kube-apiserver \
+  --volumes-from=kube-apiserver-secure-config \
+    $KUBERNETES_ANYWHERE_APISERVER_IMAGE
+Restart=always
+RestartSec=10
+[Install]
+WantedBy=kubernetes-master.target

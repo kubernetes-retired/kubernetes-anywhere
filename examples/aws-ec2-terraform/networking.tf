@@ -5,7 +5,7 @@ resource "aws_vpc" "kubernetes-vpc" {
     instance_tenancy     = "default"
 
     tags {
-        "KubernetesCluster" = "kubernetes"
+        "KubernetesCluster" = "kubernetes-${var.cluster}"
         "Name"              = "kubernetes-vpc"
     }
 }
@@ -14,12 +14,12 @@ resource "aws_internet_gateway" "kubernetes-igw" {
     vpc_id = "${aws_vpc.kubernetes-vpc.id}"
 
     tags {
-        "KubernetesCluster" = "kubernetes"
+        "KubernetesCluster" = "kubernetes-${var.cluster}"
         "Name"              = "kubernetes-igw"
     }
 }
 
-resource "aws_security_group" "kubernetes-main" {
+resource "aws_security_group" "kubernetes-main-sg" {
     name        = "kubernetes-master-kubernetes"
     description = "Kubernetes Anywhere security group applied to all nodes"
     vpc_id      = "${aws_vpc.kubernetes-vpc.id}"
@@ -67,7 +67,7 @@ resource "aws_security_group" "kubernetes-main" {
     }
 
     tags {
-        "KubernetesCluster" = "kubernetes"
+        "KubernetesCluster" = "kubernetes-${var.cluster}"
         "Name"              = "kubernetes-main-sg"
     }
 }
@@ -95,7 +95,7 @@ resource "aws_network_acl" "kubernetes-acl" {
     }
 
     tags {
-        "KubernetesCluster" = "kubernetes"
+        "KubernetesCluster" = "kubernetes-${var.cluster}"
         "Name"              = "kubernetes-acl"
     }
 }
@@ -106,7 +106,7 @@ resource "aws_subnet" "kubernetes-subnet" {
     map_public_ip_on_launch = false
 
     tags {
-        "KubernetesCluster" = "kubernetes"
+        "KubernetesCluster" = "kubernetes-${var.cluster}"
         "Name"              = "kubernetes-subnet"
     }
 }

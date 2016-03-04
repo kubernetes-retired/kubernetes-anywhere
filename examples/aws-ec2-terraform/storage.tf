@@ -2,7 +2,7 @@
 #    reference_name = "kubernetes-efs"
 #
 #    tags {
-#        "KubernetesCluster" = "kubernetes"
+#        "KubernetesCluster" = "kubernetes-${var.cluster}"
 #        "Name"              = "kubernetes-efs"
 #    }
 #}
