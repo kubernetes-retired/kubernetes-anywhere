@@ -108,7 +108,7 @@ weave launch-proxy --rewrite-inspect
 >>**Important** For the Kubernetes integration to function properly, it is crictical that you pass the `--rewrite-inspect` flag when launching the Weave Docker API Proxy.
 
 
-Finally, expose the host and make it available to Weave Net by setting its DNS record:
+Finally, expose the host and then add a DNS record for it:
 
 ```Shell
 weave expose -h "$(hostname).weave.local"
@@ -120,7 +120,7 @@ Before launching any containers you must first point the Docker client to the We
 eval $(weave env)
 ```
 
-The above can be wrapped in a convenient provisioning script which you can find described below.
+The above can be wrapped in a convenient provisioning script. You can find examples of provisioning scripts for differnt cloud providers described in [Further Examples](#further-examples). 
 
 ### Launch the etcd Cluster
 
