@@ -51,7 +51,7 @@ write_files:
 
       export HOME=/root
 
-      tools=${KUBERNETES_ANYWHERE_TOOLS_IMAGE:"weaveworks/kubernetes-anywhere:tools"}
+      tools=${KUBERNETES_ANYWHERE_TOOLS_IMAGE:-"weaveworks/kubernetes-anywhere:tools"}
       sudo docker pull $tools
 
       sudo docker pull ${KUBERNETES_ANYWHERE_TOOLS_SECURE_CONFIG_IMAGE}
@@ -65,13 +65,12 @@ write_files:
         args="${args} --volume=${SSH_AUTH_SOCK}:/agent.sock --env=SSH_AUTH_SOCK=/agent.sock"
       fi
 
-
       exec sudo docker --host="unix:///var/run/weave/weave.sock" run \
         --tty --interactive ${args} \
           $tools $@
 
   - path: /etc/kubernetes-anywhere.env
-    permissions: '0600'
+    permissions: '0644'
     owner: root
     content: |
       WEAVE_VERSION="awh1"
@@ -137,7 +136,7 @@ write_files:
       After=docker.service network-online.target
       Requires=docker.service network-online.target
       Before=kubelet.service kube-proxy.service
-      Before=kube-apiserver.service kube-scheduler.service kube-controller-manager.service kubernetes-master.target
+      Before=kube-apiserver.service kube-scheduler.service kube-controller-manager.service
       [Service]
       Type=simple
       Environment=KUBERNETES_ANYWHERE_TOOLS_IMAGE=weaveworks/kubernetes-anywhere:tools
