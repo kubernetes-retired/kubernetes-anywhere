@@ -141,8 +141,7 @@ write_files:
       After=docker.service network-online.service
       Requires=docker.service network-online.service
       Before=kubelet.service kube-proxy.service
-      Before=kube-apiserver.service kube-scheduler.service kube-controller-manager.service
-      kubernetes-master.target
+      Before=kube-apiserver.service kube-scheduler.service kube-controller-manager.service kubernetes-master.target
       [Service]
       Type=simple
       Environment=KUBERNETES_ANYWHERE_TOOLS_IMAGE=weaveworks/kubernetes-anywhere:tools
