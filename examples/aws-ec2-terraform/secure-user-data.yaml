@@ -134,8 +134,8 @@ write_files:
     content: |
       [Unit]
       Description=Authenticate to Amazon EC2 Container Registry
-      After=docker.service network-online.service
-      Requires=docker.service network-online.service
+      After=docker.service network-online.target
+      Requires=docker.service network-online.target
       Before=kubelet.service kube-proxy.service
       Before=kube-apiserver.service kube-scheduler.service kube-controller-manager.service kubernetes-master.target
       [Service]
@@ -208,6 +208,8 @@ write_files:
             kube-apiserver.service \
             kube-scheduler.service \
             kube-controller-manager.service \
+            ecr-login.service \
+            ecr-login-refresh.timer \
             kubernetes-master.target
           systemctl start kubernetes-master.target
           ;;
@@ -223,6 +225,8 @@ write_files:
           systemctl enable \
             kubelet.service \
             kube-proxy.service \
+            ecr-login.service \
+            ecr-login-refresh.timer \
             kubernetes-node.target
           systemctl start kubernetes-node.target
           ;;
