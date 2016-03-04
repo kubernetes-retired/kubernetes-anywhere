@@ -118,6 +118,44 @@ write_files:
       WantedBy=weave-network.target
       WantedBy=weave.service
 
+  - path: /etc/systemd/system/ecr-login-refresh.timer
+    permissions: '0644'
+    owner: root
+    content: |
+      [Unit]
+      Description=Refresh Amazon EC2 Container Registry token
+      [Timer]
+      OnBootSec=1h
+      OnUnitInactiveSec=1h
+      Unit=ecr-login.service
+      [Install]
+      WantedBy=kubernetes-master.target
+      WantedBy=kubernetes-node.target
+
+  - path: /etc/systemd/system/ecr-login.service
+    permissions: '0644'
+    owner: root
+    content: |
+      [Unit]
+      Description=Authenticate to Amazon EC2 Container Registry
+      After=docker.service network-online.service
+      Requires=docker.service network-online.service
+      Before=kubelet.service kube-proxy.service
+      Before=kube-apiserver.service kube-scheduler.service kube-controller-manager.service
+      kubernetes-master.target
+      [Service]
+      Type=simple
+      Environment=KUBERNETES_ANYWHERE_TOOLS_IMAGE=weaveworks/kubernetes-anywhere:tools
+      EnvironmentFile=/etc/kubernetes-anywhere.env
+      ExecStartPre=/bin/mkdir -p /root/.docker/
+      ExecStart=/usr/bin/docker run \
+          -v /root/.docker/:/root/.docker/ \
+          -v /var/run/docker.sock:/docker.sock \
+            $KUBERNETES_ANYWHERE_TOOLS_IMAGE ecr-login
+      [Install]
+      WantedBy=kubernetes-master.target
+      WantedBy=kubernetes-node.target
+
   - path: /tmp/kubernetes-anywhere-provision.sh
     owner: root
     permissions: '0755'
@@ -157,21 +195,20 @@ write_files:
           ;;
         kubernetes-master)
 
-          mkdir -p /root/.docker/
-          docker run \
-            -v /root/.docker/:/root/.docker/ \
-            -v /var/run/docker.sock:/docker.sock \
-              weaveworks/kubernetes-anywhere:tools ecr-login
-
+          ## as master builds PKI images, it needs to login to ECR first
+          systemctl start ecr-login.service
+          ## this is to be done only once, so there is no unit for it
           docker run \
             -v /root/.docker/:/root/.docker/ \
             -v /var/run/docker.sock:/docker.sock \
               weaveworks/kubernetes-anywhere:tools make-ecr-secure-config-images
-
+          ## image names won't change, so this only needs to be done once also
           docker run \
               weaveworks/kubernetes-anywhere:tools find-ecr-secure-config-images \
               > /etc/kubernetes-anywhere-secure-config-images.env
 
+          ## as provisoning happens in parallel, some of the cluster components
+          ## will restat continously until dependencies become available
           systemctl enable \
             kube-apiserver.service \
             kube-scheduler.service \
@@ -181,12 +218,9 @@ write_files:
           ;;
         kubernetes-node)
 
-          mkdir -p /root/.docker/
-          docker run \
-            -v /root/.docker/:/root/.docker/ \
-            -v /var/run/docker.sock:/docker.sock \
-              weaveworks/kubernetes-anywhere:tools ecr-login
-
+          ## as image names are determined on the basis of EC2 region name,
+          ## account number and instance tags, there is no need to login to ECR
+          ## at this point, but `erc-login.service` is expected to start shortly
           docker run \
               weaveworks/kubernetes-anywhere:tools find-ecr-secure-config-images \
               > /etc/kubernetes-anywhere-secure-config-images.env
