@@ -53,10 +53,6 @@ write_files:
 
       tools=${KUBERNETES_ANYWHERE_TOOLS_IMAGE:"weaveworks/kubernetes-anywhere:tools"}
       sudo docker pull $tools
-      docker run \
-        -v /root/.docker/:/root/.docker/ \
-        -v /var/run/docker.sock:/docker.sock \
-          $tools ecr-login
 
       sudo docker pull ${KUBERNETES_ANYWHERE_TOOLS_SECURE_CONFIG_IMAGE}
 
@@ -72,7 +68,7 @@ write_files:
 
       exec sudo docker --host="unix:///var/run/weave/weave.sock" run \
         --tty --interactive ${args} \
-          weaveworks/kubernetes-anywhere:tools $@
+          $tools $@
 
   - path: /etc/kubernetes-anywhere.env
     permissions: '0600'
