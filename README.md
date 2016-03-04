@@ -1,6 +1,6 @@
 # Running Kubernetes Anywhere
 
-Kubernetes Anywhere uses Weave Net to dramatically simplify Kubernetes deployment on to any cloud provider. It is by far the easiest way to get started on a single machine and to subsequently scale-out to any infrastructure. By implementing Weave Net as a cluster management network, complete portability is ensured, allowing you to move or clone an entire cluster. Even setting up Transport Layer Security (TLS) is fully transparent.
+Kubernetes Anywhere uses Weave Net to dramatically simplify Kubernetes deployment --anywhere. It is by far the easiest way to get started on a single machine and to subsequently scale-out to any infrastructure. By implementing Weave Net as a cluster management network, complete portability is ensured, allowing you to move or clone an entire cluster. Even setting up Transport Layer Security (TLS) is fully transparent.
 
 Because [Weave Net handles IP allocation and DNS] (https://www.youtube.com/watch?v=117gWVShcGU) without the use of a persistent store, you can also deploy etcd with the help of Weave Net. An etcd cluster also benefits from the service discovery that WeaveDNS provides, and it simplifies node replacement by not requiring any configuration changes.
 
@@ -97,9 +97,9 @@ or:
 weave launch-router --init-peer-count 6 $KUBE_MASTER_0
 ```
 
-You can also run `weave connect` at a later time, and pass `--init-peer-count` with the number of servers you expect to have in your cluster.
+The number of servers in your cluster are passed to `weave launch` using `--init-peer-count`. At a later time, run `weave connect` to dynamically add the servers to your cluster.
 
-In order to communicate with the docker daemon through Weave, launch Weave Docker API Proxy. 
+In order to communicate with the Docker daemon and use standard Docker commands, launch Weave Docker API Proxy. 
 
 ```Shell
 weave launch-proxy --rewrite-inspect
@@ -108,7 +108,7 @@ weave launch-proxy --rewrite-inspect
 >>**Important** For the Kubernetes integration to function properly, it is crictical that you pass the `--rewrite-inspect` flag when launching the Weave Docker API Proxy.
 
 
-Finally, expose the host and then add a DNS record for it:
+Finally, expose the host network and then add a DNS record for it:
 
 ```Shell
 weave expose -h "$(hostname).weave.local"
