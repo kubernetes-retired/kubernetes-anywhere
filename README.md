@@ -1,6 +1,6 @@
 # Running Kubernetes Anywhere
 
-Kubernetes Anywhere uses Weave Net to dramatically simplify Kubernetes deployment --anywhere. It is by far the easiest way to get started on a single machine and to subsequently scale-out to any infrastructure. By implementing Weave Net as a cluster management network, complete portability is ensured, allowing you to move or clone an entire cluster. Even setting up Transport Layer Security (TLS) is fully transparent.
+Kubernetes Anywhere uses Weave Net to dramatically simplify Kubernetes deployment — anywhere. It is by far the easiest way to get started on a single machine and to subsequently scale-out to any infrastructure. By implementing Weave Net as a cluster management network, complete portability is ensured, allowing you to move or clone an entire cluster. Even setting up Transport Layer Security (TLS) is fully transparent.
 
 Because [Weave Net handles IP allocation and DNS] (https://www.youtube.com/watch?v=117gWVShcGU) without the use of a persistent store, you can also deploy etcd with the help of Weave Net. An etcd cluster also benefits from the service discovery that WeaveDNS provides, and it simplifies node replacement by not requiring any configuration changes.
 
@@ -83,7 +83,7 @@ As you will see, if you were to modify the cluster topology, no configuration ch
 
 You could also run Kubernetes Anywhere using whatever provisioning automation tools you prefer (Ansible, Terraform, Fleet or Swarm).
 
-Provided that you have a recent version of Docker is running on each of the hosts, you will install and launch Weave Net first:
+Provided that you have a recent version of Docker running on each of the hosts, you will install and launch Weave Net first:
 
 ```Shell
 sudo curl --location --silent git.io/weave --output /usr/local/bin/weave
@@ -126,7 +126,7 @@ weave launch-proxy --rewrite-inspect
 >>**Important** For the Kubernetes integration to function properly, it is crictical that you pass the `--rewrite-inspect` flag when launching the Weave Docker API Proxy.
 
 
-Finally, expose the host network and then add a DNS record for it:
+Finally, expose the overlay network to the host and add a DNS record for it in `weave.local` zone:
 
 ```Shell
 weave expose -h "$(hostname).weave.local"
@@ -138,7 +138,7 @@ Before launching any containers you must first point the Docker client to the We
 eval $(weave env)
 ```
 
-The above can be wrapped in a convenient provisioning script. You can find examples of provisioning scripts for differnt cloud providers described in [Further Examples](#further-examples). 
+The above can be wrapped in a convenient provisioning script. You can find examples of provisioning scripts for differnt cloud providers described in [Further Examples](#further-examples).
 
 ### Launch the etcd Cluster
 
