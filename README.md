@@ -47,6 +47,7 @@ eval $(weave env)
 ```
 $ docker run -ti -v /:/rootfs -v /var/run/weave/weave.sock:/docker.sock weaveworks/kubernetes-anywhere:tools bash -l
 # setup-kubelet-volumes
+# compose -p kube pull
 # compose -p kube up -d
 # exit
 ```
