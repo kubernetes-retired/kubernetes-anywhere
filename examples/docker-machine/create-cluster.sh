@@ -203,4 +203,4 @@ docker_on 'kube-4' ${weaveproxy_socket} run \
 docker_on 'kube-4' ${weaveproxy_socket} run \
   --volumes-from="kube-tools-secure-config" \
     weaveworks/kubernetes-anywhere:tools \
-      kubectl create -f https://gist.github.com/errordeveloper/a98873e89848d2de02ca/raw/scope.yaml
+      kubectl create --validate="false" -f https://gist.github.com/errordeveloper/a98873e89848d2de02ca/raw/scope.yaml
