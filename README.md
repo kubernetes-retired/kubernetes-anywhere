@@ -2,9 +2,9 @@
 
 This project uses Weave to dramatically simplify Kubernetes deployment - anywhere. It is by far the easiest way to get started on a single machine, and later scale-out to any infrastructure seamlessly. We use Weave Net as a cluster management network. This enables complete portability, and for example allows one to move or clone the entire cluster. Even TLS setup is fully transparent.
 
-Additionally, thanks to how [Weave Net handles IP address allocation as well as DNS](https://www.youtube.com/watch?v=117gWVShcGU) without requiring a persistant store, you can deploy etcd over Weave Net as well. The etcd cluster can thereby benefit from simple service discovery WeaveDNS provides and therefor facilitate node replacement without config changes.
+Additionally, thanks to how [Weave Net handles IP address allocation as well as DNS](https://www.youtube.com/watch?v=117gWVShcGU) without requiring a persistent store, you can deploy etcd over Weave Net as well. The etcd cluster can thereby benefit from simple service discovery WeaveDNS provides and therefore facilitate node replacement without config changes.
 
-Now you can simply configure all of the cluster components to have fixed DNS names, all you should care about is how these services are distributed accross your compute instances, e.g. what is the size of etcd cluster and whether it is on a dedcicated machines with the right type of storage attached.
+Now you can simply configure all of the cluster components to have fixed DNS names, all you should care about is how these services are distributed accross your compute instances, e.g. what is the size of etcd cluster and whether it is on a dedicated machines with the right type of storage attached.
 
 You no longer have to care about the IP address of the API server or any of those things.
 
@@ -45,7 +45,7 @@ eval $(weave env)
 ### Deploy Kubernetes services
 
 ```
-$ docker run -ti -v /:/rootfs -v /var/run/weave/weave.sock:/docker.sock weaveworks/kubernetes-anywhere:tools bash -l
+$ docker run --rm -ti -v /:/rootfs -v /var/run/weave/weave.sock:/docker.sock weaveworks/kubernetes-anywhere:tools bash -l
 # setup-kubelet-volumes
 # compose -p kube pull
 # compose -p kube up -d
@@ -74,7 +74,7 @@ $ weave status dns
 ### Deploy the Kubernetes app
 
 ```
-$ docker run -ti weaveworks/kubernetes-anywhere:tools bash -l
+$ docker run --rm -ti weaveworks/kubernetes-anywhere:tools bash -l
 
 # kubectl get nodes
 # kubectl create -f skydns-addon
@@ -87,15 +87,15 @@ $ docker run -ti weaveworks/kubernetes-anywhere:tools bash -l
 
 ## A multi-node cluster
 
-For a more realisitic setup, let's say you'd like to have a cluster of 5 servers like this:
+For a more realistic setup, let's say you'd like to have a cluster of 5 servers like this:
 
   - 3 dedicated etcd hosts (`$KUBE_ETCD_1`, `$KUBE_ETCD_2`, `$KUBE_ETCD_3`)
   - 1 host running all master components (`$KUBE_MASTER_0`)
   - 2 worker nodes (`$KUBE_WORKER_1`, `$KUBE_WORKER_2`)
 
-As you will soon see, if you were to modify the cluster topology, it won't requite any configuration changes at all. You simply run containers on different hosts and only need to think about how many hosts are there and not what's running where exactly. You can potentially use any provisioning automation tools (Ansible, Terraform, Fleet or Swarm), but it's pretty simple to describe with automation aside.
+As you will soon see, if you were to modify the cluster topology, it wouldn't require any configuration changes at all. You simply run containers on different hosts, and only need to think about how many hosts are there and not what's running where exactly. You can potentially use any provisioning automation tools (Ansible, Terraform, Fleet or Swarm), but it's pretty simple to describe with automation aside.
 
-Given a recent version of Docker is running on each of the hosts you have setup, let's install & launch Weave Net first.
+Given a recent version of Docker is running on each of the hosts you have set up, let's install and launch Weave Net first.
 
 ```Shell
 sudo curl --location --silent git.io/weave --output /usr/local/bin/weave
@@ -238,17 +238,17 @@ If you want to deploy something else, you can just pass a URL to your manifest l
 # kubectl create -f https://example.com/app-service.yaml
 ```
 
-> Please note that that you can add a management node to run tools container, which may be part of your CI/CD setup or even just a VM on your laptop, given it can Weave Net ports on your cluster.
+> Please note that you can add a management node to run the tools container, which may be part of your CI/CD setup or even just a VM on your laptop, given it can Weave Net ports on your cluster.
 
 ## Using TLS
 
 > **Please note** that this currently requires Docker version 1.10, for the mount propagation feature.
 
-Thanks to WeaveDNS we can create a certificate for fixed `kube-apiserver.weave.local` domain name.
+Thanks to WeaveDNS we can create a certificate for the fixed `kube-apiserver.weave.local` domain name.
 
 One way to distribute the certificates and configuration files for all the components is via containers.
 
-If one assumes that their registry is a secure place, TLS configuration can be done very transparently.
+If one assumes that their registry is a secure place, TLS configuration can be done transparently.
 
 First run [a helper script](https://github.com/weaveworks/weave-kubernetes-anywhere/blob/master/docker-images/setup-secure-cluster-config-volumes.sh) shipped in the `weaveworks/kubernetes-anywhere:tools`:
 
