@@ -68,6 +68,14 @@ for m in $vm_names ; do
   docker-machine ssh ${m} "/usr/local/bin/weave connect $(docker-machine ip 'kube-1')"
 done
 
+for m in $(echo "$vm_names" | head -4) ; do
+  docker $(docker-machine config ${m}) run --detach \
+    --name="weavescope" \
+    --privileged=true --net=host --pid=host \
+    --volume="/var/run/docker.sock:/var/run/docker.sock" \
+    weaveworks/scope:0.13.1 \
+      --no-app --probe.docker=true --probe.docker.bridge=docker0
+done
 
 ## In most cases we need to SSH into the VM in order to communicate with Weave proxy via the UNIX socket,
 ## as exposing it remotely doesn't make sense in the context of the Kubernetes Anywhere project
