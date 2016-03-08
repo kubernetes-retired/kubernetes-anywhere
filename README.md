@@ -52,6 +52,19 @@ $ docker run -ti -v /:/rootfs -v /var/run/weave/weave.sock:/docker.sock weavewor
 # exit
 ```
 
+> **If you are seeing the following error** 
+> ```
+> ERROR: Cannot start container 86fbeefafb7bce30dd3b6dfbe5bd9c7c1d15ccb4cc02140ba01e3fc8b78def29: Path /var/lib/kubelet is mounted on / but it is not a shared mount.
+> ```
+> You will need to modify `docker.service` systemd unit and commend out `MountFlags=slave` (, then restart the unit.
+> One way to do this is vy running the following commands:
+> ```
+> sudo sed 's/\(MountFlags=slave\)/# \1/' -i /etc/systemd/system/docker.service
+> sudo systemctl daemon-reload
+> sudo systemctl restart docker
+>```
+
+
 View DNS records for Kubernetes cluster components
 
 ```
