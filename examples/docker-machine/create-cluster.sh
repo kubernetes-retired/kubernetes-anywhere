@@ -68,6 +68,7 @@ for m in $vm_names ; do
   docker-machine ssh ${m} "/usr/local/bin/weave connect $(docker-machine ip 'kube-1')"
 done
 
+## Launch Scope probe in head nodes to monitor master and etcd (`kube-{1,2,3,4}`)
 for m in $(echo "$vm_names" | head -4) ; do
   docker $(docker-machine config ${m}) run --detach \
     --name="weavescope" \
@@ -198,3 +199,8 @@ docker_on 'kube-4' ${weaveproxy_socket} run \
   --volumes-from="kube-tools-secure-config" \
     weaveworks/kubernetes-anywhere:tools \
       kubectl create -f skydns-addon-secure
+## And Scope addon
+docker_on 'kube-4' ${weaveproxy_socket} run \
+  --volumes-from="kube-tools-secure-config" \
+    weaveworks/kubernetes-anywhere:tools \
+      kubectl create -f https://gist.github.com/errordeveloper/a98873e89848d2de02ca/raw/scope.yaml
