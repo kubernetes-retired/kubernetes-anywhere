@@ -13,4 +13,4 @@ else
   args="--master=http://${master}:8080"
 fi
 
-exec /hyperkube ${applet} ${args} --proxy-mode="iptables" --logtostderr="true"
+exec /hyperkube ${applet} ${args} --logtostderr="true"
