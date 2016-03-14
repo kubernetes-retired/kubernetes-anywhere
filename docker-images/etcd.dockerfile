@@ -1,5 +1,4 @@
-FROM gcr.io/google_containers/etcd:2.2.1
-LABEL works.weave.role=system
+FROM temp/etcd
 
 ENV ETCD_CLUSTER_SIZE="1"
 

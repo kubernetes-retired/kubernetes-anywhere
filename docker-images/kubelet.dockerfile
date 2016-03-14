@@ -1,5 +1,4 @@
-FROM gcr.io/google_containers/hyperkube:v1.1.8
-LABEL works.weave.role=system
+FROM temp/hyperkube
 
 ADD weave-fix-nameserver.sh /fix-nameserver
 ADD kubelet-anywhere.sh /kubelet-anywhere

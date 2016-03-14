@@ -1,11 +1,9 @@
-FROM centos:7
-LABEL works.weave.role=system
+FROM temp/tools
+ARG kubernetes_release
 
 ENV DOCKER_HOST=unix:///docker.sock
 
 ENV WD=/etc/resources
-
-ENV KUBE_RELEASE=v1.1.8
 
 RUN yum --assumeyes --quiet install openssl python-setuptools git-core
 
@@ -22,7 +20,7 @@ RUN curl --silent --location \
   && chmod +x /usr/bin/docker ;
 
 RUN curl --silent --location \
-  https://storage.googleapis.com/kubernetes-release/release/$KUBE_RELEASE/bin/linux/amd64/kubectl \
+  https://storage.googleapis.com/kubernetes-release/release/${kubernetes_release}/bin/linux/amd64/kubectl \
   --output /usr/bin/kubectl \
   && chmod +x /usr/bin/kubectl ;
 
@@ -38,7 +36,7 @@ RUN kubectl config set-cluster default-cluster --server=http://kube-apiserver.we
 RUN mkdir $WD ; cd $WD ; \
   resources="{redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml" ; \
   curl --silent --location \
-    "https://raw.github.com/kubernetes/kubernetes/${KUBE_RELEASE}/examples/guestbook/${resources}" \
+    "https://raw.github.com/kubernetes/kubernetes/${kubernetes_release}/examples/guestbook/${resources}" \
     --remote-name ; \
   mkdir guestbook-example-LoadBalancer ; \
   cp *.yaml guestbook-example-LoadBalancer ; \

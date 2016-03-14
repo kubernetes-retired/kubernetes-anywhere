@@ -7,16 +7,19 @@ apiserver:
   image: "weaveworks/kubernetes-anywhere:apiserver"
   hostname: "kube-apiserver.weave.local"
   restart: "always"
+  links: [ "etcd" ]
 
 scheduler:
   image: "weaveworks/kubernetes-anywhere:scheduler"
   hostname: "kube-scheduler.weave.local"
   restart: "always"
+  links: [ "apiserver" ]
 
 controller-manager:
   image: "weaveworks/kubernetes-anywhere:controller-manager"
   hostname: "kube-controller-manager.weave.local"
   restart: "always"
+  links: [ "apiserver" ]
 
 kubelet:
   privileged: true
