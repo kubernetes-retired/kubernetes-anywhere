@@ -1,22 +1,22 @@
 etcd:
-  image: "weaveworks/kubernetes-anywhere:etcd"
+  image: "weaveworks/kubernetes-anywhere:etcd-v1.1.8"
   hostname: "etcd1.weave.local"
   restart: "always"
 
 apiserver:
-  image: "weaveworks/kubernetes-anywhere:apiserver"
+  image: "weaveworks/kubernetes-anywhere:apiserver-v1.1.8"
   hostname: "kube-apiserver.weave.local"
   restart: "always"
   links: [ "etcd" ]
 
 scheduler:
-  image: "weaveworks/kubernetes-anywhere:scheduler"
+  image: "weaveworks/kubernetes-anywhere:scheduler-v1.1.8"
   hostname: "kube-scheduler.weave.local"
   restart: "always"
   links: [ "apiserver" ]
 
 controller-manager:
-  image: "weaveworks/kubernetes-anywhere:controller-manager"
+  image: "weaveworks/kubernetes-anywhere:controller-manager-v1.1.8"
   hostname: "kube-controller-manager.weave.local"
   restart: "always"
   links: [ "apiserver" ]
@@ -26,14 +26,14 @@ kubelet:
   net: host
   pid: host
   volumes_from: [ "kubelet-volumes" ]
-  image: "weaveworks/kubernetes-anywhere:kubelet"
+  image: "weaveworks/kubernetes-anywhere:kubelet-v1.1.8"
   restart: "always"
 
 proxy:
   privileged: true
   net: host
   pid: host
-  image: "weaveworks/kubernetes-anywhere:proxy"
+  image: "weaveworks/kubernetes-anywhere:proxy-v1.1.8"
   restart: "always"
 
 weavescope:
