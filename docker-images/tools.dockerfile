@@ -59,7 +59,7 @@ RUN curl --silent --location \
   && chmod +x /usr/bin/compose ;
 
 ADD docker-compose.yml $WD/
-ADD docker-compose-with-links.yml $WD/
+ADD docker-compose-v1.2.yml $WD/
 
 ADD run-e2e-tests-ec2.sh /usr/bin/run-e2e-tests-ec2
 
