@@ -13,6 +13,7 @@ LABEL io.k8s.release=${kubernetes_release}
 LABEL works.weave.role=system
 LABEL com.git-scm.repo=${git_repo}
 LABEL com.git-scm.rev=${git_rev}
+ENV KUBERNETES_RELEASE=${kubernetes_release}
 " | docker build --tag temp/hyperkube -
 
 for i in kubelet proxy apiserver controller-manager scheduler ; do

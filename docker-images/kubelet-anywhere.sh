@@ -17,8 +17,16 @@ then ## TODO: check if not needed with v1.2.0 is out (see kubernetes/kubernetes#
   args="${args} --hostname-override=${AWS_LOCAL_HOSTNAME}"
 fi
 
+case ${KUBERNETES_RELEASE} in
+  v1.1.*)
+    args="${args} --docker-endpoint=unix:/docker.sock"
+    ;;
+  v1.2.*)
+    args="${args} --docker-endpoint=unix:///docker.sock"
+    ;;
+esac
+
 exec /hyperkube kubelet ${args} \
-  --docker-endpoint="unix:/docker.sock" \
   --cluster-dns="10.16.0.3" \
   --resolv-conf="/dev/null" \
   --cluster-domain="cluster.local" \
