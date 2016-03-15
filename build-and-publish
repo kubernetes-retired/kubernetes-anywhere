@@ -13,7 +13,7 @@ default_kubernetes_release="v1.1.8"
 
 kubernetes_release=${1:-"${default_kubernetes_release}"}
 
-minor_kubernetes_release=$(echo "${kubernetes_release}" | sed 's/\(v[0-9][0-9]*\.[0-9][0-9]*\)\.[0-9][0-9]*-[ab][le][pt][ha][a]*\.[0-9]/\1/')
+minor_kubernetes_release=$(echo "${kubernetes_release}" | sed 's/\(v[0-9]*\.[0-9]*\).*/\1/')
 
 toolbox_docker_release="1.10.3"
 toolbox_compose_release="1.6.2"
@@ -62,6 +62,8 @@ docker build \
   --build-arg="JQ_RELEASE=${toolbox_jq_release}" \
   --build-arg="EASYRSA_RELEASE=${toolbox_easyrsa_release}" \
   --file="${dir}/toolbox.dockerfile" "${dir}"
+
+[ -n "${NOPUB+x}" ] && exit
 
 for c in kubelet proxy apiserver controller-manager scheduler toolbox etcd ; do
   docker push "${image_prefix}${c}-${kubernetes_release}"
