@@ -11,8 +11,14 @@ services:
   - docker
 
 env:
-  - NOPUB="1" KUBERNETES_RELEASE="v1.1.8"
-  - NOPUB="1" KUBERNETES_RELEASE="v1.2.0-beta.1"
+  - NOPUB="1" DOCKER_RELEASE="1.10.3" KUBERNETES_RELEASE="v1.1.8"
+  - NOPUB="1" DOCKER_RELEASE="1.10.3" KUBERNETES_RELEASE="v1.2.0-beta.1" 
+
+install:
+  - sudo service docker stop
+  - sudo curl --silent --location https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_RELEASE} --output /usr/bin/docker
+  - sudo chmod +x /usr/bin/docker
+  - sudo service docker start
 
 script:
   - shellcheck ./build-and-publish
