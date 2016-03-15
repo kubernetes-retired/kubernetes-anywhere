@@ -7,7 +7,11 @@ set -o pipefail
 git_repo="https://github.com/weaveworks/weave-kubernetes-anywhere"
 git_rev=$(git rev-parse @)
 
-kubernetes_release=${1:-"v1.1.8"}
+dir="$(git rev-parse --show-toplevel)/docker-images"
+
+default_kubernetes_release="v1.1.8"
+
+kubernetes_release=${1:-"${default_kubernetes_release}"}
 
 toolbox_docker_release="1.10.3"
 toolbox_compose_release="1.6.2"
@@ -32,7 +36,7 @@ ${common_labels}
 for i in kubelet proxy apiserver controller-manager scheduler ; do
   docker build \
     --tag="${image_prefix}${i}-${kubernetes_release}" \
-    --file="./${i}.dockerfile" ./
+    --file="${dir}/${i}.dockerfile" "${dir}"
 done
 
 echo "FROM gcr.io/google_containers/etcd:2.2.1\n${common_labels}" \
@@ -40,7 +44,7 @@ echo "FROM gcr.io/google_containers/etcd:2.2.1\n${common_labels}" \
 
 docker build \
   --tag="${image_prefix}etcd-${kubernetes_release}" \
-  --file="./etcd.dockerfile" ./
+  --file="${dir}/etcd.dockerfile" "${dir}"
 
 echo "
 FROM centos:7
@@ -55,4 +59,12 @@ docker build \
   --build-arg="COMPOSE_RELEASE=${toolbox_compose_release}" \
   --build-arg="JQ_RELEASE=${toolbox_jq_release}" \
   --build-arg="EASYRSA_RELEASE=${toolbox_easyrsa_release}" \
-  --file="./toolbox.dockerfile" ./
+  --file="${dir}/toolbox.dockerfile" "${dir}"
+
+for c in kubelet proxy apiserver controller-manager scheduler toolbox etcd ; do
+  docker push "${image_prefix}${c}-${kubernetes_release}"
+  if [ ${kubernetes_release} = ${default_kubernetes_release} ] ; then
+    docker tag "${image_prefix}${c}-${kubernetes_release}" "${image_prefix}${c}"
+    docker push "${image_prefix}${c}"
+  fi
+done
