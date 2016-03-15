@@ -26,6 +26,7 @@ kubelet:
   net: host
   pid: host
   volumes_from: [ "kubelet-volumes" ]
+  volumes: [ "/var/run/docker.sock:/real-docker.sock" ]
   image: "weaveworks/kubernetes-anywhere:kubelet-v1.2.0-beta.1"
   restart: "always"
 
