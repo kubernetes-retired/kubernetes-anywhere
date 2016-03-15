@@ -13,6 +13,8 @@ default_kubernetes_release="v1.1.8"
 
 kubernetes_release=${1:-"${default_kubernetes_release}"}
 
+minor_kubernetes_release=$(echo "${kubernetes_release}" | sed 's/\(v[0-9][0-9]*\.[0-9][0-9]*\)\.[0-9][0-9]*-[ab][le][pt][ha][a]*\.[0-9]/\1/')
+
 toolbox_docker_release="1.10.3"
 toolbox_compose_release="1.6.2"
 toolbox_jq_release="1.5"
@@ -63,6 +65,8 @@ docker build \
 
 for c in kubelet proxy apiserver controller-manager scheduler toolbox etcd ; do
   docker push "${image_prefix}${c}-${kubernetes_release}"
+  docker tag "${image_prefix}${c}-${kubernetes_release}" "${image_prefix}${c}-${minor_kubernetes_release}"
+  docker push "${image_prefix}${c}-${minor_kubernetes_release}"
   if [ ${kubernetes_release} = ${default_kubernetes_release} ] ; then
     docker tag "${image_prefix}${c}-${kubernetes_release}" "${image_prefix}${c}"
     docker push "${image_prefix}${c}"
