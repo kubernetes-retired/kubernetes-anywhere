@@ -39,7 +39,7 @@ done
 
 vol="/srv/kubernetes"
 
-cat > apiserver-secure-config.dockerfile <<EOF
+cat > apiserver-pki.dockerfile <<EOF
 FROM alpine
 VOLUME ${vol}
 ADD pki/ca.crt ${vol}/kube-ca.crt
@@ -49,7 +49,7 @@ ADD known_tokens.csv ${vol}/known_tokens.csv
 ENTRYPOINT [ "/bin/true" ]
 EOF
 
-cat > kubelet-secure-config.dockerfile <<EOF
+cat > kubelet-pki.dockerfile <<EOF
 FROM alpine
 VOLUME ${vol}/kubelet
 ADD pki/ca.crt ${vol}/kubelet/kube-ca.crt
@@ -57,7 +57,7 @@ ADD kubelet.conf ${vol}/kubelet/kubeconfig
 ENTRYPOINT [ "/bin/true" ]
 EOF
 
-cat > proxy-secure-config.dockerfile <<EOF
+cat > proxy-pki.dockerfile <<EOF
 FROM alpine
 VOLUME ${vol}/kube-proxy
 ADD pki/ca.crt ${vol}/kube-proxy/kube-ca.crt
@@ -65,7 +65,7 @@ ADD proxy.conf ${vol}/kube-proxy/kubeconfig
 ENTRYPOINT [ "/bin/true" ]
 EOF
 
-cat > controller-manager-secure-config.dockerfile <<EOF
+cat > controller-manager-pki.dockerfile <<EOF
 FROM alpine
 VOLUME ${vol}/kube-controller-manager
 ADD pki/ca.crt ${vol}/kube-controller-manager/kube-ca.crt
@@ -74,7 +74,7 @@ ADD controller-manager.conf ${vol}/kube-controller-manager/kubeconfig
 ENTRYPOINT [ "/bin/true" ]
 EOF
 
-cat > scheduler-secure-config.dockerfile <<EOF
+cat > scheduler-pki.dockerfile <<EOF
 FROM alpine
 VOLUME ${vol}/kube-scheduler
 ADD pki/ca.crt ${vol}/kube-scheduler/kube-ca.crt
@@ -82,7 +82,7 @@ ADD scheduler.conf ${vol}/kube-scheduler/kubeconfig
 ENTRYPOINT [ "/bin/true" ]
 EOF
 
-cat > tools-secure-config.dockerfile <<EOF
+cat > toolbox-pki.dockerfile <<EOF
 FROM alpine
 VOLUME /root/.kube
 ADD pki/ca.crt /root/.kube/kube-ca.crt
@@ -90,6 +90,6 @@ ADD admin.conf /root/.kube/config
 ENTRYPOINT [ "/bin/true" ]
 EOF
 
-for i in apiserver kubelet proxy controller-manager scheduler tools
-do docker build -t kubernetes-anywhere:${i}-secure-config -f ./${i}-secure-config.dockerfile ./
+for i in apiserver kubelet proxy controller-manager scheduler toolbox
+do docker build -t kubernetes-anywhere:${i}-pki -f ./${i}-pki.dockerfile ./
 done

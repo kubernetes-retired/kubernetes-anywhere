@@ -34,11 +34,11 @@ instances, which were created via [`weave expose -h $(hostname).weave.local`][we
 
 [weave_expose]: https://github.com/weaveworks/weave-kubernetes-anywhere/blob/1b6b29fc17d11a66007b572b5ee1d57677515c26/examples/google-compute-engine/provision.sh#L43
 
-Next you will need to fire-up the tools container like this:
+Next you will need to fire-up the toolbox container like this:
 ```
 $ sudo -s
 # eval $(weave env)
-# docker run -ti weaveworks/kubernetes-anywhere:tools
+# docker run -ti weaveworks/kubernetes-anywhere:toolbox
 ```
 
 Inside this container you can check that there 3 nodes ready to take workload on board:
