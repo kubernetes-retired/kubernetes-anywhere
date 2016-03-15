@@ -12,7 +12,7 @@ else
 
   if [ -d /rootfs/etc ] && [ -f /rootfs/etc/os-release ]
   then
-    case "$(eval `cat /rootfs/etc/os-release` ; echo $ID)" in
+    case "$(eval $(cat /rootfs/etc/os-release) ; echo $ID)" in
       boot2docker)
         docker_root="/mnt/sda1/${def_docker_root}"
         kubelet_root="/mnt/sda1/${def_kubelet_root}"
@@ -40,7 +40,7 @@ else
   docker run \
     --pid="host" \
     --privileged="true" \
-    ${KUBERNETES_ANYWHERE_TOOLBOX_IMAGE} nsenter --mount=/proc/1/ns/mnt -- mount --make-rshared /
+    "${KUBERNETES_ANYWHERE_TOOLBOX_IMAGE}" nsenter --mount=/proc/1/ns/mnt -- mount --make-rshared /
 
   docker create \
     --volume="/:/rootfs:ro" \
@@ -51,5 +51,5 @@ else
     ${docker_root_vol} \
     --volume="/var/run/weave/weave.sock:/docker.sock" \
     --name="kubelet-volumes" \
-    ${KUBERNETES_ANYWHERE_TOOLBOX_IMAGE} true
+    "${KUBERNETES_ANYWHERE_TOOLBOX_IMAGE}" true
 fi

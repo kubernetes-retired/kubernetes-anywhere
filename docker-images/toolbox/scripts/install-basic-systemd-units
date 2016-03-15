@@ -4,9 +4,9 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-for unit in $(ls /etc/toolbox/systemd-units/common/*) ; do
-  install --mode=0644 --owner=0 --group=0 $unit /host-systemd/
+for unit in /etc/toolbox/systemd-units/common/* ; do
+  install --mode=0644 --owner=0 --group=0 "${unit}" /host-systemd/
 done
-for unit in $(ls /etc/toolbox/systemd-units/basic/*) ; do
-  install --mode=0644 --owner=0 --group=0 $unit /host-systemd/
+for unit in /etc/toolbox/systemd-units/basic/* ; do
+  install --mode=0644 --owner=0 --group=0 "${unit}" /host-systemd/
 done

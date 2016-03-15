@@ -21,7 +21,8 @@ install:
   - sudo service docker start
 
 script:
-  - shellcheck $(git grep -l '#\!/bin/bash') $(git grep -l '#\!/bin/sh')
+  - shellcheck --shell=bash $(git grep -l '#\!/bin/bash' | grep -v user-data.yaml | grep -v examples/aws-ecs)
+  - shellcheck --shell=sh $(git grep -l '#\!/bin/sh' | grep -v user-data.yaml | grep -v examples/aws-ecs)
   - shellcheck ./build-and-publish
   - ./build-and-publish
 

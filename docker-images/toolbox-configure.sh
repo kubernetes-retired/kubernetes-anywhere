@@ -14,24 +14,24 @@ easy_install awscli
 
 curl="curl --silent --location"
 
-$curl https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_RELEASE}/bin/linux/amd64/kubectl \
+$curl "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_RELEASE}/bin/linux/amd64/kubectl" \
   --output /usr/bin/kubectl
 
-$curl https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_RELEASE} \
+$curl "https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_RELEASE}" \
   --output /usr/bin/docker
 
-$curl https://github.com/docker/compose/releases/download/${COMPOSE_RELEASE}/docker-compose-Linux-x86_64 \
+$curl "https://github.com/docker/compose/releases/download/${COMPOSE_RELEASE}/docker-compose-Linux-x86_64" \
   --output /usr/bin/compose \
 
-$curl https://github.com/stedolan/jq/releases/download/jq-${JQ_RELEASE}/jq-linux64 \
+$curl "https://github.com/stedolan/jq/releases/download/jq-${JQ_RELEASE}/jq-linux64" \
   --output /usr/bin/jq
 
 chmod +x /usr/bin/kubectl /usr/bin/docker /usr/bin/compose /usr/bin/jq
 
-$curl https://github.com/OpenVPN/easy-rsa/releases/download/${EASYRSA_RELEASE}/EasyRSA-${EASYRSA_RELEASE}.tgz \
+$curl "https://github.com/OpenVPN/easy-rsa/releases/download/${EASYRSA_RELEASE}/EasyRSA-${EASYRSA_RELEASE}.tgz" \
   | tar xz -C /opt
 
-mv /opt/EasyRSA-${EASYRSA_RELEASE} /opt/EasyRSA
+mv "/opt/EasyRSA-${EASYRSA_RELEASE}" /opt/EasyRSA
 
 ## create default kubeconfig
 
@@ -53,12 +53,12 @@ $curl "https://raw.github.com/kubernetes/kubernetes/${KUBERNETES_RELEASE}/exampl
 ## create two setparate copies for each of the service types
 
 mkdir guestbook-example-LoadBalancer
-cp *.yaml guestbook-example-LoadBalancer
+cp ./*.yaml guestbook-example-LoadBalancer
 sed 's|# \(type: LoadBalancer\)|\1|' \
   -i guestbook-example-LoadBalancer/frontend-service.yaml
 
 mkdir guestbook-example-NodePort
-cp *.yaml guestbook-example-NodePort
+cp ./*.yaml guestbook-example-NodePort
 sed 's|# \(type:\) LoadBalancer|\1 NodePort|' \
   -i guestbook-example-NodePort/frontend-service.yaml
 

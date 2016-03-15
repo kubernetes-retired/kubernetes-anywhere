@@ -26,8 +26,8 @@ registry=$(printf "%s.dkr.ecr.%s.amazonaws.com" \
 
 tag_and_push() {
   local ecr_tag="${registry}/${instance_kubernetescluster_tag}/${1}/pki:${2}"
-  docker tag kubernetes-anywhere:${2}-pki $ecr_tag
-  docker push $ecr_tag
+  docker tag "kubernetes-anywhere:${2}-pki" "${ecr_tag}"
+  docker push "${ecr_tag}"
 }
 
 for i in apiserver controller-manager scheduler
