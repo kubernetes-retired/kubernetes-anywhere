@@ -1,6 +1,6 @@
 # Running Kubernetes Anywhere
 
-This project uses Weave to dramatically simplify Kubernetes deployment - anywhere. It is by far the easiest way to get started on a single machine, and later scale-out to any infrastructure seamlessly. We use Weave Net as a cluster management network. This enables complete portability, and for example allows one to move or clone the entire cluster. Even TLS setup is fully transparent.
+This project uses Weave to dramatically simplify Kubernetes deployment - anywhere. It is by far the easiest way to get started on a single machine, and later scale-out to any infrastructure seamlessly. We use Weave Net as a cluster management network. This enables complete portability, and for example allows one to move or clone the entire cluster. Even TLS setup is fully transparent, and in-place upgrades are very easy.
 
 Additionally, thanks to how [Weave Net handles IP address allocation as well as DNS](https://www.youtube.com/watch?v=117gWVShcGU) without requiring a persistent store, you can deploy etcd over Weave Net as well. The etcd cluster can thereby benefit from simple service discovery WeaveDNS provides and therefore facilitate node replacement without config changes.
 
