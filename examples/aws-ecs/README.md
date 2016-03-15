@@ -30,7 +30,7 @@ $ weave status dns
 ### Deploy the Kubernetes app
 
 ```
-$ docker run -ti weaveworks/kubernetes-anywhere:tools bash -l
+$ docker run -ti weaveworks/kubernetes-anywhere:toolbox bash -l
 
 # kubectl get nodes
 # kubectl create -f skydns-addon

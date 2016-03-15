@@ -4,31 +4,23 @@ After=weave-network.target
 Description=Kubelet
 Documentation=http://kubernetes.io/
 [Service]
-Environment=KUBERNETES_ANYWHERE_TOOLS_IMAGE=weaveworks/kubernetes-anywhere:tools
+Environment=KUBERNETES_ANYWHERE_TOOLBOX_IMAGE=weaveworks/kubernetes-anywhere:toolbox
 Environment=KUBERNETES_ANYWHERE_KUBELET_IMAGE=weaveworks/kubernetes-anywhere:kubelet
-Environment=KUBERNETES_ANYWHERE_KUBELET_SECURE_CONFIG_IMAGE=kubernetes-anywhere:kubelet-secure-config
 EnvironmentFile=-/etc/kubernetes-anywhere.env
-EnvironmentFile=-/etc/kubernetes-anywhere-secure-config-images.env
-ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_TOOLS_IMAGE
+ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_TOOLBOX_IMAGE
 ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_KUBELET_IMAGE
-ExecStartPre=-/usr/bin/docker pull $KUBERNETES_ANYWHERE_KUBELET_SECURE_CONFIG_IMAGE
 ExecStartPre=-/usr/bin/docker rm -f kubelet
-ExecStartPre=-/usr/bin/docker rm -f kubelet-secure-config
-ExecStartPre=-/usr/bin/docker run \
-  --name=kubelet-secure-config \
-    $KUBERNETES_ANYWHERE_KUBELET_SECURE_CONFIG_IMAGE
 ExecStartPre=-/usr/bin/docker run \
   --volume="/:/rootfs" \
   --volume="/var/run/docker.sock:/docker.sock" \
-  --env=KUBERNETES_ANYWHERE_TOOLS_IMAGE \
-    $KUBERNETES_ANYWHERE_TOOLS_IMAGE \
+  --env=KUBERNETES_ANYWHERE_TOOLBOX_IMAGE \
+    $KUBERNETES_ANYWHERE_TOOLBOX_IMAGE \
       setup-kubelet-volumes
 ExecStart=/usr/bin/docker --host=unix:///var/run/weave/weave.sock run \
   --env=CLOUD_PROVIDER \
   --env=AWS_LOCAL_HOSTNAME \
   --name=kubelet \
   --privileged=true --net=host --pid=host \
-  --volumes-from=kubelet-secure-config \
   --volumes-from=kubelet-volumes \
     $KUBERNETES_ANYWHERE_KUBELET_IMAGE
 Restart=always

@@ -97,46 +97,46 @@ master_config=$(docker-machine config 'kube-4')
 
 docker ${master_config} run \
   -v /var/run/docker.sock:/docker.sock \
-    weaveworks/kubernetes-anywhere:tools \
-      setup-secure-cluster-config-volumes
+    weaveworks/kubernetes-anywhere:toolboxs \
+      create-pki-containers
 
 ## Run intermediate containers to export the TLS config volumes for master components
 
-for c in 'apiserver' 'controller-manager' 'scheduler' 'tools' ; do
+for c in 'apiserver' 'controller-manager' 'scheduler' 'toolbox' ; do
   docker ${master_config} run \
-    --name="kube-${c}-secure-config" \
-    kubernetes-anywhere:${c}-secure-config
+    --name="kube-${c}-pki" \
+    kubernetes-anywhere:${c}-pki
 done
 
 ## Transfer TLS config images via a pipe between remote API, which is a neat trick to avoid having
 ## to setup a private registry, also rather safe as the network connection is encrypted
 
 docker ${master_config} save \
-    kubernetes-anywhere:kubelet-secure-config \
-    kubernetes-anywhere:proxy-secure-config \
-    kubernetes-anywhere:tools-secure-config \
+    kubernetes-anywhere:kubelet-pki \
+    kubernetes-anywhere:proxy-pki \
+    kubernetes-anywhere:toolbox-pki \
   | tee \
     >(docker $(docker-machine config 'kube-5') load) \
     >(docker $(docker-machine config 'kube-6') load) \
     >(docker $(docker-machine config 'kube-7') load) \
   | cat > /dev/null
 
-## Launch the master components using volumes provided as artefact of running the `*-secure-config` containers
+## Launch the master components using volumes provided as artefact of running the `*-pki` containers
 
 docker_on 'kube-4' ${weaveproxy_socket} run --detach \
   --env="ETCD_CLUSTER_SIZE=3" \
   --name="kube-apiserver" \
-  --volumes-from="kube-apiserver-secure-config" \
+  --volumes-from="kube-apiserver-pki" \
     weaveworks/kubernetes-anywhere:apiserver
 
 docker_on 'kube-4' ${weaveproxy_socket} run --detach \
   --name="kube-scheduler" \
-  --volumes-from="kube-scheduler-secure-config" \
+  --volumes-from="kube-scheduler-pki" \
     weaveworks/kubernetes-anywhere:scheduler
 
 docker_on 'kube-4' ${weaveproxy_socket} run --detach \
   --name="kube-controller-manager" \
-  --volumes-from="kube-controller-manager-secure-config" \
+  --volumes-from="kube-controller-manager-pki" \
     weaveworks/kubernetes-anywhere:controller-manager
 
 ## Launch kubelet and proxy on each of the worker nodes
@@ -149,43 +149,43 @@ for m in 'kube-5' 'kube-6' 'kube-7' ; do
 
   ## Run intermediate containers to export volumes kubelet wants
   docker ${worker_config} run \
-    --name="kubelet-secure-config" \
-      kubernetes-anywhere:kubelet-secure-config
+    --name="kubelet-pki" \
+      kubernetes-anywhere:kubelet-pki
   docker_on ${m} ${weaveproxy_socket} run \
     --volume="/:/rootfs" \
     --volume="/var/run/docker.sock:/docker.sock" \
-      weaveworks/kubernetes-anywhere:tools \
+      weaveworks/kubernetes-anywhere:toolbox \
         setup-kubelet-volumes
   ## Start the kubelete itself now
   docker_on ${m} ${weaveproxy_socket} run --detach \
     --name="kubelet" \
     --privileged="true" --net="host" --pid="host" \
     --volumes-from="kubelet-volumes" \
-    --volumes-from="kubelet-secure-config" \
+    --volumes-from="kubelet-pki" \
       weaveworks/kubernetes-anywhere:kubelet
 
-  ## Run intermediate container for proxy's TLS config volumes
+  ## Run intermediate container for proxy's TLS PKI data containers
   docker ${worker_config} run \
-    --name="kube-proxy-secure-config" \
-      kubernetes-anywhere:proxy-secure-config
+    --name="kube-proxy-pki" \
+      kubernetes-anywhere:proxy-pki
   ## And now start the proxy itself
   docker_on ${m} ${weaveproxy_socket} run --detach \
     --name="kube-proxy" \
     --privileged="true" --net="host" --pid="host" \
-    --volumes-from="kube-proxy-secure-config" \
+    --volumes-from="kube-proxy-pki" \
       weaveworks/kubernetes-anywhere:proxy
-  ## Create tools data volume for convenience
+  ## Create toolbox PKI data volume for convenience
   docker ${worker_config} create \
-    --name=kube-tools-secure-config \
-      kubernetes-anywhere:tools-secure-config
+    --name=kube-toolbox-pki \
+      kubernetes-anywhere:toolbox-pki
 done
 
-## Run tools container to deploy SkyDNS addon
+## Run toolbox container to deploy SkyDNS addon
 docker_on 'kube-4' ${weaveproxy_socket} run \
-  --volumes-from="kube-tools-secure-config" \
-    weaveworks/kubernetes-anywhere:tools \
+  --volumes-from="kube-toolbox-pki" \
+    weaveworks/kubernetes-anywhere:toolbox \
       kubectl create -f kube-system-namespace.yaml
 docker_on 'kube-4' ${weaveproxy_socket} run \
-  --volumes-from="kube-tools-secure-config" \
-    weaveworks/kubernetes-anywhere:tools \
+  --volumes-from="kube-toolbox-pki" \
+    weaveworks/kubernetes-anywhere:toolbox \
       kubectl create -f skydns-addon-secure

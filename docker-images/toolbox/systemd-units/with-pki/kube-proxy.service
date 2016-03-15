@@ -5,20 +5,20 @@ Description=Kubernetes Proxy
 Documentation=http://kubernetes.io/
 [Service]
 Environment=KUBERNETES_ANYWHERE_PROXY_IMAGE=weaveworks/kubernetes-anywhere:proxy
-Environment=KUBERNETES_ANYWHERE_PROXY_SECURE_CONFIG_IMAGE=kubernetes-anywhere:proxy-secure-config
+Environment=KUBERNETES_ANYWHERE_PROXY_PKI_IMAGE=kubernetes-anywhere:proxy-pki
 EnvironmentFile=-/etc/kubernetes-anywhere.env
-EnvironmentFile=-/etc/kubernetes-anywhere-secure-config-images.env
+EnvironmentFile=-/etc/kubernetes-anywhere-pki-images.env
 ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_PROXY_IMAGE
-ExecStartPre=-/usr/bin/docker pull $KUBERNETES_ANYWHERE_PROXY_SECURE_CONFIG_IMAGE
+ExecStartPre=-/usr/bin/docker pull $KUBERNETES_ANYWHERE_PROXY_PKI_IMAGE
 ExecStartPre=-/usr/bin/docker rm -f kube-proxy
-ExecStartPre=-/usr/bin/docker rm -f kube-proxy-secure-config
+ExecStartPre=-/usr/bin/docker rm -f kube-proxy-pki
 ExecStartPre=-/usr/bin/docker run \
-  --name=kube-proxy-secure-config \
-    $KUBERNETES_ANYWHERE_PROXY_SECURE_CONFIG_IMAGE
+  --name=kube-proxy-pki \
+    $KUBERNETES_ANYWHERE_PROXY_PKI_IMAGE
 ExecStart=/usr/bin/docker --host=unix:///var/run/weave/weave.sock run \
   --name=kube-proxy \
   --privileged=true --net=host --pid=host \
-  --volumes-from=kube-proxy-secure-config \
+  --volumes-from=kube-proxy-pki \
     $KUBERNETES_ANYWHERE_PROXY_IMAGE
 Restart=always
 RestartSec=10

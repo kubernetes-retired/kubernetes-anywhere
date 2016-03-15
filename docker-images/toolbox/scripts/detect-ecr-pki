@@ -4,8 +4,6 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-setup-secure-cluster-config-volumes
-
 doc=$(curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document)
 export AWS_DEFAULT_REGION=$(printf "${doc}" | jq -r .region)
 
@@ -24,16 +22,16 @@ registry=$(printf "%s.dkr.ecr.%s.amazonaws.com" \
   $(printf "${doc}" | jq -r .region) \
 )
 
-tag_and_push() {
-  local ecr_tag="${registry}/${instance_kubernetescluster_tag}/${1}/secure-config:${2}"
-  docker tag kubernetes-anywhere:${2}-secure-config $ecr_tag
-  docker push $ecr_tag
+print_image_variable() {
+  local ecr_tag="${registry}/${instance_kubernetescluster_tag}/${1}/pki:${2}"
+  local upcase_name=${2^^};
+  echo KUBERNETES_ANYWHERE_${upcase_name/-/_}_PKI_IMAGE=\"${ecr_tag}\"
 }
 
 for i in apiserver controller-manager scheduler
-do tag_and_push master $i
+do print_image_variable master $i
 done
 
-for i in kubelet proxy tools
-do tag_and_push node $i
+for i in kubelet proxy toolbox
+do print_image_variable node $i
 done
