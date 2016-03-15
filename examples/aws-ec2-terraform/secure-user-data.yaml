@@ -47,19 +47,19 @@ write_files:
     content: |
       #!/bin/bash
       source /etc/kubernetes-anywhere.env
-      source /etc/kubernetes-anywhere-secure-config-images.env
+      source /etc/kubernetes-anywhere-pki-images.env
 
       export HOME=/root
 
-      tools=${KUBERNETES_ANYWHERE_TOOLS_IMAGE:-"weaveworks/kubernetes-anywhere:tools"}
-      sudo docker pull $tools
+      toolbox=${KUBERNETES_ANYWHERE_TOOLBOX_IMAGE:-"weaveworks/kubernetes-anywhere:toolbox"}
+      sudo docker pull $toolbox
 
-      sudo docker pull ${KUBERNETES_ANYWHERE_TOOLS_SECURE_CONFIG_IMAGE}
+      sudo docker pull ${KUBERNETES_ANYWHERE_TOOLBOX_PKI_IMAGE}
 
       ## TODO: find a way to avoid garbage
-      secure_config_container=$(sudo docker run --detach ${KUBERNETES_ANYWHERE_TOOLS_SECURE_CONFIG_IMAGE})
+      pki=$(sudo docker run --detach ${KUBERNETES_ANYWHERE_TOOLBOX_PKI_IMAGE})
 
-      args="--volume=/var/run/weave/weave.sock:/docker.sock --volumes-from=${secure_config_container}"
+      args="--volume=/var/run/weave/weave.sock:/docker.sock --volumes-from=${pki}"
 
       if [ -n "${SSH_AUTH_SOCK}" ] ; then
         args="${args} --volume=${SSH_AUTH_SOCK}:/agent.sock --env=SSH_AUTH_SOCK=/agent.sock"
@@ -67,7 +67,7 @@ write_files:
 
       exec sudo docker --host="unix:///var/run/weave/weave.sock" run \
         --tty --interactive ${args} \
-          $tools $@
+          $toolbox $@
 
   - path: /etc/kubernetes-anywhere.env
     permissions: '0644'
@@ -139,13 +139,13 @@ write_files:
       Before=kube-apiserver.service kube-scheduler.service kube-controller-manager.service
       [Service]
       Type=simple
-      Environment=KUBERNETES_ANYWHERE_TOOLS_IMAGE=weaveworks/kubernetes-anywhere:tools
+      Environment=KUBERNETES_ANYWHERE_TOOLBOX_IMAGE=weaveworks/kubernetes-anywhere:toolbox
       EnvironmentFile=/etc/kubernetes-anywhere.env
       ExecStartPre=/bin/mkdir -p /root/.docker/
       ExecStart=/usr/bin/docker run \
           -v /root/.docker/:/root/.docker/ \
           -v /var/run/docker.sock:/docker.sock \
-            $KUBERNETES_ANYWHERE_TOOLS_IMAGE ecr-login
+            $KUBERNETES_ANYWHERE_TOOLBOX_IMAGE ecr-login
       [Install]
       WantedBy=kubernetes-master.target
       WantedBy=kubernetes-node.target
@@ -168,19 +168,19 @@ write_files:
       systemctl start docker.service
 
       docker version
-      docker pull weaveworks/kubernetes-anywhere:tools
+      docker pull weaveworks/kubernetes-anywhere:toolbox
       docker images
 
       docker run \
         -v /etc/systemd/system:/host-systemd \
-          weaveworks/kubernetes-anywhere:tools install-secure-systemd-units
+          weaveworks/kubernetes-anywhere:toolbox install-systemd-units-with-pki
 
       systemctl daemon-reload
 
       systemctl enable weave.service weaveproxy.service weave-expose.service weave-network.target
       systemctl start weave-network.target
 
-      eval $(docker run weaveworks/kubernetes-anywhere:tools describe-ec2-node | tee -a /etc/kubernetes-anywhere.env)
+      eval $(docker run weaveworks/kubernetes-anywhere:toolbox describe-ec2-node | tee -a /etc/kubernetes-anywhere.env)
 
       case "${NAME_TAG}" in
         kubernetes-etcd)
@@ -195,11 +195,11 @@ write_files:
           docker run \
             -v /root/.docker/:/root/.docker/ \
             -v /var/run/docker.sock:/docker.sock \
-              weaveworks/kubernetes-anywhere:tools make-ecr-secure-config-images
+              weaveworks/kubernetes-anywhere:toolbox create-pki-and-push-to-ecr
           ## image names won't change, so this only needs to be done once also
           docker run \
-              weaveworks/kubernetes-anywhere:tools find-ecr-secure-config-images \
-              > /etc/kubernetes-anywhere-secure-config-images.env
+              weaveworks/kubernetes-anywhere:toolbox detect-ecr-pki \
+              > /etc/kubernetes-anywhere-pki-images.env
 
           ## as provisoning happens in parallel, some of the cluster components
           ## will restat continously until dependencies become available
@@ -218,8 +218,8 @@ write_files:
           ## account number and instance tags, there is no need to login to ECR
           ## at this point, but `erc-login.service` is expected to start shortly
           docker run \
-              weaveworks/kubernetes-anywhere:tools find-ecr-secure-config-images \
-              > /etc/kubernetes-anywhere-secure-config-images.env
+              weaveworks/kubernetes-anywhere:toolbox detect-ecr-pki \
+              > /etc/kubernetes-anywhere-pki-images.env
 
           systemctl enable \
             kubelet.service \

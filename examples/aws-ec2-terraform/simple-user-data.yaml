@@ -55,7 +55,7 @@ write_files:
 
       exec sudo docker --host="unix:///var/run/weave/weave.sock" run \
         --tty --interactive ${args} \
-          weaveworks/kubernetes-anywhere:tools $@
+          weaveworks/kubernetes-anywhere:toolbox $@
 
   - path: /etc/kubernetes-anywhere.env
     permissions: '0600'
@@ -118,16 +118,16 @@ write_files:
       systemctl start docker.service
 
       docker version
-      docker pull weaveworks/kubernetes-anywhere:tools
+      docker pull weaveworks/kubernetes-anywhere:toolbox
       docker images
-      docker run -v /etc/systemd/system:/host-systemd weaveworks/kubernetes-anywhere:tools install-simple-systemd-units
+      docker run -v /etc/systemd/system:/host-systemd weaveworks/kubernetes-anywhere:toolbox install-basic-systemd-units
 
       systemctl daemon-reload
 
       systemctl enable weave.service weaveproxy.service weave-expose.service weave-network.target
       systemctl start weave-network.target
 
-      eval $(docker run weaveworks/kubernetes-anywhere:tools describe-ec2-node | tee -a /etc/kubernetes-anywhere.env)
+      eval $(docker run weaveworks/kubernetes-anywhere:toolbox describe-ec2-node | tee -a /etc/kubernetes-anywhere.env)
 
       case "${NAME_TAG}" in
         kubernetes-etcd)

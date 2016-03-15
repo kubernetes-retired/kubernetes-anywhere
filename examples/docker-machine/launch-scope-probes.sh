@@ -14,7 +14,7 @@ done
 curl --silent --location https://gist.github.com/errordeveloper/3f13301adb276e26bfee/raw/scope-ds.yaml \
   | sed "s/%%WEAVE_SCOPE_SERVICE_TOKEN%%/${1}/" \
   | docker-machine ssh 'kube-4' docker --host="unix:///var/run/weave/weave.sock" run \
-      --volumes-from="kube-tools-secure-config" \
+      --volumes-from="kube-toolbox-pki" \
       --interactive \
-        weaveworks/kubernetes-anywhere:tools \
+        weaveworks/kubernetes-anywhere:toolbox \
           kubectl create --validate="false" -f -

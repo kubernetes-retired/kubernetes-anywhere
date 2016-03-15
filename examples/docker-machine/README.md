@@ -22,8 +22,8 @@ e.g. `docker-machine ssh kube-5` and run the following commands.
 
 ```
 eval $(weave env)
-docker run --interactive --tty --volumes-from=kube-tools-secure-config \
-  weaveworks/kubernetes-anywhere:tools bash -l
+docker run --interactive --tty --volumes-from=kube-toolbox-pki \
+  weaveworks/kubernetes-anywhere:toolbox
 ```
 
 > **Please note** this example has TLS enabled, see `create-cluster.sh` for more details.
