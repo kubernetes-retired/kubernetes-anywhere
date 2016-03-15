@@ -4,8 +4,8 @@ services:
   - docker
 
 env:
-    - KUBERNETES_RELEASE="v1.1.8"
-    - KUBERNETES_RELEASE="v1.2.0-beta.1"
+  - KUBERNETES_RELEASE="v1.1.8"
+  - KUBERNETES_RELEASE="v1.2.0-beta.1"
   global:
     - NOPUB=1
 
