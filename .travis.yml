@@ -8,5 +8,5 @@ env:
   - NOPUB="1" KUBERNETES_RELEASE="v1.2.0-beta.1"
 
 script:
-  - ./buid-and-publish
+  - ./build-and-publish
 
