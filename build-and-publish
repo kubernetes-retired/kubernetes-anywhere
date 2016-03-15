@@ -29,7 +29,7 @@ LABEL com.git-scm.repo=${git_repo}
 LABEL com.git-scm.rev=${git_rev}
 "
 
-printf "FROM gcr.io/google_containers/hyperkube:%s\nENV KUBERNETES_RELEASE=%s\n%s\n"
+printf "FROM gcr.io/google_containers/hyperkube:%s\nENV KUBERNETES_RELEASE=%s\n%s\n" \
   "${kubernetes_release}" "${kubernetes_release}" "${common_labels}" \
   | docker build --tag="temp/hyperkube" -
 
