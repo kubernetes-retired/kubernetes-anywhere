@@ -188,7 +188,7 @@ do echo $i:
     docker -H unix:///var/run/weave/weave.sock run \
       --volume="/:/rootfs" \
       --volume="/var/run/weave/weave.sock:/docker.sock" \
-      weaveworks/kubernetes-anywhere:tools \
+      weaveworks/kubernetes-anywhere:toolbox \
       setup-kubelet-volumes
   ssh $SSH_FLAGS ec2-user@$i \
     docker -H unix:///var/run/weave/weave.sock run -d -l com.amazonaws.ecs.container-name=kubelet \

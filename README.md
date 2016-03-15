@@ -45,7 +45,7 @@ eval $(weave env)
 ### Deploy Kubernetes services
 
 ```
-$ docker run --rm -ti -v /:/rootfs -v /var/run/weave/weave.sock:/docker.sock weaveworks/kubernetes-anywhere:tools bash -l
+$ docker run --rm -ti -v /:/rootfs -v /var/run/weave/weave.sock:/docker.sock weaveworks/kubernetes-anywhere:toolbox
 # setup-kubelet-volumes
 # compose -p kube pull
 # compose -p kube up -d
@@ -74,7 +74,7 @@ $ weave status dns
 ### Deploy the Kubernetes app
 
 ```
-$ docker run --rm -ti weaveworks/kubernetes-anywhere:tools bash -l
+$ docker run --rm -ti weaveworks/kubernetes-anywhere:toolbox
 
 # kubectl get nodes
 # kubectl create -f skydns-addon
@@ -186,7 +186,7 @@ On `$KUBE_WORKER_1` & `$KUBE_WORKER_2`, start kubelet and proxy like this:
 docker run \
       --volume="/:/rootfs" \
       --volume="/var/run/docker.sock:/docker.sock" \
-      weaveworks/kubernetes-anywhere:tools \
+      weaveworks/kubernetes-anywhere:toolbox \
       setup-kubelet-volumes
 docker run -d \
       --name=kubelet \
@@ -201,14 +201,14 @@ docker run -d \
 
 ### Provisioning is done, let's launch an app!
 
-There is a tools container you can run on any of the hosts in the cluster that has `kubectl` preconfigured to use `kube-apiserver.weave.local`.
+There is a toolbox container you can run on any of the hosts in the cluster that has `kubectl` preconfigured to use `kube-apiserver.weave.local`.
 
-Here is how you can use this tools container.
+Here is how you can use this toolbox container.
 
 Start it in interactive mode:
 
 ```
-$ docker run -ti weaveworks/kubernetes-anywhere:tools
+$ docker run -ti weaveworks/kubernetes-anywhere:toolbox
 ```
 
 Check there is an expected number of worker nodes in the cluster:
@@ -238,74 +238,73 @@ If you want to deploy something else, you can just pass a URL to your manifest l
 # kubectl create -f https://example.com/app-service.yaml
 ```
 
-> Please note that you can add a management node to run the tools container, which may be part of your CI/CD setup or even just a VM on your laptop, given it can Weave Net ports on your cluster.
+> Please note that you can add a management node to run the toolbox container, which may be part of your CI/CD setup or even just a VM on your laptop, given it can Weave Net ports on your cluster.
 
 ## Using TLS
 
-> **Please note** that this currently requires Docker version 1.10, for the mount propagation feature.
-
-Thanks to WeaveDNS we can create a certificate for the fixed `kube-apiserver.weave.local` domain name.
+Kubernetes Anywhere uses containerised Public Key Infrastructure (PKI) to enable configuration for the cluster
+components. Thanks to WeaveDNS we can create a certificate for the fixed `kube-apiserver.weave.local` domain name.
 
 One way to distribute the certificates and configuration files for all the components is via containers.
 
 If one assumes that their registry is a secure place, TLS configuration can be done transparently.
 
-First run [a helper script](https://github.com/weaveworks/weave-kubernetes-anywhere/blob/master/docker-images/setup-secure-cluster-config-volumes.sh) shipped in the `weaveworks/kubernetes-anywhere:tools`:
+First run [a helper script](https://github.com/weaveworks/weave-kubernetes-anywhere/blob/master/docker-images/toolbox/scripts/create-pki-containers) shipped in the `weaveworks/kubernetes-anywhere:toolbox`:
 
 ```
-docker run -v /var/run/docker.sock:/docker.sock weaveworks/kubernetes-anywhere:tools setup-secure-cluster-config-volumes
+docker run -v /var/run/docker.sock:/docker.sock weaveworks/kubernetes-anywhere:toolbox create-pki-containers
 ```
 
-which results in a number of containers tagged `kubernetes-anywhere:<component>-secure-config`, e.g.
+which results in a number of containers tagged `kubernetes-anywhere:<component>-pki`, e.g.
 
 ```
-REPOSITORY               TAG                       IMAGE ID        CREATED         VIRTUAL SIZE
-kubernetes-anywhere                  tools-secure-config                9f29f12d2462        9 minutes ago       4.796 MB
-kubernetes-anywhere                  scheduler-secure-config            7a6b45807c48        9 minutes ago       4.796 MB
-kubernetes-anywhere                  controller-manager-secure-config   cb0dd7c10ba7        9 minutes ago       4.797 MB
-kubernetes-anywhere                  kubelet-secure-config              f80fcff78a37        9 minutes ago       4.796 MB
-kubernetes-anywhere                  proxy-secure-config                073305ee4bef        9 minutes ago       4.796 MB
-kubernetes-anywhere                  apiserver-secure-config            3b7f44eb2fc2        9 minutes ago       4.802 MB
+REPOSITORY               TAG                      IMAGE ID        CREATED         VIRTUAL SIZE
+kubernetes-anywhere      toolbox-pki              9f29f12d2462    9 minutes ago   4.796 MB
+kubernetes-anywhere      scheduler-pki            7a6b45807c48    9 minutes ago   4.796 MB
+kubernetes-anywhere      controller-manager-pki   cb0dd7c10ba7    9 minutes ago   4.797 MB
+kubernetes-anywhere      kubelet-pki              f80fcff78a37    9 minutes ago   4.796 MB
+kubernetes-anywhere      proxy-pki                073305ee4bef    9 minutes ago   4.796 MB
+kubernetes-anywhere      apiserver-pki            3b7f44eb2fc2    9 minutes ago   4.802 MB
 ```
 
 Next, you can push these to the registry and use the volumes these images export like this
 
 ### API Server
 ```
-docker run --name=kube-apiserver-secure-config kubernetes-anywhere:apiserver-secure-config
-docker run -d --name=kube-apiserver --volumes-from=kube-apiserver-secure-config weaveworks/kubernetes-anywhere:apiserver
+docker run --name=kube-apiserver-pki kubernetes-anywhere:apiserver-pki
+docker run -d --name=kube-apiserver --volumes-from=kube-apiserver-pki weaveworks/kubernetes-anywhere:apiserver
 ```
 
 > **Don't forget** to pass `-e ETCD_CLUSTER_SIZE=<N>` as intended.
 
 ### Kubelet
 ```
-docker run -v /:/rootfs -v /var/run/docker.sock:/docker.sock weaveworks/kubernetes-anywhere:tools setup-kubelet-volumes
-docker run --name=kubelet-secure-config kubernetes-anywhere:kubelet-secure-config
-docker run -d --name=kubelet  --privileged=true --net=host --pid=host --volumes-from=kubelet-volumes --volumes-from=kubelet-secure-config weaveworks/kubernetes-anywhere:kubelet
+docker run -v /:/rootfs -v /var/run/docker.sock:/docker.sock weaveworks/kubernetes-anywhere:toolbox setup-kubelet-volumes
+docker run --name=kubelet-pki kubernetes-anywhere:kubelet-pki
+docker run -d --name=kubelet  --privileged=true --net=host --pid=host --volumes-from=kubelet-volumes --volumes-from=kubelet-pki weaveworks/kubernetes-anywhere:kubelet
 ```
 ### Proxy
 ```
-docker run --name=kube-proxy-secure-config kubernetes-anywhere:proxy-secure-config
-docker run -d --name=kube-proxy  --privileged=true --net=host --pid=host --volumes-from=kube-proxy-secure-config weaveworks/kubernetes-anywhere:proxy
+docker run --name=kube-proxy-pki kubernetes-anywhere:proxy-pki
+docker run -d --name=kube-proxy  --privileged=true --net=host --pid=host --volumes-from=kube-proxy-pki weaveworks/kubernetes-anywhere:proxy
 ```
 ### Controller Manager
 ```
-docker run --name=kube-controller-manager-secure-config kubernetes-anywhere:controller-manager-secure-config
-docker run -d --name=kube-controller-manager --volumes-from=kube-controller-manager-secure-config weaveworks/kubernetes-anywhere:controller-manager
+docker run --name=kube-controller-manager-pki kubernetes-anywhere:controller-manager-pki
+docker run -d --name=kube-controller-manager --volumes-from=kube-controller-manager-pki weaveworks/kubernetes-anywhere:controller-manager
 ```
 ### Scheduler
 ```
-docker run --name=kube-scheduler-secure-config kubernetes-anywhere:scheduler-secure-config
-docker run -d --name=kube-scheduler --volumes-from=kube-scheduler-secure-config weaveworks/kubernetes-anywhere:scheduler
+docker run --name=kube-scheduler-pki kubernetes-anywhere:scheduler-pki
+docker run -d --name=kube-scheduler --volumes-from=kube-scheduler-pki weaveworks/kubernetes-anywhere:scheduler
 ```
-### Tools
+### toolbox
 ```
-docker run --name=kube-tools-secure-config kubernetes-anywhere:tools-secure-config
-docker run --interactive --tty --volumes-from=kube-tools-secure-config weaveworks/kubernetes-anywhere:tools bash -l
+docker run --name=kube-toolbox-pki kubernetes-anywhere:toolbox-pki
+docker run --interactive --tty --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox
 ```
 
-Setting up SkyDNS requires a different version of the manisfest, which had been provided in tools container, please use it like this:
+Setting up SkyDNS requires a different version of the manisfest, which had been provided in toolbox container, please use it like this:
 ```
 # kubectl create -f kube-system-namespace.yaml
 namespace "kube-system" created

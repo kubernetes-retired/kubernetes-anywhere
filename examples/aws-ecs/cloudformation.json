@@ -1,0 +1,599 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "AWS CloudFormation template to create resources required to run tasks on an ECS cluster.",
+  "Mappings": {
+    "VpcCidrs": {
+      "vpc": {
+        "cidr": "172.31.0.0/16"
+      },
+      "pubsubnet1": {
+        "cidr": "172.31.0.0/24"
+      },
+      "pubsubnet2": {
+        "cidr": "172.31.1.0/24"
+      }
+    },
+    "WeaveworksEcsAmiIds": {
+      "us-east-1": {
+        "ImageId": "ami-a71431cd"
+      },
+      "us-west-1": {
+        "ImageId": "ami-24166244"
+      },
+      "us-west-2": {
+        "ImageId": "ami-f2829893"
+      },
+      "eu-west-1": {
+        "ImageId": "ami-4b43e838"
+      },
+      "eu-central-1": {
+        "ImageId": "ami-6d504901"
+      },
+      "ap-northeast-1": {
+        "ImageId": "ami-2f360a41"
+      },
+      "ap-southeast-1": {
+        "ImageId": "ami-03c40860"
+      },
+      "ap-southeast-2": {
+        "ImageId": "ami-e00b2e83"
+      }
+    }
+  },
+  "Parameters": {
+    "EcsInstanceType": {
+      "Type": "String",
+      "Description": "ECS EC2 instance type",
+      "Default": "t2.micro",
+      "AllowedValues": [
+        "t2.micro",
+        "t2.small",
+        "t2.medium",
+        "t2.large",
+        "m3.medium",
+        "m3.large",
+        "m3.xlarge",
+        "m3.2xlarge",
+        "m4.large",
+        "m4.xlarge",
+        "m4.2xlarge",
+        "m4.4xlarge",
+        "m4.10xlarge",
+        "c4.large",
+        "c4.xlarge",
+        "c4.2xlarge",
+        "c4.4xlarge",
+        "c4.8xlarge",
+        "c3.large",
+        "c3.xlarge",
+        "c3.2xlarge",
+        "c3.4xlarge",
+        "c3.8xlarge",
+        "r3.large",
+        "r3.xlarge",
+        "r3.2xlarge",
+        "r3.4xlarge",
+        "r3.8xlarge",
+        "i2.xlarge",
+        "i2.2xlarge",
+        "i2.4xlarge",
+        "i2.8xlarge"
+      ],
+      "ConstraintDescription": "must be a valid EC2 instance type."
+    },
+    "Scale": {
+      "Type": "Number",
+      "Description": "Size of ECS cluster",
+      "Default": "3"
+    },
+    "KeyName": {
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "Description": "Name of an existing EC2 KeyPair to enable SSH access to the ECS instances",
+      "MinLength": "1",
+      "ConstraintDescription": "must be the name of an existing EC2 KeyPair."
+    },
+    "WeaveScopeServiceToken": {
+      "Type": "String",
+      "Description": "Optional - Authentication token for Weave Scope service [http://scope.weave.works/]",
+      "Default": ""
+    }
+  },
+  "Conditions": {
+    "UseScopeService": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "WeaveScopeServiceToken"
+            },
+            ""
+          ]
+        }
+      ]
+    }
+  },
+  "Resources": {
+    "EcsCluster": {
+      "Type": "AWS::ECS::Cluster"
+    },
+    "KubernetesAnywhereAPIServerTask": {
+      "Type": "AWS::ECS::TaskDefinition",
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "Essential": true,
+            "Name": "kube-apiserver",
+            "Image": "weaveworks/kubernetes-anywhere:apiserver"
+          }
+        ],
+        "Volumes": []
+      }
+    },
+    "KubernetesAnywhereAPIServerService": {
+      "Type": "AWS::ECS::Service",
+      "Properties": {
+        "Cluster": {
+          "Ref": "EcsCluster"
+        },
+        "DesiredCount": 2,
+        "TaskDefinition": {
+          "Ref": "KubernetesAnywhereAPIServerTask"
+        }
+      }
+    },
+    "KubernetesAnywhereSchedulerTask": {
+      "Type": "AWS::ECS::TaskDefinition",
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "Essential": true,
+            "Name": "kube-scheduler",
+            "Image": "weaveworks/kubernetes-anywhere:scheduler"
+          }
+        ],
+        "Volumes": []
+      }
+    },
+    "KubernetesAnywhereSchedulerService": {
+      "Type": "AWS::ECS::Service",
+      "Properties": {
+        "Cluster": {
+          "Ref": "EcsCluster"
+        },
+        "DesiredCount": 1,
+        "TaskDefinition": {
+          "Ref": "KubernetesAnywhereSchedulerTask"
+        }
+      }
+    },
+    "KubernetesAnywhereControllerManagerTask": {
+      "Type": "AWS::ECS::TaskDefinition",
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "Essential": true,
+            "Name": "kube-controller-manager",
+            "Image": "weaveworks/kubernetes-anywhere:controller-manager"
+          }
+        ],
+        "Volumes": []
+      }
+    },
+    "KubernetesAnywhereControllerManagerService": {
+      "Type": "AWS::ECS::Service",
+      "Properties": {
+        "Cluster": {
+          "Ref": "EcsCluster"
+        },
+        "DesiredCount": 1,
+        "TaskDefinition": {
+          "Ref": "KubernetesAnywhereControllerManagerTask"
+        }
+      }
+    },
+    "KubernetesAnywhereEtcd1Task": {
+      "Type": "AWS::ECS::TaskDefinition",
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "Essential": true,
+            "Name": "etcd1",
+            "Image": "weaveworks/kubernetes-anywhere:etcd"
+          }
+        ],
+        "Volumes": []
+      }
+    },
+    "KubernetesAnywhereEtcd1Service": {
+      "Type": "AWS::ECS::Service",
+      "Properties": {
+        "Cluster": {
+          "Ref": "EcsCluster"
+        },
+        "DesiredCount": 1,
+        "TaskDefinition": {
+          "Ref": "KubernetesAnywhereEtcd1Task"
+        }
+      }
+    },
+    "Vpc": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": {
+          "Fn::FindInMap": [
+            "VpcCidrs",
+            "vpc",
+            "cidr"
+          ]
+        }
+      }
+    },
+    "PubSubnetAz1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "Vpc"
+        },
+        "CidrBlock": {
+          "Fn::FindInMap": [
+            "VpcCidrs",
+            "pubsubnet1",
+            "cidr"
+          ]
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "0",
+            {
+              "Fn::GetAZs": {
+                "Ref": "AWS::Region"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "PubSubnetAz2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "Vpc"
+        },
+        "CidrBlock": {
+          "Fn::FindInMap": [
+            "VpcCidrs",
+            "pubsubnet2",
+            "cidr"
+          ]
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "1",
+            {
+              "Fn::GetAZs": {
+                "Ref": "AWS::Region"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "InternetGateway": {
+      "Type": "AWS::EC2::InternetGateway"
+    },
+    "AttachGateway": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "Vpc"
+        },
+        "InternetGatewayId": {
+          "Ref": "InternetGateway"
+        }
+      }
+    },
+    "RouteViaIgw": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "Vpc"
+        }
+      }
+    },
+    "PublicRouteViaIgw": {
+      "DependsOn": "AttachGateway",
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "RouteViaIgw"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "InternetGateway"
+        }
+      }
+    },
+    "PubSubnet1RouteTableAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PubSubnetAz1"
+        },
+        "RouteTableId": {
+          "Ref": "RouteViaIgw"
+        }
+      }
+    },
+    "PubSubnet2RouteTableAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PubSubnetAz2"
+        },
+        "RouteTableId": {
+          "Ref": "RouteViaIgw"
+        }
+      }
+    },
+    "EcsSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "ECS Allowed Ports",
+        "VpcId": {
+          "Ref": "Vpc"
+        }
+      }
+    },
+    "EcsSecurityGroupIngressAppPort": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "EcsSecurityGroup"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "EcsSecurityGroupIngressSshPort": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "EcsSecurityGroup"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "EcsSecurityGroupIngressWeaveScopeExtPort": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "EcsSecurityGroup"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "4040",
+        "ToPort": "4040",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "EcsSecurityGroupIngressWeaveScopeIntPort": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "EcsSecurityGroup"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "4040",
+        "ToPort": "4040",
+        "SourceSecurityGroupId": {
+          "Ref": "EcsSecurityGroup"
+        }
+      }
+    },
+    "EcsSecurityGroupIngressWeaveNetIntTcpPort": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "EcsSecurityGroup"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "6783",
+        "ToPort": "6783",
+        "SourceSecurityGroupId": {
+          "Ref": "EcsSecurityGroup"
+        }
+      }
+    },
+    "EcsSecurityGroupIngressWeaveNetIntUdpPorts": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "EcsSecurityGroup"
+        },
+        "IpProtocol": "udp",
+        "FromPort": "6783",
+        "ToPort": "6784",
+        "SourceSecurityGroupId": {
+          "Ref": "EcsSecurityGroup"
+        }
+      }
+    },
+    "EcsInstancePolicy": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+        ],
+        "Policies": [
+          {
+            "PolicyName": "ClusterInstanceRole",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ecs:CreateCluster",
+                    "ecs:DeregisterContainerInstance",
+                    "ecs:DiscoverPollEndpoint",
+                    "ecs:Poll",
+                    "ecs:RegisterContainerInstance",
+                    "ecs:Submit*",
+                    "ecs:ListClusters",
+                    "ecs:ListContainerInstances",
+                    "ecs:DescribeContainerInstances",
+                    "ec2:DescribeInstances",
+                    "autoscaling:DescribeAutoScalingInstances"
+                  ],
+                  "Resource": [
+                    "*"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "EcsInstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "EcsInstancePolicy"
+          }
+        ]
+      }
+    },
+    "EcsInstanceLc": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Properties": {
+        "ImageId": {
+          "Fn::FindInMap": [
+            "WeaveworksEcsAmiIds",
+            {
+              "Ref": "AWS::Region"
+            },
+            "ImageId"
+          ]
+        },
+        "InstanceType": {
+          "Ref": "EcsInstanceType"
+        },
+        "AssociatePublicIpAddress": true,
+        "IamInstanceProfile": {
+          "Ref": "EcsInstanceProfile"
+        },
+        "KeyName": {
+          "Ref": "KeyName"
+        },
+        "SecurityGroups": [
+          {
+            "Ref": "EcsSecurityGroup"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash\n",
+                "echo ECS_CLUSTER=",
+                {
+                  "Ref": "EcsCluster"
+                },
+                " >> /etc/ecs/ecs.config\n",
+                {
+                  "Fn::If": [
+                    "UseScopeService",
+                    "echo SERVICE_TOKEN=",
+                    ""
+                  ]
+                },
+                {
+                  "Ref": "WeaveScopeServiceToken"
+                },
+                {
+                  "Fn::If": [
+                    "UseScopeService",
+                    " >> /etc/weave/scope.config\n",
+                    ""
+                  ]
+                }
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "EcsInstanceAsg": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "VPCZoneIdentifier": [
+          {
+            "Fn::Join": [
+              ",",
+              [
+                {
+                  "Ref": "PubSubnetAz1"
+                },
+                {
+                  "Ref": "PubSubnetAz2"
+                }
+              ]
+            ]
+          }
+        ],
+        "LaunchConfigurationName": {
+          "Ref": "EcsInstanceLc"
+        },
+        "MinSize": "1",
+        "MaxSize": {
+          "Ref": "Scale"
+        },
+        "DesiredCapacity": {
+          "Ref": "Scale"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "ECS Instance - ",
+                  {
+                    "Ref": "AWS::StackName"
+                  }
+                ]
+              ]
+            },
+            "PropagateAtLaunch": "true"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -112,7 +112,7 @@ case "$(hostname)" in
     docker run \
       --volume="/:/rootfs" \
       --volume="/var/run/docker.sock:/docker.sock" \
-      weaveworks/kubernetes-anywhere:tools \
+      weaveworks/kubernetes-anywhere:toolbox \
       setup-kubelet-volumes
     docker run -d \
       -e CLOUD_PROVIDER=gce \
