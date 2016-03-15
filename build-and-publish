@@ -29,7 +29,7 @@ LABEL com.git-scm.repo=${git_repo}
 LABEL com.git-scm.rev=${git_rev}
 "
 
-echo "
+printf "
 FROM gcr.io/google_containers/hyperkube:${kubernetes_release}
 ENV KUBERNETES_RELEASE=${kubernetes_release}
 ${common_labels}
@@ -41,14 +41,14 @@ for i in kubelet proxy apiserver controller-manager scheduler ; do
     --file="${dir}/${i}.dockerfile" "${dir}"
 done
 
-echo "FROM gcr.io/google_containers/etcd:2.2.1\n${common_labels}" \
+printf "FROM gcr.io/google_containers/etcd:2.2.1\n${common_labels}\n" \
   | docker build --tag="temp/etcd" -
 
 docker build \
   --tag="${image_prefix}etcd-${kubernetes_release}" \
   --file="${dir}/etcd.dockerfile" "${dir}"
 
-echo "
+printf "
 FROM centos:7
 ENV KUBERNETES_ANYWHERE_TOOLBOX_IMAGE=${image_prefix}toolbox-${kubernetes_release}
 ${common_labels}
@@ -69,7 +69,7 @@ for c in kubelet proxy apiserver controller-manager scheduler toolbox etcd ; do
   docker push "${image_prefix}${c}-${kubernetes_release}"
   docker tag "${image_prefix}${c}-${kubernetes_release}" "${image_prefix}${c}-${minor_kubernetes_release}"
   docker push "${image_prefix}${c}-${minor_kubernetes_release}"
-  if [ ${kubernetes_release} = ${default_kubernetes_release} ] ; then
+  if [ "${kubernetes_release}" = "${default_kubernetes_release}" ] ; then
     docker tag "${image_prefix}${c}-${kubernetes_release}" "${image_prefix}${c}"
     docker push "${image_prefix}${c}"
   fi
