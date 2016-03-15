@@ -29,11 +29,9 @@ LABEL com.git-scm.repo=${git_repo}
 LABEL com.git-scm.rev=${git_rev}
 "
 
-printf "
-FROM gcr.io/google_containers/hyperkube:${kubernetes_release}
-ENV KUBERNETES_RELEASE=${kubernetes_release}
-${common_labels}
-" | docker build --tag="temp/hyperkube" -
+printf "FROM gcr.io/google_containers/hyperkube:%s\nENV KUBERNETES_RELEASE=%s\n%s\n"
+  "${kubernetes_release}" "${kubernetes_release}" "${common_labels}" \
+  | docker build --tag="temp/hyperkube" -
 
 for i in kubelet proxy apiserver controller-manager scheduler ; do
   docker build \
@@ -41,18 +39,16 @@ for i in kubelet proxy apiserver controller-manager scheduler ; do
     --file="${dir}/${i}.dockerfile" "${dir}"
 done
 
-printf "FROM gcr.io/google_containers/etcd:2.2.1\n${common_labels}\n" \
+printf "FROM gcr.io/google_containers/etcd:2.2.1\n%s\n" "${common_labels}" \
   | docker build --tag="temp/etcd" -
 
 docker build \
   --tag="${image_prefix}etcd-${kubernetes_release}" \
   --file="${dir}/etcd.dockerfile" "${dir}"
 
-printf "
-FROM centos:7
-ENV KUBERNETES_ANYWHERE_TOOLBOX_IMAGE=${image_prefix}toolbox-${kubernetes_release}
-${common_labels}
-" | docker build --tag="temp/toolbox" -
+printf "FROM centos:7\nENV KUBERNETES_ANYWHERE_TOOLBOX_IMAGE=%s\n%s\n" \
+  "${image_prefix}toolbox-${kubernetes_release}" "${common_labels}" \
+  | docker build --tag="temp/toolbox" -
 
 docker build \
   --tag="${image_prefix}toolbox-${kubernetes_release}" \
