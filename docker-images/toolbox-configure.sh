@@ -64,7 +64,7 @@ sed 's|# \(type:\) LoadBalancer|\1 NodePort|' \
 
 ## remove files we have downloaded originally
 
-rm -f ${resources}
+rm -f redis-*.yaml frontend-*.yaml
 
 ## create a modified copy of skydns addon and remove master url arg
 
