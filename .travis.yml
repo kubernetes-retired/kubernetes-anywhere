@@ -21,6 +21,7 @@ install:
   - sudo service docker start
 
 script:
+  - shellcheck $(git grep -l '#\!/bin/bash') $(git grep -l '#\!/bin/sh')
   - shellcheck ./build-and-publish
   - ./build-and-publish
 
