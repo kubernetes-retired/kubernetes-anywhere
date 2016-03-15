@@ -1,5 +1,12 @@
 sudo: required
 
+addons:
+  apt:
+    sources:
+      - debian-sid    # Grab shellcheck from the Debian repo (o_O)
+    packages:
+      - shellcheck
+
 services:
   - docker
 
@@ -8,5 +15,6 @@ env:
   - NOPUB="1" KUBERNETES_RELEASE="v1.2.0-beta.1"
 
 script:
+  - shellcheck ./build-and-publish
   - ./build-and-publish
 
