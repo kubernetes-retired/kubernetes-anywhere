@@ -59,14 +59,16 @@ docker build \
   --build-arg="EASYRSA_RELEASE=${toolbox_easyrsa_release}" \
   --file="${dir}/toolbox.dockerfile" "${dir}"
 
-[ -n "${NOPUB+x}" ] && exit
+docker_push() {
+  [ -n "${NOPUB+x}" ] || docker push $1
+}
 
 for c in kubelet proxy apiserver controller-manager scheduler toolbox etcd ; do
-  docker push "${image_prefix}${c}-${kubernetes_release}"
+  docker_push "${image_prefix}${c}-${kubernetes_release}"
   docker tag "${image_prefix}${c}-${kubernetes_release}" "${image_prefix}${c}-${kubernetes_release_short}"
-  docker push "${image_prefix}${c}-${kubernetes_release_short}"
+  docker_push "${image_prefix}${c}-${kubernetes_release_short}"
   if [ "${kubernetes_release}" = "${default_kubernetes_release}" ] ; then
     docker tag "${image_prefix}${c}-${kubernetes_release}" "${image_prefix}${c}"
-    docker push "${image_prefix}${c}"
+    docker_push "${image_prefix}${c}"
   fi
 done
