@@ -13,7 +13,6 @@ else
     "/sys:/sys:ro"
     "/dev:/dev"
     "/var/run:/var/run:rw"
-    "/var/run/weave/weave.sock:/docker.sock"
   )
 
   def_docker_root="/var/lib/docker"
@@ -44,6 +43,14 @@ else
     echo "Root filesystem from the host has to be mounted (please use \`--volume=\"/:/rootfs\"\`)."
     exit 1
   fi
+  if [ "${USE_CNI}" = "yes" ]
+  then
+    docker_sock_vol="/var/run/docker.sock:/docker.sock"
+  else
+    docker_sock_vol="/var/run/weave/weave.sock:/docker.sock"
+  fi
+
+  volumes+=("${docker_sock_vol}")
 
   docker run \
     --pid="host" \
