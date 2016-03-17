@@ -12,12 +12,12 @@ else
   args="--api-servers=http://${master}:8080"
 fi
 
-if [ ${CLOUD_PROVIDER} = 'aws' ]
+if [ "${CLOUD_PROVIDER}" = "aws" ]
 then ## TODO: check if not needed with v1.2.0 is out (see kubernetes/kubernetes#11543)
   args="${args} --hostname-override=${AWS_LOCAL_HOSTNAME}"
 fi
 
-case ${KUBERNETES_RELEASE} in
+case "${KUBERNETES_RELEASE}" in
   v1.1.*)
     args="${args} --docker-endpoint=unix:/docker.sock"
     ;;
