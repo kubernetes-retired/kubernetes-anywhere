@@ -37,6 +37,13 @@ case "${KUBERNETES_RELEASE}" in
     ;;
   v1.2.*)
     args+=( --docker-endpoint="unix:///docker.sock" )
+    if [ "${USE_CNI}" = "yes" ]
+    then
+      args+=(
+        --network-plugin="cni"
+        --network-plugin-dir="/etc/cni/net.d"
+      )
+    fi
     ;;
 esac
 
