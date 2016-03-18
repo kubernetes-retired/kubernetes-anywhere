@@ -12,7 +12,7 @@ RUN chmod +x /usr/bin/docker
 ADD kubelet-cni/bin /opt/cni/bin
 ADD kubelet-cni/net.d /etc/cni/net.d
 
-ENV WEAVE_VERSION=git-43786aaf4464
+ENV WEAVE_VERSION=git-c8ca295cda09
 #ENV WEAVE_DEBUG=1
 ENV DOCKER_HOST=unix:///docker.sock
 
