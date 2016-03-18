@@ -53,12 +53,12 @@ $curl "https://raw.github.com/kubernetes/kubernetes/${KUBERNETES_RELEASE}/exampl
 ## create two setparate copies for each of the service types
 
 mkdir guestbook-example-LoadBalancer
-cp *.yaml guestbook-example-LoadBalancer
+cp redis-*.yaml frontend-*.yaml guestbook-example-LoadBalancer
 sed 's|# \(type: LoadBalancer\)|\1|' \
   -i guestbook-example-LoadBalancer/frontend-service.yaml
 
 mkdir guestbook-example-NodePort
-cp *.yaml guestbook-example-NodePort
+cp redis-*.yaml frontend-*.yaml guestbook-example-NodePort
 sed 's|# \(type:\) LoadBalancer|\1 NodePort|' \
   -i guestbook-example-NodePort/frontend-service.yaml
 
