@@ -14,6 +14,6 @@ ADD kubelet-cni/net.d /etc/cni/net.d
 
 ENV WEAVE_VERSION=git-43786aaf4464
 #ENV WEAVE_DEBUG=1
-ENV DOCKER_HOST=unix:///real-docker.sock
+ENV DOCKER_HOST=unix:///docker.sock
 
 CMD [ "/kubelet-anywhere" ]
