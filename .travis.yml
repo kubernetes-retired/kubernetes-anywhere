@@ -23,6 +23,7 @@ install:
 script:
   - shellcheck -s bash \
       ./build-and-publish \
+      ./docker-images/toolbox-configure.sh \
       ./docker-images/toolbox/scripts/*
   - ./build-and-publish
 
