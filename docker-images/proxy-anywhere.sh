@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/bash -x
 
 /fix-nameserver
 
@@ -6,11 +6,15 @@ applet="proxy"
 config="/srv/kubernetes/kube-${applet}/kubeconfig"
 master="kube-apiserver.weave.local"
 
+args=(
+  --logtostderr="true"
+)
+
 if [ -f $config ]
 then
-  args="--kubeconfig=${config}"
+  args+=( --kubeconfig="${config}" )
 else
-  args="--master=http://${master}:8080"
+  args+=( --master="http://${master}:8080" )
 fi
 
-exec /hyperkube ${applet} ${args} --logtostderr="true"
+exec /hyperkube ${applet} "${args[@]}"

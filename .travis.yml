@@ -23,5 +23,5 @@ install:
 script:
   - shellcheck -s bash ./build-and-publish ./docker-images/toolbox-configure.sh ./docker-images/toolbox/scripts/*
   - shellcheck -s sh docker-images/etcd-anywhere.sh docker-images/weave-fix-nameserver.sh
+  - shellcheck -s bash docker-images/apiserver-anywhere.sh docker-images/controller-manager-anywhere.sh docker-images/kubelet-anywhere.sh docker-images/proxy-anywhere.sh docker-images/scheduler-anywhere.sh
   - ./build-and-publish
-

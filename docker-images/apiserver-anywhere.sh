@@ -1,30 +1,36 @@
-#!/bin/sh -x
+#!/bin/bash -x
 
-etcd_cluster=$(seq -s , 1 $ETCD_CLUSTER_SIZE | sed 's|\([1-9]*\)|http://etcd\1:2379|g')
+etcd_cluster=$(seq -s , 1 "${ETCD_CLUSTER_SIZE}" | sed 's|\([1-9]*\)|http://etcd\1:2379|g')
 
 weave_ip=$(hostname -i)
+
+args=(
+  --advertise-address="${weave_ip}"
+  --external-hostname="kube-apiserver.weave.local"
+  --etcd-servers="${etcd_cluster}"
+  --service-cluster-ip-range="10.16.0.0/12"
+  --runtime-config="extensions/v1beta1/daemonsets=true"
+  --cloud-provider="${CLOUD_PROVIDER}"
+  --allow-privileged="true"
+  --logtostderr="true"
+)
 
 config="/srv/kubernetes/"
 
 if [ -d $config ]
 then
-  args=" \
-    --tls-cert-file=${config}/kube-apiserver.crt \
-    --tls-private-key-file=${config}/kube-apiserver.key \
-    --client-ca-file=${config}/kube-ca.crt \
-    --token-auth-file=/srv/kubernetes/known_tokens.csv \
-    --admission-control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota \
-  "
+  args+=(
+    --tls-cert-file="${config}/kube-apiserver.crt"
+    --tls-private-key-file="${config}/kube-apiserver.key"
+    --client-ca-file="${config}/kube-ca.crt"
+    --token-auth-file="/srv/kubernetes/known_tokens.csv"
+    --admission-control="NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota"
+  )
 else
-  args="--insecure-bind-address=${weave_ip} --port=8080"
+  args+=(
+    --insecure-bind-address="${weave_ip}"
+    --port="8080"
+  )
 fi
 
-exec /hyperkube apiserver ${args} \
-  --advertise-address="${weave_ip}" \
-  --external-hostname="kube-apiserver.weave.local" \
-  --etcd-servers="${etcd_cluster}" \
-  --service-cluster-ip-range="10.16.0.0/12" \
-  --runtime-config="extensions/v1beta1/daemonsets=true" \
-  --cloud-provider="${CLOUD_PROVIDER}" \
-  --allow-privileged="true" \
-  --logtostderr="true"
+exec /hyperkube apiserver "${args[@]}"
