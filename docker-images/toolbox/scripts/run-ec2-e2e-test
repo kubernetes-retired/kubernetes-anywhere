@@ -19,4 +19,4 @@ exec ./platforms/linux/amd64/e2e.test \
   --cluster-tag=KubernetesCluster \
   --kubeconfig="./config" \
   --repo-root="./" \
-  $@
+  "$@"

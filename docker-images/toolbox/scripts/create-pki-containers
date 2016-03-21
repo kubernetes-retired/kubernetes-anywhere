@@ -9,7 +9,7 @@ set -o pipefail
 ./easyrsa init-pki > /dev/null 2>&1
 
 ./easyrsa --batch \
-  "--req-cn=kube-apiserver.weave.local@`date +%s`" \
+  "--req-cn=kube-apiserver.weave.local@$(date +%s)" \
   build-ca nopass > /dev/null 2>&1
 
 ./easyrsa \

@@ -7,27 +7,28 @@ set -o nounset
 create-pki-containers
 
 doc=$(curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document)
-export AWS_DEFAULT_REGION=$(printf "${doc}" | jq -r .region)
+AWS_DEFAULT_REGION=$(printf "%s" "${doc}" | jq -r .region)
+export AWS_DEFAULT_REGION
 
 instance_description=$(
   aws ec2 describe-instances \
-    --instance-ids $(printf "${doc}" | jq -r .instanceId)
+    --instance-ids "$(printf "%s" "${doc}" | jq -r .instanceId)"
 )
 
 instance_kubernetescluster_tag=$(
-  printf "${instance_description}" \
+  printf "%s" "${instance_description}" \
   | jq -r '.Reservations[].Instances[].Tags[] | select(.Key=="KubernetesCluster") .Value'
 )
 
 registry=$(printf "%s.dkr.ecr.%s.amazonaws.com" \
-  $(printf "${doc}" | jq -r .accountId) \
-  $(printf "${doc}" | jq -r .region) \
+  "$(printf "%s" "${doc}" | jq -r .accountId)" \
+  "$(printf "%s" "${doc}" | jq -r .region)" \
 )
 
 tag_and_push() {
   local ecr_tag="${registry}/${instance_kubernetescluster_tag}/${1}/pki:${2}"
-  docker tag kubernetes-anywhere:${2}-pki $ecr_tag
-  docker push $ecr_tag
+  docker tag "kubernetes-anywhere:${2}-pki" "${ecr_tag}"
+  docker push "${ecr_tag}"
 }
 
 for i in apiserver controller-manager scheduler
