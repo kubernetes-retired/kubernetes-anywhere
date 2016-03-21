@@ -7,7 +7,6 @@ master="kube-apiserver.weave.local"
 
 args=(
   --cluster-dns="10.16.0.3"
-  --resolv-conf="/dev/null"
   --cluster-domain="cluster.local"
   --cloud-provider="${CLOUD_PROVIDER}"
   --allow-privileged="true"
@@ -33,7 +32,10 @@ fi
 
 case "${KUBERNETES_RELEASE}" in
   v1.1.*)
-    args+=( --docker-endpoint="unix:/docker.sock" )
+    args+=(
+      --docker-endpoint="unix:/docker.sock"
+      --resolv-conf="/dev/null"
+    )
     ;;
   v1.2.*)
     args+=( --docker-endpoint="unix:///docker.sock" )
@@ -43,6 +45,8 @@ case "${KUBERNETES_RELEASE}" in
         --network-plugin="cni"
         --network-plugin-dir="/etc/cni/net.d"
       )
+    else
+      args+=( --resolv-conf="/dev/null" )
     fi
     ;;
 esac
