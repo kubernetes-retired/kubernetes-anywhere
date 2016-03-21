@@ -1,9 +1,10 @@
-#!/bin/bash -x
+#!/bin/bash
 
 KUBERNETES_ANYWHERE_TOOLBOX_IMAGE=${KUBERNETES_ANYWHERE_TOOLBOX_IMAGE:-'weaveworks/kubernetes-anywhere:toolbox'}
 
-if [[ $(docker inspect --format='{{.State.Status}}' kubelet-volumes) = 'created' ]]
+if [[ $(docker inspect --format='{{.State.Status}}' kubelet-volumes 2> /dev/null) = 'created' ]]
 then
+  echo "Docker container \`kubelet-volume\` aleady exists"
   exit
 else
 
@@ -35,6 +36,9 @@ else
         "
         ;;
     esac
+  else
+    echo "Root filesystem from the host has to be mounted (please use \`--volume=\"/:/rootfs\"\`)."
+    exit 1
   fi
 
   docker run \
