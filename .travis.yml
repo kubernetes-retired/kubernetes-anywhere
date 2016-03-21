@@ -22,5 +22,6 @@ install:
 
 script:
   - shellcheck -s bash ./build-and-publish ./docker-images/toolbox-configure.sh ./docker-images/toolbox/scripts/*
+  - shellcheck -s sh docker-images/etcd-anywhere.sh docker-images/weave-fix-nameserver.sh
   - ./build-and-publish
 
