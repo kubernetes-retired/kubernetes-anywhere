@@ -21,9 +21,6 @@ install:
   - sudo service docker start
 
 script:
-  - shellcheck -s bash \
-      ./build-and-publish \
-      ./docker-images/toolbox-configure.sh \
-      ./docker-images/toolbox/scripts/*
+  - shellcheck -s bash ./build-and-publish ./docker-images/toolbox-configure.sh ./docker-images/toolbox/scripts/*
   - ./build-and-publish
 
