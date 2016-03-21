@@ -11,10 +11,9 @@ args=(
   --logtostderr="true"
 )
 
-
 if [ -f $config ]
 then
-  args+=( --kubeconfig="${config}"
+  args+=( --kubeconfig="${config}" )
 else
   args+=( --master="http://${master}:8080" )
 fi
