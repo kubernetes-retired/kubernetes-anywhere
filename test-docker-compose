@@ -5,7 +5,7 @@ toolbox_run() {
   docker run \
     --volume="/:/rootfs" \
     --volume="/var/run/weave/weave.sock:/docker.sock" \
-      "weaveworks/kubernetes-anywhere:toolbox-${KUBERNETES_RELEASE}" 
+      "weaveworks/kubernetes-anywhere:toolbox-${KUBERNETES_RELEASE}" \
         "$@"
 }
 
