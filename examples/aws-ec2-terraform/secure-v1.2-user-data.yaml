@@ -83,8 +83,8 @@ write_files:
       DOCKER_ARGS="--host=fd:// --storage-driver=overlay"
       KUBERNETES_ANYWHERE_TOOLBOX_IMAGE="weaveworks/kubernetes-anywhere:toolbox-v1.2"
       KUBERNETES_ANYWHERE_APISERVER_IMAGE="weaveworks/kubernetes-anywhere:apiserver-v1.2"
-      KUBERNETES_ANYWHERE_SCHEDULER_IMAGE="weaveworks/kubernetes-anywhere:apiserver-v1.2"
-      KUBERNETES_ANYWHERE_CONTROLLER_MANAGER_IMAGE="weaveworks/kubernetes-anywhere:apiserver-v1.2"
+      KUBERNETES_ANYWHERE_SCHEDULER_IMAGE="weaveworks/kubernetes-anywhere:scheduler-v1.2"
+      KUBERNETES_ANYWHERE_CONTROLLER_MANAGER_IMAGE="weaveworks/kubernetes-anywhere:controller-manager-v1.2"
       KUBERNETES_ANYWHERE_KUBELET_IMAGE="weaveworks/kubernetes-anywhere:kubelet-v1.2"
       KUBERNETES_ANYWHERE_PROXY_IMAGE="weaveworks/kubernetes-anywhere:proxy-v1.2"
 
