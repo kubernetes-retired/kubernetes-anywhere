@@ -65,6 +65,7 @@ write_files:
     permissions: '0644'
     owner: root
     content: |
+      WEAVEPROXY_ARGS="--rewrite-inspect"
       WEAVE_INIT_PEER_COUNT="--init-peer-count 7"
       WEAVE_SCRIPT_VERSION="v1.4.5"
       ETCD_CLUSTER_SIZE="3"
@@ -130,7 +131,7 @@ write_files:
 
       systemctl daemon-reload
 
-      systemctl enable weave.service weaveproxy.service weave-expose.service weave-network.target
+      systemctl enable weave.service weaveproxy.service weaveplugin.service weave-expose.service weave-network.target
       systemctl start weave-network.target
 
       eval $(docker run $toolbox describe-ec2-node | tee -a /etc/kubernetes-anywhere.env)
