@@ -60,15 +60,16 @@ docker build \
   --file="${dir}/toolbox.dockerfile" "${dir}"
 
 docker_push() {
-  [ -n "${NOPUB+x}" ] || docker push $1
+  [ -n "${NOPUB+x}" ] || docker push "${1}"
 }
 
 for c in kubelet proxy apiserver controller-manager scheduler toolbox etcd ; do
-  docker_push "${image_prefix}${c}-${kubernetes_release}"
-  docker tag "${image_prefix}${c}-${kubernetes_release}" "${image_prefix}${c}-${kubernetes_release_short}"
-  docker_push "${image_prefix}${c}-${kubernetes_release_short}"
+  img="${image_prefix}${c}"
+  docker_push "${img}-${kubernetes_release}"
+  docker tag "${img}-${kubernetes_release}" "${img}-${kubernetes_release_short}"
+  docker_push "${img}-${kubernetes_release_short}"
   if [ "${kubernetes_release}" = "${default_kubernetes_release}" ] ; then
-    docker tag "${image_prefix}${c}-${kubernetes_release}" "${image_prefix}${c}"
-    docker_push "${image_prefix}${c}"
+    docker tag "${img}-${kubernetes_release}" "${image_prefix}${c}"
+    docker_push "${img}"
   fi
 done
