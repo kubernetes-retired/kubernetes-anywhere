@@ -4,6 +4,14 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+do_build() {
+  [ -n "${NO_BUILD+x}" ] || docker build "$@"
+}
+
+do_push() {
+  [ -n "${NO_PUSH+x}" ] || docker push "${1}"
+}
+
 git_repo="https://github.com/weaveworks/weave-kubernetes-anywhere"
 git_rev=$(git rev-parse @)
 
@@ -31,26 +39,26 @@ LABEL com.git-scm.rev=${git_rev}
 
 printf "FROM gcr.io/google_containers/hyperkube:%s\nENV KUBERNETES_RELEASE=%s\n%s\n" \
   "${kubernetes_release}" "${kubernetes_release}" "${common_labels}" \
-  | docker build --tag="temp/hyperkube" -
+  | do_build --tag="temp/hyperkube" -
 
 for i in kubelet proxy apiserver controller-manager scheduler ; do
-  docker build \
+  do_build \
     --tag="${image_prefix}${i}-${kubernetes_release}" \
     --file="${dir}/${i}.dockerfile" "${dir}"
 done
 
 printf "FROM gcr.io/google_containers/etcd:2.2.1\n%s\n" "${common_labels}" \
-  | docker build --tag="temp/etcd" -
+  | do_build --tag="temp/etcd" -
 
-docker build \
+do_build \
   --tag="${image_prefix}etcd-${kubernetes_release}" \
   --file="${dir}/etcd.dockerfile" "${dir}"
 
 printf "FROM centos:7\nENV KUBERNETES_ANYWHERE_TOOLBOX_IMAGE=%s\n%s\n" \
   "${image_prefix}toolbox-${kubernetes_release}" "${common_labels}" \
-  | docker build --tag="temp/toolbox" -
+  | do_build --tag="temp/toolbox" -
 
-docker build \
+do_build \
   --tag="${image_prefix}toolbox-${kubernetes_release}" \
   --build-arg="KUBERNETES_RELEASE=${kubernetes_release}" \
   --build-arg="DOCKER_RELEASE=${toolbox_docker_release}" \
@@ -59,17 +67,13 @@ docker build \
   --build-arg="EASYRSA_RELEASE=${toolbox_easyrsa_release}" \
   --file="${dir}/toolbox.dockerfile" "${dir}"
 
-docker_push() {
-  [ -n "${NOPUB+x}" ] || docker push "${1}"
-}
-
 for c in kubelet proxy apiserver controller-manager scheduler toolbox etcd ; do
   img="${image_prefix}${c}"
-  docker_push "${img}-${kubernetes_release}"
+  do_push "${img}-${kubernetes_release}"
   docker tag "${img}-${kubernetes_release}" "${img}-${kubernetes_release_short}"
-  docker_push "${img}-${kubernetes_release_short}"
+  do_push "${img}-${kubernetes_release_short}"
   if [ "${kubernetes_release}" = "${default_kubernetes_release}" ] ; then
     docker tag "${img}-${kubernetes_release}" "${image_prefix}${c}"
-    docker_push "${img}"
+    do_push "${img}"
   fi
 done
