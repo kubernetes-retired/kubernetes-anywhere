@@ -71,3 +71,6 @@ rm -f redis-*.yaml frontend-*.yaml
 cp -a skydns-addon skydns-addon-secure
 sed 's|\(- -kube_master_url=http://kube-apiserver.weave.local:8080\)$|# \1|' \
   -i skydns-addon-secure/controller.yaml
+cp -a skydns-addon-v1.2 skydns-addon-secure-v1.2
+sed 's|\(- --kube_master_url=http://kube-apiserver.weave.local:8080\)$|# \1|' \
+  -i skydns-addon-secure-v1.2/controller.yaml
