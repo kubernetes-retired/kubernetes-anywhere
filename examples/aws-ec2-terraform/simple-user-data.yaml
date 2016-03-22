@@ -46,6 +46,10 @@ write_files:
     owner: root
     content: |
       #!/bin/bash
+      source /etc/kubernetes-anywhere.env
+
+      toolbox=${KUBERNETES_ANYWHERE_TOOLBOX_IMAGE:-"weaveworks/kubernetes-anywhere:toolbox"}
+      sudo docker pull $toolbox
 
       args="--volume=/var/run/weave/weave.sock:/docker.sock"
 
@@ -55,15 +59,14 @@ write_files:
 
       exec sudo docker --host="unix:///var/run/weave/weave.sock" run \
         --tty --interactive ${args} \
-          weaveworks/kubernetes-anywhere:toolbox $@
+          $toolbox $@
 
   - path: /etc/kubernetes-anywhere.env
-    permissions: '0600'
+    permissions: '0644'
     owner: root
     content: |
-      WEAVE_DEBUG=1
       WEAVE_INIT_PEER_COUNT="--init-peer-count 7"
-      WEAVE_SCRIPT_VERSION="v1.4.4"
+      WEAVE_SCRIPT_VERSION="v1.4.5"
       ETCD_CLUSTER_SIZE="3"
       CLOUD_PROVIDER="aws"
       DOCKER_ARGS="--host=fd:// --storage-driver=overlay"
@@ -120,14 +123,17 @@ write_files:
       docker version
       docker pull weaveworks/kubernetes-anywhere:toolbox
       docker images
-      docker run -v /etc/systemd/system:/host-systemd weaveworks/kubernetes-anywhere:toolbox install-basic-systemd-units
+
+      docker run \
+        -v /etc/systemd/system:/host-systemd \
+          $toolbox install-basic-systemd-units
 
       systemctl daemon-reload
 
       systemctl enable weave.service weaveproxy.service weave-expose.service weave-network.target
       systemctl start weave-network.target
 
-      eval $(docker run weaveworks/kubernetes-anywhere:toolbox describe-ec2-node | tee -a /etc/kubernetes-anywhere.env)
+      eval $(docker run $toolbox describe-ec2-node | tee -a /etc/kubernetes-anywhere.env)
 
       case "${NAME_TAG}" in
         kubernetes-etcd)
@@ -135,11 +141,18 @@ write_files:
           systemctl start etcd.service
           ;;
         kubernetes-master)
-          systemctl enable kube-apiserver.service kube-scheduler.service kube-controller-manager.service kubernetes-master.target
+          systemctl enable \
+            kube-apiserver.service \
+            kube-scheduler.service \
+            kube-controller-manager.service \
+            kubernetes-master.target
           systemctl start kubernetes-master.target
           ;;
         kubernetes-node)
-          systemctl enable kubelet.service kube-proxy.service kubernetes-node.target
+          systemctl enable \
+            kubelet.service \
+            kube-proxy.service \
+            kubernetes-node.target
           systemctl start kubernetes-node.target
           ;;
       esac
