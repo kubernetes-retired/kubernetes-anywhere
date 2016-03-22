@@ -27,7 +27,7 @@ kubelet:
   pid: host
   volumes_from: [ "kubelet-volumes" ]
   #environment:
-  #  USE_CNI: yes
+  #  USE_CNI: "yes"
   image: "weaveworks/kubernetes-anywhere:kubelet-v1.2"
   restart: "always"
 
