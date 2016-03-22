@@ -11,17 +11,22 @@ services:
   - docker
 
 env:
-  - DOCKER_RELEASE="1.10.3" KUBERNETES_RELEASE="v1.1.8"
-  - DOCKER_RELEASE="1.10.3" KUBERNETES_RELEASE="v1.2.0-beta.1"
+  - DOCKER_RELEASE="1.10.3" WEAVE_RELEASE="v1.4.5" KUBERNETES_RELEASE="v1.1.8"
+  - DOCKER_RELEASE="1.10.3" WEAVE_RELEASE="v1.4.5" KUBERNETES_RELEASE="v1.2.0-beta.1"
 
 install:
   - sudo service docker stop
   - sudo curl --silent --location https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_RELEASE} --output /usr/bin/docker
   - sudo chmod +x /usr/bin/docker
   - sudo service docker start
+  - sudo curl --silent --location https://github.com/weaveworks/weave/releases/download/${WEAVE_RELEASE}/weave --output /usr/bin/weave
+  - sudo chmod +x /usr/bin/weave
+  - weave launch-router
+  - weave launch-proxy --rewrite-inspect
+  - weave launch-plugin
+  - weave expose -h "$(hostname).weave.local"
 
 script:
-  - shellcheck -s bash ./build-and-push ./docker-images/toolbox-configure.sh ./docker-images/toolbox/scripts/*
-  - shellcheck -s sh docker-images/etcd-anywhere.sh docker-images/weave-fix-nameserver.sh
-  - shellcheck -s bash docker-images/apiserver-anywhere.sh docker-images/controller-manager-anywhere.sh docker-images/kubelet-anywhere.sh docker-images/proxy-anywhere.sh docker-images/scheduler-anywhere.sh
+  - ./test-shellcheck
   - env NO_PUSH=1 ./build-and-push
+  - ./test-docker-compose

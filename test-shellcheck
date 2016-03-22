@@ -1,0 +1,19 @@
+#!/bin/bash -e
+_bin_bash=(
+  ./build-and-push
+  ./docker-images/toolbox-configure.sh
+  ./docker-images/toolbox/scripts/*
+  ./docker-images/apiserver-anywhere.sh
+  ./docker-images/controller-manager-anywhere.sh
+  ./docker-images/kubelet-anywhere.sh
+  ./docker-images/proxy-anywhere.sh
+  ./docker-images/scheduler-anywhere.sh
+)
+
+_bin_sh=(
+  ./docker-images/etcd-anywhere.sh
+  ./docker-images/weave-fix-nameserver.sh
+)
+
+shellcheck -s bash "${_bin_bash[@]}"
+shellcheck -s sh "${_bin_posix[@]}"

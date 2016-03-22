@@ -1,0 +1,16 @@
+#!/bin/bash -ex
+eval "$(weave env)"
+
+toolbox_run() {
+  docker run \
+    --volume="/:/rootfs" \
+    --volume="/var/run/weave/weave.sock:/docker.sock" \
+      "weaveworks/kubernetes-anywhere:toolbox-${KUBERNETES_RELEASE}" 
+        "$@"
+}
+
+toolbox_run setup-kubelet-volumes
+toolbox_run compose -p kube pull
+toolbox_run compose -p kube up -d
+toolbox_run kubectl create -f skydns-addon
+toolbox_run kubectl create -f guestbook-example-NodePort
