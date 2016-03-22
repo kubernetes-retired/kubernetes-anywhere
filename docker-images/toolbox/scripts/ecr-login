@@ -8,4 +8,6 @@ doc=$(curl --silent http://169.254.169.254/latest/dynamic/instance-identity/docu
 AWS_DEFAULT_REGION=$(printf "%s" "${doc}" | jq -r .region)
 export AWS_DEFAULT_REGION
 
-exec "$(aws ecr get-login)"
+docker_login=($(aws ecr get-login))
+
+exec "${docker_login[@]}"
