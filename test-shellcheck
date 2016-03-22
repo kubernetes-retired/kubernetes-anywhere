@@ -1,6 +1,8 @@
 #!/bin/bash -e
 _bin_bash=(
+  "${BASH_SOURCE[0]}"
   ./build-and-push
+  ./test-docker-compose
   ./docker-images/toolbox-configure.sh
   ./docker-images/toolbox/scripts/*
   ./docker-images/apiserver-anywhere.sh
@@ -16,4 +18,4 @@ _bin_sh=(
 )
 
 shellcheck -s bash "${_bin_bash[@]}"
-shellcheck -s sh "${_bin_posix[@]}"
+shellcheck -s sh "${_bin_sh[@]}"
