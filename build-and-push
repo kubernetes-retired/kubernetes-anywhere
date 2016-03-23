@@ -30,15 +30,16 @@ toolbox_easyrsa_release="3.0.1"
 
 image_prefix=${2:-"weaveworks/kubernetes-anywhere:"}
 
-common_labels="
+common="
 LABEL io.k8s.release=${kubernetes_release}
 LABEL works.weave.role=system
 LABEL com.git-scm.repo=${git_repo}
 LABEL com.git-scm.rev=${git_rev}
+ENV KUBERNETES_RELEASE=${kubernetes_release}
 "
 
-printf "FROM gcr.io/google_containers/hyperkube:%s\nENV KUBERNETES_RELEASE=%s\n%s\n" \
-  "${kubernetes_release}" "${kubernetes_release}" "${common_labels}" \
+printf "FROM gcr.io/google_containers/hyperkube:%s\n%s\n" \
+  "${kubernetes_release}" "${kubernetes_release}" "${common}" \
   | do_build --tag="temp/hyperkube" -
 
 for i in kubelet proxy apiserver controller-manager scheduler ; do
@@ -47,7 +48,7 @@ for i in kubelet proxy apiserver controller-manager scheduler ; do
     --file="${dir}/${i}.dockerfile" "${dir}"
 done
 
-printf "FROM gcr.io/google_containers/etcd:2.2.1\n%s\n" "${common_labels}" \
+printf "FROM gcr.io/google_containers/etcd:2.2.1\n%s\n" "${common}" \
   | do_build --tag="temp/etcd" -
 
 do_build \
@@ -55,7 +56,7 @@ do_build \
   --file="${dir}/etcd.dockerfile" "${dir}"
 
 printf "FROM centos:7\nENV KUBERNETES_ANYWHERE_TOOLBOX_IMAGE=%s\n%s\n" \
-  "${image_prefix}toolbox-${kubernetes_release}" "${common_labels}" \
+  "${image_prefix}toolbox-${kubernetes_release}" "${common}" \
   | do_build --tag="temp/toolbox" -
 
 do_build \
