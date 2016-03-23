@@ -28,5 +28,5 @@ install:
 
 script:
   - ./test-shellcheck
-  - env NO_PUSH=1 ./build-and-push
+  - env NO_PUSH=1 ./build-and-push ${KUBERNETES_RELEASE}
   - ./test-docker-compose
