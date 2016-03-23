@@ -39,7 +39,7 @@ ENV KUBERNETES_RELEASE=${kubernetes_release}
 "
 
 printf "FROM gcr.io/google_containers/hyperkube:%s\n%s\n" \
-  "${kubernetes_release}" "${kubernetes_release}" "${common}" \
+  "${kubernetes_release}" "${common}" \
   | do_build --tag="temp/hyperkube" -
 
 for i in kubelet proxy apiserver controller-manager scheduler ; do
