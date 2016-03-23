@@ -16,3 +16,4 @@ toolbox_run kubectl get nodes
 toolbox_run kubectl create -f skydns-addon
 toolbox_run kubectl create -f guestbook-example-NodePort
 toolbox_run bash -c "until [ \"\$(kubectl get pods --all-namespaces --no-headers | grep -v Running | wc -l)\" = 0 ]; do kubectl get pods --all-namespaces ; sleep 1 ; done"
+toolbox_run kubectl get pods --all-namespaces
