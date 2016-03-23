@@ -25,8 +25,14 @@ install:
   - weave launch-proxy --rewrite-inspect
   - weave launch-plugin
   - weave expose -h "$(hostname).weave.local"
+  - weave status
+  - docker ps
+  - docker images
 
 script:
   - ./test-shellcheck
   - env NO_PUSH=1 ./build-and-push ${KUBERNETES_RELEASE}
   - ./test-docker-compose
+  - docker ps
+  - docker images
+  - weave status dns
