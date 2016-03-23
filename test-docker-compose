@@ -10,7 +10,6 @@ toolbox_run() {
 }
 
 toolbox_run setup-kubelet-volumes
-toolbox_run compose -p kube pull
 toolbox_run compose -p kube up -d
 toolbox_run kubectl create -f skydns-addon
 toolbox_run kubectl create -f guestbook-example-NodePort
