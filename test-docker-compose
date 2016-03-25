@@ -15,5 +15,25 @@ toolbox_run kubectl version
 toolbox_run kubectl get nodes
 toolbox_run kubectl create -f skydns-addon
 toolbox_run kubectl create -f guestbook-example-NodePort
-toolbox_run bash -c "until [ \"\$(kubectl get pods --all-namespaces --no-headers | grep -v Running | wc -l)\" = 0 ]; do kubectl get pods --all-namespaces ; sleep 1 ; done"
+toolbox_run bash -c "
+  until (
+      test \"\$(kubectl get pods --all-namespaces --no-headers \\
+        | grep -v Running | wc -l)\" = 0
+      ) ; do
+    kubectl get pods --all-namespaces
+    sleep 1
+  done
+"
 toolbox_run kubectl get pods --all-namespaces
+toolbox_run bash -e -x -c "
+  guestbook_ip=\"\$(kubectl get svc frontend --output=template --template='{{.spec.clusterIP}}')\"
+  test_value=\"TEST_\${RANDOM}\"
+  test \"\$(curl -s \"\${guestbook_ip}/guestbook.php?cmd=set&key=messages&value=\$test_value\" \\
+    | jq -r .message)\" = \"Updated\"
+  until (
+      test \"\$(curl -s \"\${guestbook_ip}/guestbook.php?cmd=get&key=messages\" \\
+        | jq -r .data)\" = \"\$test_value\"
+      ) ; do
+    sleep 1
+  done
+"
