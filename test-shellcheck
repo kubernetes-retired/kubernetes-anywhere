@@ -10,6 +10,8 @@ _bin_bash=(
   ./docker-images/kubelet-anywhere.sh
   ./docker-images/proxy-anywhere.sh
   ./docker-images/scheduler-anywhere.sh
+  ./examples/google-compute-engine/create-cluster.sh
+  ./examples/google-compute-engine/delete-cluster.sh
 )
 
 _bin_sh=(

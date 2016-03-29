@@ -1,6 +1,8 @@
 #!/bin/bash -x
 
-gcloud compute instances delete -q $(seq -f 'kube-etcd-%g' 1 3) 'kube-master-0'
+etcd_instances=($(seq -s ' ' -f 'kube-etcd-%g' 1 3))
+
+gcloud compute instances delete -q "${etcd_instances[@]}" 'kube-master-0'
 
 gcloud compute instance-groups unmanaged delete -q 'kube-master-group'
 
