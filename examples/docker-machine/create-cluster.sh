@@ -97,7 +97,7 @@ master_config=$(docker-machine config 'kube-4')
 
 docker ${master_config} run \
   -v /var/run/docker.sock:/docker.sock \
-    weaveworks/kubernetes-anywhere:toolboxs \
+    weaveworks/kubernetes-anywhere:toolbox \
       create-pki-containers
 
 ## Run intermediate containers to export the TLS config volumes for master components
