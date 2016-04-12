@@ -1,27 +1,27 @@
 #!/bin/bash -x
 
-if ! /usr/local/bin/docker -v 2> /dev/null | grep -q "^Docker\ version\ 1\.10" ; then
+if ! /usr/bin/docker -v 2> /dev/null | grep -q "^Docker\ version\ 1\.10" ; then
   echo "Installing current version of Docker Engine 1.10"
-  curl --silent --location  https://get.docker.com/builds/Linux/x86_64/docker-1.10.3  --output /usr/local/bin/docker
-  chmod +x /usr/local/bin/docker
+  curl --silent --location  https://get.docker.com/builds/Linux/x86_64/docker-1.10.3  --output /usr/bin/docker
+  chmod +x /usr/bin/docker
 fi
 
-systemd-run --unit=docker.service /usr/local/bin/docker daemon
+systemd-run --unit=docker.service /usr/bin/docker daemon
 
-/usr/local/bin/docker version
+/usr/bin/docker version
 
-if ! [ -x /usr/local/bin/weave ] ; then
+if ! [ -x /usr/bin/weave ] ; then
   echo "Installing current version of Weave Net"
-  curl --silent --location http://git.io/weave --output /usr/local/bin/weave
-  chmod +x /usr/local/bin/weave
-  /usr/local/bin/weave setup
+  curl --silent --location http://git.io/weave --output /usr/bin/weave
+  chmod +x /usr/bin/weave
+  /usr/bin/weave setup
 fi
 
-/usr/local/bin/weave version
+/usr/bin/weave version
 
-/usr/local/bin/weave launch-router --init-peer-count 7
+/usr/bin/weave launch-router --init-peer-count 7
 
-/usr/local/bin/weave launch-proxy --rewrite-inspect
+/usr/bin/weave launch-proxy --rewrite-inspect
 
 ## In a specific instance groups find nodes with `kube-weave` tag
 
@@ -37,23 +37,23 @@ list_weave_peers_in_group() {
 ## systemd units that write and watch an environment file and call `weave connect` when needed...
 ## However, the purpose of this script is only too illustrate the usage of Kubernetes Anywhere in GCE.
 
-/usr/local/bin/weave connect \
+/usr/bin/weave connect \
   $(list_weave_peers_in_group kube-master-group) \
   $(list_weave_peers_in_group kube-node-group)
 
-/usr/local/bin/weave expose -h $(hostname).weave.local
+/usr/bin/weave expose -h $(hostname).weave.local
 
-if ! [ -x /usr/local/bin/scope ] ; then
+if ! [ -x /usr/bin/scope ] ; then
   echo "Installing current version of Weave Scope"
-  curl --silent --location http://git.io/scope --output /usr/local/bin/scope
-  chmod +x /usr/local/bin/scope
+  curl --silent --location http://git.io/scope --output /usr/bin/scope
+  chmod +x /usr/bin/scope
 fi
 
-/usr/local/bin/scope version
+/usr/bin/scope version
 
-/usr/local/bin/scope launch --probe.kubernetes="true" --probe.kubernetes.api="http://kube-apiserver.weave.local:8080"
+/usr/bin/scope launch --probe.kubernetes="true" --probe.kubernetes.api="http://kube-apiserver.weave.local:8080"
 
-eval $(/usr/local/bin/weave env)
+eval $(/usr/bin/weave env)
 
 ## We don't set a restart policy here, as this script re-runs on each boot, which is quite handy,
 ## however we need clear out previous container while saving the logs for future reference
