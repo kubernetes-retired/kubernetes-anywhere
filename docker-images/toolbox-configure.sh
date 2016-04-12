@@ -45,7 +45,11 @@ cd /etc/toolbox/resources
 
 ## fetch released copy of guestbook example released
 
-resources="{redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml"
+if echo "${KUBERNETES_RELEASE}" | grep -q "v1.1" ; then
+  resources="{redis-master-controller,redis-master-service,redis-slave-controller,redis-slave-service,frontend-controller,frontend-service}.yaml"
+else
+  resources="{redis-master-deployment,redis-master-service,redis-slave-deployment,redis-slave-service,frontend-deployment,frontend-service}.yaml"
+fi
 
 $curl "https://raw.github.com/kubernetes/kubernetes/${KUBERNETES_RELEASE}/examples/guestbook/${resources}" \
     --remote-name
