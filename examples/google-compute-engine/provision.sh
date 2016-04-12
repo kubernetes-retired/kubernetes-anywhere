@@ -2,7 +2,7 @@
 
 if ! /usr/local/bin/docker -v 2> /dev/null | grep -q "^Docker\ version\ 1\.10" ; then
   echo "Installing current version of Docker Engine 1.10"
-  curl --silent --location  https://get.docker.com/builds/Linux/x86_64/docker-1.10.1  --output /usr/local/bin/docker
+  curl --silent --location  https://get.docker.com/builds/Linux/x86_64/docker-1.10.3  --output /usr/local/bin/docker
   chmod +x /usr/local/bin/docker
 fi
 
@@ -51,7 +51,7 @@ fi
 
 /usr/local/bin/scope version
 
-/usr/local/bin/scope launch --probe.kubernetes true --probe.kubernetes.api http://kube-apiserver.weave.local:8080
+/usr/local/bin/scope launch --probe.kubernetes="true" --probe.kubernetes.api="http://kube-apiserver.weave.local:8080"
 
 eval $(/usr/local/bin/weave env)
 
@@ -69,60 +69,71 @@ save_last_run_log_and_cleanup() {
 case "$(hostname)" in
   kube-etcd-1)
     save_last_run_log_and_cleanup etcd1
-    docker run -d \
-      -e ETCD_CLUSTER_SIZE=3 \
-      --name=etcd1 \
-      weaveworks/kubernetes-anywhere:etcd
+    docker pull weaveworks/kubernetes-anywhere:etcd-v1.2
+    docker run --detach \
+      --env="ETCD_CLUSTER_SIZE=3" \
+      --name="etcd1" \
+        weaveworks/kubernetes-anywhere:etcd-v1.2
     ;;
   kube-etcd-2)
     save_last_run_log_and_cleanup etcd2
-    docker run -d \
-      -e ETCD_CLUSTER_SIZE=3 \
-      --name=etcd2 \
-      weaveworks/kubernetes-anywhere:etcd
+    docker pull weaveworks/kubernetes-anywhere:etcd-v1.2
+    docker run --detach \
+      --env="ETCD_CLUSTER_SIZE=3" \
+      --name="etcd2" \
+        weaveworks/kubernetes-anywhere:etcd-v1.2
     ;;
   kube-etcd-3)
-    save_last_run_log_and_cleanup etcd3
-    docker run -d \
-      -e ETCD_CLUSTER_SIZE=3 \
-      --name=etcd3 \
-      weaveworks/kubernetes-anywhere:etcd
+    save_last_run_log_and_cleanup etcd3-v1.2
+    docker pull weaveworks/kubernetes-anywhere:etcd-v1.2
+    docker run --detach \
+      --env="ETCD_CLUSTER_SIZE=3" \
+      --name="etcd3" \
+        weaveworks/kubernetes-anywhere:etcd-v1.2
     ;;
   kube-master-0)
     save_last_run_log_and_cleanup kube-apiserver
     save_last_run_log_and_cleanup kube-controller-manager
     save_last_run_log_and_cleanup kube-scheduler
-    docker run -d \
-      -e ETCD_CLUSTER_SIZE=3 \
-      -e CLOUD_PROVIDER=gce \
-      --name=kube-apiserver \
-      weaveworks/kubernetes-anywhere:apiserver
-    docker run -d \
-      -e CLOUD_PROVIDER=gce \
-      --name=kube-controller-manager \
-      weaveworks/kubernetes-anywhere:controller-manager
-    docker run -d \
-      --name=kube-scheduler \
-      weaveworks/kubernetes-anywhere:scheduler
+    docker pull weaveworks/kubernetes-anywhere:apiserver-v1.2
+    docker pull weaveworks/kubernetes-anywhere:controller-manager-v1.2
+    docker pull weaveworks/kubernetes-anywhere:scheduler-v1.2
+    docker run --detach \
+      --env="ETCD_CLUSTER_SIZE=3" \
+      --env="CLOUD_PROVIDER=gce" \
+      --name="kube-apiserver" \
+        weaveworks/kubernetes-anywhere:apiserver-v1.2
+    docker run --detach \
+      --env="CLOUD_PROVIDER=gce" \
+      --name="kube-controller-manager" \
+        weaveworks/kubernetes-anywhere:controller-manager-v1.2
+    docker run --detach \
+      --name="kube-scheduler" \
+        weaveworks/kubernetes-anywhere:scheduler-v1.2
     ;;
   ## kube-[5..N] are the cluster nodes
   kube-node-*)
     save_last_run_log_and_cleanup kubelet
     save_last_run_log_and_cleanup kube-proxy
+    docker pull weaveworks/kubernetes-anywhere:toolbox-v1.2
+    docker pull weaveworks/kubernetes-anywhere:kubelet-v1.2
+    docker pull weaveworks/kubernetes-anywhere:proxy-v1.2
     docker run \
+      --env="USE_CNI=yes" \
       --volume="/:/rootfs" \
       --volume="/var/run/docker.sock:/docker.sock" \
-      weaveworks/kubernetes-anywhere:toolbox \
-      setup-kubelet-volumes
-    docker run -d \
-      -e CLOUD_PROVIDER=gce \
-      --name=kubelet \
-      --privileged=true --net=host --pid=host \
-      --volumes-from=kubelet-volumes \
-      weaveworks/kubernetes-anywhere:kubelet
-    docker run -d \
-      --name=kube-proxy \
-      --privileged=true --net=host --pid=host \
-      weaveworks/kubernetes-anywhere:proxy
+        weaveworks/kubernetes-anywhere:toolbox-v1.2 \
+          setup-kubelet-volumes
+    docker run --detach \
+      --env="USE_CNI=yes" \
+      --env="CLOUD_PROVIDER=gce" \
+      --name="kubelet" \
+      --privileged="true" --net="host" --pid="host" \
+      --volumes-from="kubelet-volumes" \
+        weaveworks/kubernetes-anywhere:kubelet-v1.2
+    docker run --detach \
+      --name="kube-proxy" \
+      --privileged="true" --net="host" --pid="host" \
+        weaveworks/kubernetes-anywhere:proxy-v1.2
     ;;
 esac

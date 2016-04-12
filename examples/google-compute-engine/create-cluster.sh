@@ -35,7 +35,7 @@ gcloud compute instance-groups unmanaged create 'kube-master-group'
 
 common_instace_flags=(
   --network kube-net
-  --image debian-8
+  --image centos-7
   --metadata-from-file startup-script=provision.sh
   --boot-disk-type pd-standard
 )
