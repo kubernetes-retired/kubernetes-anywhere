@@ -23,7 +23,7 @@ fi
 
 /usr/bin/weave launch-proxy --rewrite-inspect
 
-## In a specific instance groups find nodes with `kube-weave` tag
+## Find nodes with `kube-weave` tag in an instance group
 
 list_weave_peers_in_group() {
   ## There doesn't seem to be a native way to obtain instances with certain tags, so we use awk
