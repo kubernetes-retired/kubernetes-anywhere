@@ -37,9 +37,9 @@ fix_systemd_unit_if_needed=" \
 install_weave=" \
   sudo curl --silent --location http://git.io/weave --output /usr/local/bin/weave ; \
   sudo chmod +x /usr/local/bin/weave ; \
-  env WEAVE_VERSION=git-43786aaf4464 /usr/local/bin/weave launch-router --init-peer-count 7 ; \
-  env WEAVE_VERSION=git-43786aaf4464 /usr/local/bin/weave launch-proxy --no-detect-tls ; \
-  env WEAVE_VERSION=git-43786aaf4464 /usr/local/bin/weave launch-plugin ; \
+  /usr/local/bin/weave launch-router --init-peer-count 7 ; \
+  /usr/local/bin/weave launch-proxy --no-detect-tls ; \
+  /usr/local/bin/weave launch-plugin ; \
 "
 
 ## TODO: with a private network we still need to find a way to obtain the IPs, as Docker Machine doesn't have it
@@ -66,7 +66,7 @@ done
 ## Connect Weave Net peers to `kube-1`
 
 for m in $vm_names ; do
-  docker-machine ssh ${m} "env WEAVE_VERSION=git-43786aaf4464 /usr/local/bin/weave connect $(docker-machine ip 'kube-1')"
+  docker-machine ssh ${m} "/usr/local/bin/weave connect $(docker-machine ip 'kube-1')"
 done
 
 ## In most cases we need to SSH into the VM in order to communicate with Weave proxy via the UNIX socket,
@@ -146,7 +146,7 @@ for m in 'kube-5' 'kube-6' 'kube-7' ; do
   worker_config=$(docker-machine config ${m})
 
   ## Expose host to Weave Net and provide a DNS record that kubelet will pick up, as it runs in host namespace
-  docker-machine ssh ${m} "env WEAVE_VERSION=git-43786aaf4464 /usr/local/bin/weave expose -h ${m}.weave.local"
+  docker-machine ssh ${m} "/usr/local/bin/weave expose -h ${m}.weave.local"
 
   ## Run intermediate containers to export volumes kubelet wants
   docker ${worker_config} run \

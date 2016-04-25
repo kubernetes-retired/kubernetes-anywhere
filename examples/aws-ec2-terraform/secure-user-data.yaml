@@ -73,7 +73,7 @@ write_files:
     permissions: '0644'
     owner: root
     content: |
-      WEAVE_VERSION="awh2"
+      WEAVE_VERSION="1.5.0"
       WEAVEPROXY_ARGS="--no-detect-tls --rewrite-inspect --log-level=debug"
       WEAVE_INIT_PEER_COUNT="--init-peer-count 7"
       WEAVE_SCRIPT_VERSION="v1.4.5"

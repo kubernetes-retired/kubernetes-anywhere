@@ -73,7 +73,7 @@ write_files:
     permissions: '0644'
     owner: root
     content: |
-      WEAVE_VERSION="git-c09dfe6b5ad8"
+      WEAVE_VERSION="1.5.0"
       USE_CNI="yes"
       WEAVEPROXY_ARGS="--no-detect-tls --rewrite-inspect --log-level=debug"
       WEAVE_INIT_PEER_COUNT="--init-peer-count 7"
