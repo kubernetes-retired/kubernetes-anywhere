@@ -1,4 +1,5 @@
 FROM temp/hyperkube
+LABEL io.k8s/KubernetesAnywhere/role=apiserver
 
 ENV ETCD_CLUSTER_SIZE="1"
 

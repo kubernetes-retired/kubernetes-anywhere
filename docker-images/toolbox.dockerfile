@@ -1,4 +1,5 @@
 FROM temp/toolbox
+LABEL io.k8s/KubernetesAnywhere/role=toolbox
 ARG KUBERNETES_RELEASE
 ARG DOCKER_RELEASE
 ARG COMPOSE_RELEASE
