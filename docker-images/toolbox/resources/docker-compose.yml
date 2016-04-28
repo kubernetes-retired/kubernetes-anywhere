@@ -32,7 +32,7 @@ kubelet:
   restart: "always"
   volumes_from: [ "kubelet-volumes", "kubelet-pki" ]
   environment:
-    USE_CNI: "${USE_CNI-no}"
+    USE_CNI:
 
 proxy:
   privileged: true
@@ -42,4 +42,4 @@ proxy:
   restart: "always"
   volumes_from: [ "kube-proxy-pki" ]
   environment:
-    USE_CNI: "${USE_CNI-no}"
+    USE_CNI:
