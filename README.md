@@ -66,7 +66,7 @@ eval $(weave env)
 ```
 docker run --rm -ti \
   -v /:/rootfs -v /var/run/weave/weave.sock:/docker.sock \
-  weaveworks/kubernetes-anywhere:toolbox sh -c 'setup-kubelet-volumes && compose -p kube up -d'
+  weaveworks/kubernetes-anywhere:toolbox-v1.2 sh -c 'setup-single-node && compose -p kube up -d'
 ```
 
 > **If you are seeing the following error**
@@ -84,10 +84,11 @@ $ weave status dns
 ### Deploying the Guestbook App
 
 ```
-$ docker run --rm -ti weaveworks/kubernetes-anywhere:toolbox
+$ docker run --rm -ti --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2
 
 # kubectl get nodes
-# kubectl create -f skydns-addon
+# kubectl create -f kube-system-namespace.yaml
+# kubectl create -f skydns-addon-secure-v1.2
 # kubectl get pods,rc,services --all-namespaces
 # kubectl get pods --all-namespaces --watch
 

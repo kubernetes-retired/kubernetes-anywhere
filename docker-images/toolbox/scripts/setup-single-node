@@ -1,0 +1,38 @@
+#!/bin/bash
+
+echo "Creating data volumes container for kubelet (\`kubelet-volumes\`)..."
+setup-kubelet-volumes
+:
+num_pki_images="$(docker images --filter "label=io.k8s/KubernetesAnywhere/pki=true" --quiet | wc -c)"
+num_pki_containers="$(docker ps --filter "label=io.k8s/KubernetesAnywhere/pki=true" --quiet | wc -c)"
+
+if [ "${num_pki_images}" -eq 0 ] && [ "${num_pki_containers}" -eq 0 ] ; then
+  echo "Creating single-node Public Key Infrastructure (PKI)..."
+  echo "Creating local container images (\`kubernetes-anywhere:*-pki\`)..."
+  create-pki-containers > /dev/null 2>&1
+  echo "Creating data volumes containers for each of the commponents..."
+  docker run --name=kube-apiserver-pki \
+    kubernetes-anywhere:apiserver-pki
+  docker run --name=kube-controller-manager-pki \
+    kubernetes-anywhere:controller-manager-pki
+  docker run --name=kube-scheduler-pki \
+    kubernetes-anywhere:scheduler-pki
+  docker run --name=kubelet-pki \
+    kubernetes-anywhere:kubelet-pki
+  docker run --name=kube-proxy-pki \
+    kubernetes-anywhere:proxy-pki
+  docker run --name=kube-toolbox-pki \
+    kubernetes-anywhere:toolbox-pki
+elif [ "${num_pki_images}" -ne 6 ] && [ "${num_pki_containers}" -ne 6 ] ; then
+  echo "Detected an unexpected PKI configuration, it might need tidying up..."
+  echo "You have ${num_pki_images} images and ${num_pki_containers} containers,"
+  echo "it's expected to have 6 of each on a single-node cluster."
+  echo
+  echo "The following PKI image already exist:"
+  docker images --filter "label=io.k8s/KubernetesAnywhere/pki=true"
+  echo
+  echo "And the following containers had already been created:"
+  docker ps --filter "label=io.k8s/KubernetesAnywhere/pki=true"
+  echo
+  echo "If your setup is not functional, try \`reset-single-node\` to start from scratch."
+fi

@@ -41,6 +41,8 @@ vol="/srv/kubernetes"
 
 cat > apiserver-pki.dockerfile <<EOF
 FROM alpine
+LABEL io.k8s/KubernetesAnywhere/role=apiserver-pki
+LABEL io.k8s/KubernetesAnywhere/pki=true
 VOLUME ${vol}
 ADD pki/ca.crt ${vol}/kube-ca.crt
 ADD pki/issued/kube-apiserver.crt ${vol}/kube-apiserver.crt
@@ -51,6 +53,8 @@ EOF
 
 cat > kubelet-pki.dockerfile <<EOF
 FROM alpine
+LABEL io.k8s/KubernetesAnywhere/role=kubelet-pki
+LABEL io.k8s/KubernetesAnywhere/pki=true
 VOLUME ${vol}/kubelet
 ADD pki/ca.crt ${vol}/kubelet/kube-ca.crt
 ADD kubelet.conf ${vol}/kubelet/kubeconfig
@@ -59,6 +63,8 @@ EOF
 
 cat > proxy-pki.dockerfile <<EOF
 FROM alpine
+LABEL io.k8s/KubernetesAnywhere/role=proxy-pki
+LABEL io.k8s/KubernetesAnywhere/pki=true
 VOLUME ${vol}/kube-proxy
 ADD pki/ca.crt ${vol}/kube-proxy/kube-ca.crt
 ADD proxy.conf ${vol}/kube-proxy/kubeconfig
@@ -67,6 +73,8 @@ EOF
 
 cat > controller-manager-pki.dockerfile <<EOF
 FROM alpine
+LABEL io.k8s/KubernetesAnywhere/role=controller-manager-pki
+LABEL io.k8s/KubernetesAnywhere/pki=true
 VOLUME ${vol}/kube-controller-manager
 ADD pki/ca.crt ${vol}/kube-controller-manager/kube-ca.crt
 ADD pki/private/kube-apiserver.key ${vol}/kube-controller-manager/kube-apiserver.key
@@ -76,6 +84,8 @@ EOF
 
 cat > scheduler-pki.dockerfile <<EOF
 FROM alpine
+LABEL io.k8s/KubernetesAnywhere/role=scheduler-pki
+LABEL io.k8s/KubernetesAnywhere/pki=true
 VOLUME ${vol}/kube-scheduler
 ADD pki/ca.crt ${vol}/kube-scheduler/kube-ca.crt
 ADD scheduler.conf ${vol}/kube-scheduler/kubeconfig
@@ -84,6 +94,8 @@ EOF
 
 cat > toolbox-pki.dockerfile <<EOF
 FROM alpine
+LABEL io.k8s/KubernetesAnywhere/role=toolbox-pki
+LABEL io.k8s/KubernetesAnywhere/pki=true
 VOLUME /root/.kube
 ADD pki/ca.crt /root/.kube/kube-ca.crt
 ADD admin.conf /root/.kube/config

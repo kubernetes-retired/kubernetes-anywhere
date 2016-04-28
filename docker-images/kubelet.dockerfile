@@ -1,4 +1,5 @@
 FROM temp/hyperkube
+LABEL io.k8s/KubernetesAnywhere/role=kubelet
 
 ADD weave-fix-nameserver.sh /fix-nameserver
 ADD kubelet-anywhere.sh /kubelet-anywhere

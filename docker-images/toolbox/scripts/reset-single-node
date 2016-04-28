@@ -1,0 +1,13 @@
+#!/bin/bash
+
+containers=($(docker ps --all --filter "label=io.k8s/KubernetesAnywhere/role" --quiet))
+for c in "${containers[@]}" ; do
+  ## TODO: we can probably check if the comand is equal to $0
+  role="$(docker inspect --type=container "${c}" | jq -r '.[].Config.Labels["io.k8s/KubernetesAnywhere/role"]')"
+  [ "${role}" = "toolbox" ] || docker rm -f "${c}" 2> /dev/null
+done
+
+pki_images=($(docker images --filter "label=io.k8s/KubernetesAnywhere/pki=true" --quiet))
+docker rmi -f "${pki_images[@]}" 2> /dev/null
+
+:
