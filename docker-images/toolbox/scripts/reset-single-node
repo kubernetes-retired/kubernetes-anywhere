@@ -1,0 +1,7 @@
+#!/bin/bash
+containers=($(docker ps --all --filter "label=io.k8s/KubernetesAnywhere/role" --quiet))
+pki_images=($(docker images --filter "label=io.k8s/KubernetesAnywhere/pki=true" --quiet))
+docker rm -f "${containers[@]}" 2> /dev/null
+docker rmi -f "${pki_images[@]}" 2> /dev/null
+
+:
