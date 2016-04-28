@@ -17,7 +17,6 @@ EOF
 sudo systemctl daemon-reload
 sudo systemctl restart docker.service
 ```
-If you have already ran `setup-kublete-voumes` and it failed, you will need remove 
 
 ### Debian 8 and cgroups
 
