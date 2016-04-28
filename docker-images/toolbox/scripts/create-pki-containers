@@ -73,7 +73,7 @@ EOF
 
 cat > controller-manager-pki.dockerfile <<EOF
 FROM alpine
-LABEL io.k8s/KubernetesAnywhere/role=proxy-pki
+LABEL io.k8s/KubernetesAnywhere/role=controller-manager-pki
 LABEL io.k8s/KubernetesAnywhere/pki=true
 VOLUME ${vol}/kube-controller-manager
 ADD pki/ca.crt ${vol}/kube-controller-manager/kube-ca.crt

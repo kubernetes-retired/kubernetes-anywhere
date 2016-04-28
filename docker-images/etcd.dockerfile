@@ -1,5 +1,5 @@
 FROM temp/etcd
-LABEL io.k8s/KubernetesAnywhere/role=etc
+LABEL io.k8s/KubernetesAnywhere/role=etcd
 
 ENV ETCD_CLUSTER_SIZE="1"
 
