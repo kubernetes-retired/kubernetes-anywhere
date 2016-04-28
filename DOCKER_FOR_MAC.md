@@ -25,12 +25,18 @@ NAME      STATUS    AGE
 docker    Ready     5m
 ```
 
-## Deploy the Guesbook app
+## Deploy Initialise the Cluster
+
 ```
-> docker run --net=weave --dns=172.17.0.1 --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 kubectl create -f skydns-addon-v1.2
+> docker run --net=weave --dns=172.17.0.1 --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 kubectl create -f kube-system-namespace.yaml
+namespace "kube-system" created
+> docker run --net=weave --dns=172.17.0.1 --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 kubectl create -f skydns-addon-secure-v1.2
 replicationcontroller "kube-dns-v11" created
 service "kube-dns" created
 ```
+
+## Deploy the Guesbook App
+
 ```
 > docker run --net=weave --dns=172.17.0.1 --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 kubectl create -f
 guestbook-example-NodePort

@@ -87,7 +87,8 @@ $ weave status dns
 $ docker run --rm -ti --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2
 
 # kubectl get nodes
-# kubectl create -f skydns-addon
+# kubectl create -f kube-system-namespace.yaml
+# kubectl create -f skydns-addon-secure-v1.2
 # kubectl get pods,rc,services --all-namespaces
 # kubectl get pods --all-namespaces --watch
 
