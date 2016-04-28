@@ -19,19 +19,20 @@ docker run \
 
 Now you can use toolbox, try use toolbox to interact with the cluster:
 ```
-> docker run --net=weave --dns=172.17.0.1 weaveworks/kubernetes-anywhere:toolbox-v1.2 kubectl get nodes
+> docker run --net=weave --dns=172.17.0.1 --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 kubectl get nodes
+weaveworks/kubernetes-anywhere:toolbox-v1.2
 NAME      STATUS    AGE
 docker    Ready     5m
 ```
 
 ## Deploy the Guesbook app
 ```
-> docker run --net=weave --dns=172.17.0.1 weaveworks/kubernetes-anywhere:toolbox-v1.2 kubectl create -f skydns-addon-v1.2
+> docker run --net=weave --dns=172.17.0.1 --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 kubectl create -f skydns-addon-v1.2
 replicationcontroller "kube-dns-v11" created
 service "kube-dns" created
 ```
 ```
-> docker run --net=weave --dns=172.17.0.1 weaveworks/kubernetes-anywhere:toolbox-v1.2 kubectl create -f
+> docker run --net=weave --dns=172.17.0.1 --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 kubectl create -f
 guestbook-example-NodePort
 deployment "frontend" created
 You have exposed your service on an external port on all nodes in your
