@@ -9,7 +9,7 @@ toolbox_run() {
         "$@"
 }
 
-toolbox_run setup-kubelet-volumes
+toolbox_run setup-single-node
 toolbox_run compose -p kube up -d
 toolbox_run kubectl version
 toolbox_run kubectl get nodes
