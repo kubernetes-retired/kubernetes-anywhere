@@ -4,7 +4,7 @@ Kubernetes runs well in containers on most Linux distributions that support Dock
 
 > _See [docker/docker#19625][] for details_
 
-If you install Docker through the official package repository on a systemd-enabled distribution, you will need ensure that `docker.service` unit has `MountFlags=slave` reset to `MountFlags=`.
+If you install Docker through the official package repository on a systemd-enabled distribution, you will need ensure that `docker.service` unit has `MountFlags=shared` instead of default `MountFlags=slave`.
 
 This is simple to fix with a drop-in unit:
 
@@ -12,11 +12,12 @@ This is simple to fix with a drop-in unit:
 sudo mkdir -p /etc/systemd/system/docker.service.d/
 cat << EOF | sudo tee /etc/systemd/system/docker.service.d/clear_mount_propagtion_flags.conf
 [Service]
-MountFlags=
+MountFlags=shared
 EOF
 sudo systemctl daemon-reload
 sudo systemctl restart docker.service
 ```
+If you have already ran `setup-kublete-voumes` and it failed, you will need remove 
 
 ### Debian 8 and cgroups
 
