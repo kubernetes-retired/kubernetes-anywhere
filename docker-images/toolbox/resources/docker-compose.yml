@@ -39,7 +39,7 @@ proxy:
   restart: "always"
 
 weavescope:
-  image: weaveworks/scope:0.13.1
+  image: weaveworks/scope:0.14.0
   privileged: true
   net: host
   pid: host
