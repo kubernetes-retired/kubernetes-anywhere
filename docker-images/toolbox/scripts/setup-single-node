@@ -8,9 +8,9 @@ num_pki_containers="$(docker ps --filter "label=io.k8s/KubernetesAnywhere/pki=tr
 
 if [ "${num_pki_images}" -eq 0 ] && [ "${num_pki_containers}" -eq 0 ] ; then
   echo "Creating single-node Public Key Infrastructure (PKI)..."
-  echo "Creating local container images (`kubernetes-anywhere:*-pki`)..."
+  echo "Creating local container images (\`kubernetes-anywhere:*-pki\`)..."
   create-pki-containers > /dev/null 2>&1
-  echo "Creating data volumes containers for each of the commponents(`kubernetes-anywhere:*-pki`)..."
+  echo "Creating data volumes containers for each of the commponents..."
   docker run --name=kube-apiserver-pki \
     kubernetes-anywhere:apiserver-pki
   docker run --name=kube-controller-manager-pki \
