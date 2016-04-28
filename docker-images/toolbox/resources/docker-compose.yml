@@ -8,28 +8,31 @@ apiserver:
   hostname: "kube-apiserver.weave.local"
   restart: "always"
   links: [ "etcd" ]
+  volumes_from: [ "kube-apiserver-pki" ]
 
 scheduler:
   image: "weaveworks/kubernetes-anywhere:scheduler-${KUBERNETES_RELEASE}"
   hostname: "kube-scheduler.weave.local"
   restart: "always"
   links: [ "apiserver" ]
+  volumes_from: [ "kube-scheduler-pki" ]
 
 controller-manager:
   image: "weaveworks/kubernetes-anywhere:controller-manager-${KUBERNETES_RELEASE}"
   hostname: "kube-controller-manager.weave.local"
   restart: "always"
   links: [ "apiserver" ]
+  volumes_from: [ "kube-controller-manager-pki" ]
 
 kubelet:
   privileged: true
   net: host
   pid: host
-  volumes_from: [ "kubelet-volumes" ]
-  #environment:
-  #  USE_CNI: "yes"
   image: "weaveworks/kubernetes-anywhere:kubelet-${KUBERNETES_RELEASE}"
   restart: "always"
+  volumes_from: [ "kubelet-volumes", "kubelet-pki" ]
+  environment:
+    USE_CNI: "${USE_CNI-no}"
 
 proxy:
   privileged: true
@@ -37,21 +40,6 @@ proxy:
   pid: host
   image: "weaveworks/kubernetes-anywhere:proxy-${KUBERNETES_RELEASE}"
   restart: "always"
-
-weavescope:
-  image: weaveworks/scope:0.14.0
-  privileged: true
-  net: host
-  pid: host
-  ports:
-  - "0.0.0.0:4040:4040"
-  volumes:
-  - "/var/run/:/var/run:rw"
-  command:
-  - "--probe.docker"
-  - "true"
-  - "--probe.kubernetes"
-  - "true"
-  - "--probe.kubernetes.api"
-  - "http://kube-apiserver.weave.local:8080"
-  restart: "always"
+  volumes_from: [ "kube-proxy-pki" ]
+  environment:
+    USE_CNI: "${USE_CNI-no}"
