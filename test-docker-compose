@@ -5,15 +5,19 @@ toolbox_run() {
   docker run \
     --volume="/:/rootfs" \
     --volume="/var/run/weave/weave.sock:/docker.sock" \
+    "${docker_run_args[@]}"
       "weaveworks/kubernetes-anywhere:toolbox-${KUBERNETES_RELEASE}" \
         "$@"
 }
 
-toolbox_run setup-kubelet-volumes
+docker_run_args=()
+toolbox_run setup-single-node
 toolbox_run compose -p kube up -d
+docker_run_args=("--volumes-from=kube-toolbox-pki")
 toolbox_run kubectl version
 toolbox_run kubectl get nodes
-toolbox_run kubectl create -f skydns-addon
+toolbox_run kubectl create -f kube-system-namespace.yaml
+toolbox_run kubectl create -f skydns-addon-secure
 toolbox_run kubectl create -f guestbook-example-NodePort
 toolbox_run bash -c "
   until (
