@@ -66,7 +66,7 @@ eval $(weave env)
 ```
 docker run --rm -ti \
   -v /:/rootfs -v /var/run/weave/weave.sock:/docker.sock \
-  weaveworks/kubernetes-anywhere:toolbox sh -c 'setup-kubelet-volumes && compose -p kube up -d'
+  weaveworks/kubernetes-anywhere:toolbox sh -c 'setup-single-node && compose -p kube up -d'
 ```
 
 > **If you are seeing the following error**

@@ -14,7 +14,7 @@ docker run \
   --volume="/:/rootfs" \
   --volume="/var/run/weave/weave.sock:/docker.sock" \
     weaveworks/kubernetes-anywhere:toolbox-v1.2 \
-      sh -c 'setup-kubelet-volumes && compose -p kube up -d'
+      sh -c 'setup-single-node && compose -p kube up -d'
 ```
 
 Now you can use toolbox, try use toolbox to interact with the cluster:

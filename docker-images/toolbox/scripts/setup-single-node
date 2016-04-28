@@ -1,0 +1,21 @@
+#!/bin/bash -x
+
+echo "Creating data volumes container for kubelet (`kubelet-volumes`)..."
+setup-kubelet-volumes
+
+if ! [ "$(docker images --filter "label=io.k8s.pki_image=true" --quiet | grep -c)" = 6 ] ; then
+  echo "Creating single-node Public Key Infrastructure (PKI)..."
+  create-pki-containers
+  docker run --name=kube-apiserver-pki \
+    kubernetes-anywhere:apiserver-pki
+  docker run --name=kube-controller-manager-pki \
+    kubernetes-anywhere:controller-manager-pki
+  docker run --name=kube-scheduler-pki \
+    kubernetes-anywhere:scheduler-pki
+  docker run --name=kubelet-pki \
+    kubernetes-anywhere:kubelet-pki
+  docker run --name=kube-proxy-pki \
+    kubernetes-anywhere:proxy-pki
+  docker run --name=kube-toolbox-pki \
+    kubernetes-anywhere:toolbox-pki
+fi
