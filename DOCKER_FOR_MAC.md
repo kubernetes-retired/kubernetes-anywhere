@@ -17,7 +17,7 @@ docker run \
       sh -c 'setup-single-node && compose -p kube up -d'
 ```
 
-Now you can use toolbox, try use toolbox to interact with the cluster:
+Now you can use toolbox to interact with the cluster:
 ```
 > docker run --net=weave --dns=172.17.0.1 --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 kubectl get nodes
 weaveworks/kubernetes-anywhere:toolbox-v1.2
@@ -25,7 +25,7 @@ NAME      STATUS    AGE
 docker    Ready     5m
 ```
 
-## Deploy Initialise the Cluster
+## Start System Service
 
 ```
 > docker run --net=weave --dns=172.17.0.1 --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 kubectl create -f kube-system-namespace.yaml
