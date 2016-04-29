@@ -1,7 +1,8 @@
 # Running Kubernetes on Docker for Mac
 
-> ***Q:*** What's good about this approach?
-> ***A:*** You can actually extend the cluster pretty easily, i.e. start sing-node on your laptop, add more nodes on cloeague's laptop or some other place :)
+> **Q:** What's good about this approach?
+>
+> **A:** You can actually extend the cluster pretty easily, i.e. start sing-node on your laptop, add more nodes on cloeague's laptop or some other place :)
 
 First, setup Weave Net:
 ```
