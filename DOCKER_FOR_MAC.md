@@ -2,7 +2,7 @@
 
 > **Q:** What's good about this approach?
 >
-> **A:** You can actually extend the cluster pretty easily, i.e. start sing-node on your laptop, add more nodes on cloeague's laptop or some other place :)
+> **A:** You can actually extend the cluster pretty easily, i.e. start single node on your laptop, add cloeague's laptop as another node or relocate the cluster to cloud :)
 
 First, setup Weave Net:
 ```
