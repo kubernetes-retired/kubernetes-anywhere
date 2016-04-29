@@ -63,3 +63,5 @@ You also might like to checkout [`weave-osx-ctl`](https://github.com/pidster/wea
 
 The advantage of using Weave Net is that you can add new nodes easily and recosolidate the cluster on any number of
 machines without configuration changes.
+
+- [ ] How to expand the cluster?
