@@ -59,9 +59,7 @@ service "redis-slave" created
 
 ## Additional notes and TODOs
 
-You also might like to checkout [`weave-osx-ctl`](https://github.com/pidster/weave-osx-ctl/).
-
-The advantage of using Weave Net is that you can add new nodes easily and recosolidate the cluster on any number of
-machines without configuration changes.
 
 - [ ] How to expand the cluster?
+- [ ] <strike>Explain how to use [`weave-osx-ctl`](https://github.com/pidster/weave-osx-ctl/)...</strike> _(broken as of beta9, thanks Apple)
+
