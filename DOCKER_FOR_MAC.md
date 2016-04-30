@@ -29,7 +29,7 @@ NAME      STATUS    AGE
 docker    Ready     5m
 ```
 
-## Start System Service
+## Start System Services
 
 ```
 > docker run --net=weave --dns=172.17.0.1 --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 kubectl create -f kube-system-namespace.yaml
@@ -42,8 +42,7 @@ service "kube-dns" created
 ## Deploy the Guesbook App
 
 ```
-> docker run --net=weave --dns=172.17.0.1 --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 kubectl create -f
-guestbook-example-NodePort
+> docker run --net=weave --dns=172.17.0.1 --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 kubectl create -f guestbook-example-NodePort
 deployment "frontend" created
 You have exposed your service on an external port on all nodes in your
 cluster.  If you want to expose this service to the external internet, you may
