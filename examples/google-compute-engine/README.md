@@ -38,7 +38,7 @@ Next you will need to fire-up the toolbox container like this:
 ```
 $ sudo -s
 # eval $(weave env)
-# docker run -ti weaveworks/kubernetes-anywhere:toolbox
+# docker run -ti weaveworks/kubernetes-anywhere:toolbox-v1.2
 ```
 
 Inside this container you can check that there 3 nodes ready to take workload on board:
@@ -46,9 +46,9 @@ Inside this container you can check that there 3 nodes ready to take workload on
 kubectl get nodes
 ```
 
-First, create the SkyDNS addon:
+First, deploy cluster addons:
 ```
-kubectl create -f skydns-addon
+kubectl create -f addons-no-pki.yaml
 ```
 
 And now you can deploy the guestbook app:
