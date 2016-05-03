@@ -38,7 +38,8 @@ install_weave=" \
   sudo curl --silent --location http://git.io/weave --output /usr/local/bin/weave ; \
   sudo chmod +x /usr/local/bin/weave ; \
   /usr/local/bin/weave launch-router --init-peer-count 7 ; \
-  /usr/local/bin/weave launch-proxy --rewrite-inspect ; \
+  /usr/local/bin/weave launch-proxy --no-detect-tls ; \
+  /usr/local/bin/weave launch-plugin ; \
 "
 
 ## TODO: with a private network we still need to find a way to obtain the IPs, as Docker Machine doesn't have it
@@ -78,17 +79,17 @@ weaveproxy_socket="-H unix:///var/run/weave/weave.sock"
 docker_on 'kube-1' ${weaveproxy_socket} run --detach \
   --env="ETCD_CLUSTER_SIZE=3" \
   --name="etcd1" \
-    weaveworks/kubernetes-anywhere:etcd
+    weaveworks/kubernetes-anywhere:etcd-v1.2
 
 docker_on 'kube-2' ${weaveproxy_socket} run --detach \
   --env="ETCD_CLUSTER_SIZE=3" \
   --name="etcd2" \
-    weaveworks/kubernetes-anywhere:etcd
+    weaveworks/kubernetes-anywhere:etcd-v1.2
 
 docker_on 'kube-3' ${weaveproxy_socket} run --detach \
   --env="ETCD_CLUSTER_SIZE=3" \
   --name="etcd3" \
-    weaveworks/kubernetes-anywhere:etcd
+    weaveworks/kubernetes-anywhere:etcd-v1.2
 
 ## Create TLS config volumes that will be transfered to worker nodes via `docker save | docker load` pipe
 ## In this instance it's easier to use remote Docker API, as Weave proxy is not required for this part
@@ -97,7 +98,7 @@ master_config=$(docker-machine config 'kube-4')
 
 docker ${master_config} run \
   -v /var/run/docker.sock:/docker.sock \
-    weaveworks/kubernetes-anywhere:toolbox \
+    weaveworks/kubernetes-anywhere:toolbox-v1.2 \
       create-pki-containers
 
 ## Run intermediate containers to export the TLS config volumes for master components
@@ -127,17 +128,17 @@ docker_on 'kube-4' ${weaveproxy_socket} run --detach \
   --env="ETCD_CLUSTER_SIZE=3" \
   --name="kube-apiserver" \
   --volumes-from="kube-apiserver-pki" \
-    weaveworks/kubernetes-anywhere:apiserver
+    weaveworks/kubernetes-anywhere:apiserver-v1.2
 
 docker_on 'kube-4' ${weaveproxy_socket} run --detach \
   --name="kube-scheduler" \
   --volumes-from="kube-scheduler-pki" \
-    weaveworks/kubernetes-anywhere:scheduler
+    weaveworks/kubernetes-anywhere:scheduler-v1.2
 
 docker_on 'kube-4' ${weaveproxy_socket} run --detach \
   --name="kube-controller-manager" \
   --volumes-from="kube-controller-manager-pki" \
-    weaveworks/kubernetes-anywhere:controller-manager
+    weaveworks/kubernetes-anywhere:controller-manager-v1.2
 
 ## Launch kubelet and proxy on each of the worker nodes
 
@@ -152,17 +153,19 @@ for m in 'kube-5' 'kube-6' 'kube-7' ; do
     --name="kubelet-pki" \
       kubernetes-anywhere:kubelet-pki
   docker_on ${m} ${weaveproxy_socket} run \
+    --env="USE_CNI=yes" \
     --volume="/:/rootfs" \
     --volume="/var/run/docker.sock:/docker.sock" \
-      weaveworks/kubernetes-anywhere:toolbox \
+      weaveworks/kubernetes-anywhere:toolbox-v1.2 \
         setup-kubelet-volumes
   ## Start the kubelete itself now
   docker_on ${m} ${weaveproxy_socket} run --detach \
     --name="kubelet" \
     --privileged="true" --net="host" --pid="host" \
+    --env="USE_CNI=yes" \
     --volumes-from="kubelet-volumes" \
     --volumes-from="kubelet-pki" \
-      weaveworks/kubernetes-anywhere:kubelet
+      weaveworks/kubernetes-anywhere:kubelet-v1.2
 
   ## Run intermediate container for proxy's TLS PKI data containers
   docker ${worker_config} run \
@@ -173,7 +176,7 @@ for m in 'kube-5' 'kube-6' 'kube-7' ; do
     --name="kube-proxy" \
     --privileged="true" --net="host" --pid="host" \
     --volumes-from="kube-proxy-pki" \
-      weaveworks/kubernetes-anywhere:proxy
+      weaveworks/kubernetes-anywhere:proxy-v1.2
   ## Create toolbox PKI data volume for convenience
   docker ${worker_config} create \
     --name=kube-toolbox-pki \
@@ -183,5 +186,5 @@ done
 ## Run toolbox container to deploy cluster addons
 docker_on 'kube-4' ${weaveproxy_socket} run \
   --volumes-from="kube-toolbox-pki" \
-    weaveworks/kubernetes-anywhere:toolbox \
+    weaveworks/kubernetes-anywhere:toolbox-v1.2 \
       kubectl create -f addons.yaml

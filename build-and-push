@@ -17,7 +17,7 @@ git_rev=$(git rev-parse @)
 
 dir="$(git rev-parse --show-toplevel)/docker-images"
 
-default_kubernetes_release="v1.1.8"
+default_kubernetes_release="v1.2.3"
 
 kubernetes_release=${1:-"${default_kubernetes_release}"}
 kubernetes_release_base="${kubernetes_release/-[a-z]*\.[0-9]/}"
