@@ -10,4 +10,6 @@ done
 pki_images=($(docker images --filter "label=io.k8s/KubernetesAnywhere/pki=true" --quiet))
 docker rmi -f "${pki_images[@]}" 2> /dev/null
 
+docker rm -f kubelet-volumes
+
 :
