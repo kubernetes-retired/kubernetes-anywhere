@@ -56,8 +56,30 @@ deployment "redis-slave" created
 service "redis-slave" created
 ```
 
-## Additional notes and TODOs
+## Using `kubectl`
 
+You can use toolbox container as show below, however in some cases it may be more convenient to use `kubectl` that you
+hav installed on your Mac. You can install it via Homebrew (`brew install kubectl`), or via Google Cloud SDK.
+
+To configure `kubectl`, you can run the following command:
+```
+docker run --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 print-apiproxy-config
+```
+
+You can redirect the output to a file, which you can pass with `--kubeconfig` flag:
+```
+docker run --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 print-apiproxy-config > ./local-cluster
+kubectl --kubeconfig=./local-cluster get nodes
+```
+
+Otherwise, if you prefer, you can simply setup default configuration in `~/.kube/config`:
+```
+mkdir -p ~/.kube
+docker run --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 print-apiproxy-config > ~/.kube/config
+kubectl get nodes
+```
+
+## Additional notes and TODOs
 
 - [ ] How to expand the cluster?
 - [ ] <strike>Explain how to use [`weave-osx-ctl`](https://github.com/pidster/weave-osx-ctl/)...</strike> _(broken as of beta9, thanks Apple)_
