@@ -1,0 +1,11 @@
+#!/bin/bash -x
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+kubectl \
+  --kubeconfig="/root/.kube/config" \
+  proxy \
+    --address="0.0.0.0" --port="${APIPROXY_PORT}" \
+    --logtostderr="true" --v="8"
