@@ -3,8 +3,8 @@
 echo "Creating data volumes container for kubelet (\`kubelet-volumes\`)..."
 setup-kubelet-volumes
 :
-num_pki_images="$(docker images --filter "label=io.k8s/KubernetesAnywhere/pki=true" --quiet | wc -c)"
-num_pki_containers="$(docker ps --filter "label=io.k8s/KubernetesAnywhere/pki=true" --quiet | wc -c)"
+num_pki_images="$(docker images --filter "label=io.k8s/KubernetesAnywhere/pki=true" --quiet | wc -l)"
+num_pki_containers="$(docker ps --all --filter "label=io.k8s/KubernetesAnywhere/pki=true" --quiet | wc -l)"
 
 if [ "${num_pki_images}" -eq 0 ] && [ "${num_pki_containers}" -eq 0 ] ; then
   echo "Creating single-node Public Key Infrastructure (PKI)..."
