@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+cp /root/.kube/config /tmp/apiproxy-config
+
+kubectl \
+  --kubeconfig="/tmp/apiproxy-config" \
+  config set-cluster local-cluster \
+    --server="http://localhost:${APIPROXY_PORT}" \
+  > /dev/null
+
+kubectl \
+  --kubeconfig="/tmp/apiproxy-config" \
+  config set-context kubernetes-anywhere \
+    --cluster="local-cluster" \
+  > /dev/null
+
+kubectl \
+  --kubeconfig="/tmp/apiproxy-config" \
+  config view

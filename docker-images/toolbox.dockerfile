@@ -10,4 +10,5 @@ ADD toolbox /etc/toolbox
 ADD toolbox-configure.sh /tmp/toolbox-configure.sh
 RUN /tmp/toolbox-configure.sh
 ENV USE_CNI=no
+ENV APIPROXY_PORT=8001
 WORKDIR /etc/toolbox/resources
