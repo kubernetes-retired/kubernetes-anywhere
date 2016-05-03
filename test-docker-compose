@@ -16,8 +16,7 @@ toolbox_run compose -p kube up -d
 docker_run_args=("--volumes-from=kube-toolbox-pki")
 toolbox_run kubectl version
 toolbox_run kubectl get nodes
-toolbox_run kubectl create -f kube-system-namespace.yaml
-toolbox_run kubectl create -f skydns-addon-secure
+toolbox_run kubectl create -f addons.yaml
 toolbox_run kubectl create -f guestbook-example-NodePort
 toolbox_run bash -c "
   until (

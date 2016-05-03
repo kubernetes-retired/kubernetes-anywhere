@@ -33,7 +33,7 @@ $ weave status dns
 $ docker run -ti weaveworks/kubernetes-anywhere:toolbox bash -l
 
 # kubectl get nodes
-# kubectl create -f skydns-addon
+# kubectl create -f addons-no-pki.yaml
 # kubectl get pods,rc,services --all-namespaces
 # kubectl scale --namespace=kube-system --replicas=3 rc kube-dns-v8
 # kubectl get pods --all-namespaces --watch

@@ -36,6 +36,7 @@ LABEL works.weave.role=system
 LABEL com.git-scm.repo=${git_repo}
 LABEL com.git-scm.rev=${git_rev}
 ENV KUBERNETES_RELEASE=${kubernetes_release}
+ENV KUBERNETES_RELEASE_SHORT=${kubernetes_release_short}
 "
 
 printf "FROM gcr.io/google_containers/hyperkube:%s\n%s\n" \
