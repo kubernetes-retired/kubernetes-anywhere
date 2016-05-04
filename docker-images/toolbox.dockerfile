@@ -9,5 +9,6 @@ ENV DOCKER_HOST=unix:///docker.sock
 ADD toolbox /etc/toolbox
 ADD toolbox-configure.sh /tmp/toolbox-configure.sh
 RUN /tmp/toolbox-configure.sh
-ENV USE_CNI=no
+ENV USE_CNI=yes
+ENV FORCE_USERSPACE_PROXY=no
 WORKDIR /etc/toolbox/resources
