@@ -10,7 +10,7 @@ toolbox_run() {
         "$@"
 }
 
-docker_run_args=()
+docker_run_args=(--env=USE_CNI --env=FORCE_USERSPACE_PROXY)
 toolbox_run setup-single-node
 toolbox_run compose -p kube up -d
 docker_run_args=("--volumes-from=kube-toolbox-pki")

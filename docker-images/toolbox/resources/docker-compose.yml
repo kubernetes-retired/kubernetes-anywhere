@@ -43,3 +43,4 @@ proxy:
   volumes_from: [ "kube-proxy-pki" ]
   environment:
     USE_CNI:
+    FORCE_USERSPACE_PROXY:
