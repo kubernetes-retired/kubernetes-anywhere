@@ -17,7 +17,7 @@ else
   args+=( --master="http://${master}:8080" )
 fi
 
-if ! [ "${USE_CNI}" = "yes" ]
+if ! [ "${USE_CNI}" = "yes" ] || [ "${FORCE_USERSPACE_PROXY}" = "yes" ]
 then
   args+=( --proxy-mode="userspace" )
 fi
