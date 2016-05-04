@@ -87,8 +87,7 @@ $ weave status dns
 $ docker run --rm -ti --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2
 
 # kubectl get nodes
-# kubectl create -f kube-system-namespace.yaml
-# kubectl create -f skydns-addon-secure-v1.2
+# kubectl create -f addons.yaml
 # kubectl get pods,rc,services --all-namespaces
 # kubectl get pods --all-namespaces --watch
 
@@ -268,10 +267,10 @@ Check that there is the correct number of worker nodes in the cluster:
 # kubectl get nodes
 ```
 
-Deploy the SkyDNS addon and, if you like, scale it from default single replica to 3:
+Deploy cluster addons and, if you like, scale it from default single replica to 3:
 
 ```
-# kubectl create -f skydns-addon
+# kubectl create -f addons.yaml
 # kubectl scale --namespace=kube-system --replicas=3 rc kube-dns-v10
 ```
 
@@ -354,13 +353,11 @@ docker run -d --name=kube-scheduler --volumes-from=kube-scheduler-pki weaveworks
 docker run --name=kube-toolbox-pki kubernetes-anywhere:toolbox-pki
 docker run --interactive --tty --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox
 ```
-
-Setting up SkyDNS requires a different version of the manifest, which is provided in toolbox container. You can use it like this:
+Deploy addons:
 
 ```
-# kubectl create -f kube-system-namespace.yaml
+# kubectl create -f addons.yaml
 namespace "kube-system" created
-# kubectl create -f skydns-addon-secure
 replicationcontroller "kube-dns-v10" created
 service "kube-dns" created
 ```

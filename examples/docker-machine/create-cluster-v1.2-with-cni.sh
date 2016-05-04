@@ -183,12 +183,8 @@ for m in 'kube-5' 'kube-6' 'kube-7' ; do
       kubernetes-anywhere:toolbox-pki
 done
 
-## Run toolbox container to deploy SkyDNS addon
+## Run toolbox container to deploy cluster addons
 docker_on 'kube-4' ${weaveproxy_socket} run \
   --volumes-from="kube-toolbox-pki" \
     weaveworks/kubernetes-anywhere:toolbox-v1.2 \
-      kubectl create -f kube-system-namespace.yaml
-docker_on 'kube-4' ${weaveproxy_socket} run \
-  --volumes-from="kube-toolbox-pki" \
-    weaveworks/kubernetes-anywhere:toolbox-v1.2 \
-      kubectl create -f skydns-addon-secure-v1.2
+      kubectl create -f addons.yaml
