@@ -44,3 +44,12 @@ proxy:
   environment:
     USE_CNI:
     FORCE_USERSPACE_PROXY:
+
+apiproxy:
+  image: "weaveworks/kubernetes-anywhere:toolbox-${KUBERNETES_RELEASE}"
+  hostname: "kube-apiproxy.weave.local"
+  restart: "always"
+  links: [ "apiserver" ]
+  ports: [ "0.0.0.0:${APIPROXY_PORT}:${APIPROXY_PORT}" ]
+  volumes_from: [ "kube-toolbox-pki" ]
+  command: "start-apiproxy"
