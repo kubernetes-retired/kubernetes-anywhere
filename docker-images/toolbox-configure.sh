@@ -8,7 +8,7 @@ set -o pipefail
 
 ln -s /etc/toolbox/scripts/* /usr/bin/
 
-yum --assumeyes --quiet install openssl python-setuptools git-core
+yum --assumeyes --quiet install openssl python-setuptools git-core iproute bind-utils nmap-ncat socat
 
 easy_install awscli
 
