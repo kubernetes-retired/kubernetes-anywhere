@@ -33,5 +33,5 @@ variable "aws_region" {
 
 variable "cluster_config_flavour" {
    description = "Flavour of the cluster config (secure or simple)"
-   default     = "simple"
+   default     = "secure-v1.2"
 }

@@ -66,7 +66,7 @@ eval $(weave env)
 ```
 docker run --rm -ti \
   -v /:/rootfs -v /var/run/weave/weave.sock:/docker.sock \
-  weaveworks/kubernetes-anywhere:toolbox-v1.2 sh -c 'setup-single-node && compose -p kube up -d'
+  weaveworks/kubernetes-anywhere:toolbox sh -c 'setup-single-node && compose -p kube up -d'
 ```
 
 > **If you are seeing the following error**
@@ -84,7 +84,7 @@ $ weave status dns
 ### Deploying the Guestbook App
 
 ```
-$ docker run --rm -ti --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2
+$ docker run --rm -ti --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox
 
 # kubectl get nodes
 # kubectl create -f addons.yaml
@@ -107,7 +107,6 @@ module "kubernetes-anywhere-aws-ec2" {
     aws_region     = "us-east-1" # currently the only supported region as it uses ECR
 
     cluster                = "weave1"
-    cluster_config_flavour = "secure-v1.2" # or simple-v1.2, if you don't need TLS
 
     # You can also set instance types with node_instance_type/master_instance_type/etcd_instance_type
     # For SSH access, you will need to create a key named kubernetes-anywhere or set ec2_key_name
