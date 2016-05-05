@@ -17,7 +17,7 @@ weave expose -h docker.weave.local
 
 Next, bootstrap single-node local cluster with one command:
 ```
-docker run \
+docker run --rm \
   --volume="/:/rootfs" \
   --volume="/var/run/weave/weave.sock:/docker.sock" \
     weaveworks/kubernetes-anywhere:toolbox-v1.2 \
@@ -39,7 +39,7 @@ If you have installed Google Cloud SDK (`gcloud`), you will have `kubectl`, just
 To configure `kubectl` to use your newly created Docker for Mac cluster, you can run the following command:
 ```
 mkdir -p ~/.kube
-docker run --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 print-apiproxy-config > ~/.kube/config
+docker run --rm --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 print-apiproxy-config > ~/.kube/config
 ```
 
 To confirm it worked, run `kubectl get nodes` and you should see one node called `docker` on the list, i.e.:
@@ -53,7 +53,7 @@ docker    Ready     5m
 If you already have `~/.kube/config` file and would like to keep it, you can simply create one in your current working
 directory by redirecting standard output, i.e.:
 ```
-docker run --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 print-apiproxy-config > ./local-cluster
+docker run --rm --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 print-apiproxy-config > ./local-cluster
 ```
 To use that file you will need to pass `--kubeconfig=<path>` flag like this:
 ```
@@ -62,7 +62,7 @@ kubectl --kubeconfig=./local-cluster get nodes
 
 If you don't wish to install anything, you can use provided toolbox container like this:
 ```
-docker run \
+docker run --rm \
   --net=weave --dns=172.17.0.1 \
   --volumes-from=kube-toolbox-pki \
   weaveworks/kubernetes-anywhere:toolbox-v1.2 \
