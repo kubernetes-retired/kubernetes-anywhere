@@ -5,11 +5,13 @@ ARG DOCKER_RELEASE
 ARG COMPOSE_RELEASE
 ARG JQ_RELEASE
 ARG EASYRSA_RELEASE
-ENV DOCKER_HOST=unix:///docker.sock
+ENV DOCKER_HOST="unix:///docker.sock"
+ENV USE_CNI="yes"
+ENV FORCE_USERSPACE_PROXY="no"
+ENV FORCE_LOCAL_APISERVER="no"
+ENV APIPROXY_PORT="8001"
+ENV APISERVER_LOCAL_PORT="8080"
 ADD toolbox /etc/toolbox
 ADD toolbox-configure.sh /tmp/toolbox-configure.sh
 RUN /tmp/toolbox-configure.sh
-ENV USE_CNI=yes
-ENV FORCE_USERSPACE_PROXY=no
-ENV APIPROXY_PORT=8001
 WORKDIR /etc/toolbox/resources
