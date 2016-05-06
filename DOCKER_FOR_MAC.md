@@ -57,7 +57,7 @@ docker    Ready     5m
 
 If you would like to avoid passing `-s` flag each time, you can overwrite default configuration file like this:
 ```
-docker run --rm --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 print-apiproxy-config > ~/.kube/config
+docker run --rm --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 print-local-config > ~/.kube/config
 ```
 
 > If you don't wish to install anything, you can use provided toolbox container like this:
