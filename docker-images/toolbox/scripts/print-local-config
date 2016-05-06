@@ -9,7 +9,7 @@ cp /root/.kube/config /tmp/kubeconfig
 kubectl \
   --kubeconfig="/tmp/kubeconfig" \
   config set-cluster local-cluster \
-    --server="http://localhost:${APIPROXY_PORT}" \
+    --server="http://localhost:${APISERVER_LOCAL_PORT}" \
   > /dev/null
 
 kubectl \
