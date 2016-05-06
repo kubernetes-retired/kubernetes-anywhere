@@ -9,7 +9,6 @@ args=(
   --external-hostname="kube-apiserver.weave.local"
   --etcd-servers="${etcd_cluster}"
   --service-cluster-ip-range="10.16.0.0/12"
-  --runtime-config="extensions/v1beta1/daemonsets=true"
   --cloud-provider="${CLOUD_PROVIDER}"
   --allow-privileged="true"
   --logtostderr="true"
@@ -32,5 +31,6 @@ else
     --port="8080"
   )
 fi
+
 
 exec /hyperkube apiserver "${args[@]}"
