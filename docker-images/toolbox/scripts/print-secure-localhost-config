@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+cp /root/.kube/config /tmp/kubeconfig
+
+kubectl \
+  --kubeconfig="/tmp/kubeconfig" \
+  config set-cluster local-cluster \
+    --server="https://127.0.0.0:${1:-6443}" \
+    --certificate-authority="/root/.kube/kube-ca.crt" \
+    --embed-certs \
+  > /dev/null
+
+kubectl \
+  --kubeconfig="/tmp/kubeconfig" \
+  config set-context kubernetes-anywhere \
+    --cluster="local-cluster" \
+  > /dev/null
+
+kubectl \
+  --kubeconfig="/tmp/kubeconfig" \
+  config view
