@@ -25,6 +25,17 @@ then
     --token-auth-file="/srv/kubernetes/known_tokens.csv"
     --admission-control="NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota"
   )
+  if [ "${FORCE_LOCAL_APISERVER}" = "yes" ]
+  then
+    args+=(
+      # It will have to listen on all interfaces, but local to the container,
+      # however this means it will also be exposed unsecurelly on Weave Net
+      # (`${weave_ip}:${APISERVER_LOCAL_PORT}`), hence it's only for local
+      # single-node deployment.
+      --insecure-bind-address="0.0.0.0"
+      --insecure-port="${APISERVER_LOCAL_PORT}"
+    )
+  fi
 else
   args+=(
     --insecure-bind-address="${weave_ip}"
