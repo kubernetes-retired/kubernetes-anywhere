@@ -20,6 +20,4 @@ kubectl \
     --cluster="local-cluster" \
   > /dev/null
 
-kubectl \
-  --kubeconfig="/tmp/kubeconfig" \
-  config view
+cat /tmp/kubeconfig
