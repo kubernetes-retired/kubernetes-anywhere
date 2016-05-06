@@ -34,40 +34,40 @@ brew install kubectl
 If you have installed it by some other means earlier, you should check if the version you have is at least v1.2.0,
 otherwise some features may not work as expected.
 
-If you have installed Google Cloud SDK (`gcloud`), you will have `kubectl`, just make sure to run `gcloud components update`.
+> If you have installed Google Cloud SDK (`gcloud`), you will have `kubectl`, just make sure to run `gcloud components update`.
 
-To configure `kubectl` to use your newly created Docker for Mac cluster, you can run the following command:
-```
-mkdir -p ~/.kube
-docker run --rm --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 print-apiproxy-config > ~/.kube/config
-```
-
-To confirm it worked, run `kubectl get nodes` and you should see one node called `docker` on the list, i.e.:
+To confirm all is working correctly, run `kubectl cluster-info && kubectl get nodes` and you should see one node called `docker` on the list, i.e.:
 
 ```
-> kubectl get nodes
+> kubectl cluser-info && kubectl get nodes
+Kubernetes master is running at http://localhost:8080
 NAME      STATUS    AGE
 docker    Ready     5m
 ```
 
-If you already have `~/.kube/config` file and would like to keep it, you can simply create one in your current working
-directory by redirecting standard output, i.e.:
+If the output you see is completely different, you might be talking to (or trying to talk to) another cluser. To check,
+please try to specify explicit address like this:
+
 ```
-docker run --rm --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 print-apiproxy-config > ./local-cluster
-```
-To use that file you will need to pass `--kubeconfig=<path>` flag like this:
-```
-kubectl --kubeconfig=./local-cluster get nodes
+> kubectl -s http://localhost:8080 cluser-info && kubectl -s http://localhost:8080 get nodes
+Kubernetes master is running at http://localhost:8080
+NAME      STATUS    AGE
+docker    Ready     5m
 ```
 
-If you don't wish to install anything, you can use provided toolbox container like this:
+If you would like to avoid passing `-s` flag each time, you can overwrite default configuration file like this:
 ```
-docker run --rm \
-  --net=weave --dns=172.17.0.1 \
-  --volumes-from=kube-toolbox-pki \
-  weaveworks/kubernetes-anywhere:toolbox-v1.2 \
-    kubectl [flags] [command]
+docker run --rm --volumes-from=kube-toolbox-pki weaveworks/kubernetes-anywhere:toolbox-v1.2 print-apiproxy-config > ~/.kube/config
 ```
+
+> If you don't wish to install anything, you can use provided toolbox container like this:
+> ```
+> docker run --rm \
+>   --net=weave --dns=172.17.0.1 \
+>   --volumes-from=kube-toolbox-pki \
+>   weaveworks/kubernetes-anywhere:toolbox-v1.2 \
+>     kubectl [flags] [command]
+> ```
 
 ## Create Cluster Addons
 
