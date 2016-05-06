@@ -43,5 +43,4 @@ else
   )
 fi
 
-
 exec /hyperkube apiserver "${args[@]}"
