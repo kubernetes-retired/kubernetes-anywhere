@@ -13,7 +13,7 @@ RUN chmod +x /usr/bin/docker
 ADD kubelet-cni/bin /opt/cni/bin
 ADD kubelet-cni/net.d /etc/cni/net.d
 
-ENV USE_CNI=yes
-ENV DOCKER_HOST=unix:///docker.sock
+ENV USE_CNI="yes"
+ENV DOCKER_HOST="unix:///docker.sock"
 
 CMD [ "/kubelet-anywhere" ]
