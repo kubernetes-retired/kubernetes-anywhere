@@ -9,7 +9,7 @@ cp /root/.kube/config /tmp/kubeconfig
 kubectl \
   --kubeconfig="/tmp/kubeconfig" \
   config set-cluster local-cluster \
-    --server="https://127.0.0.0:${1:-6443}" \
+    --server="https://127.0.0.1:${1:-6443}" \
     --certificate-authority="/root/.kube/kube-ca.crt" \
     --embed-certs \
   > /dev/null
