@@ -269,8 +269,8 @@ Check that there is the correct number of worker nodes in the cluster:
 Deploy cluster addons and, if you like, scale it from default single replica to 3:
 
 ```
-# kubectl create -f addons.yaml
-# kubectl scale --namespace=kube-system --replicas=3 rc kube-dns-v10
+# kubectl create -f addons-no-pki.yaml
+# kubectl scale --namespace=kube-system --replicas=3 rc kube-dns-v11
 ```
 
 Deploy Guestbook example app and wait until the pods are ready:
