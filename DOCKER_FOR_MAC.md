@@ -49,7 +49,7 @@ If the output you see is completely different, you might be talking to (or tryin
 please try to specify explicit address like this:
 
 ```
-> kubectl -s http://localhost:8080 cluser-info && kubectl -s http://localhost:8080 get nodes
+> kubectl -s http://localhost:8080 cluster-info && kubectl -s http://localhost:8080 get nodes
 Kubernetes master is running at http://localhost:8080
 NAME      STATUS    AGE
 docker    Ready     5m
