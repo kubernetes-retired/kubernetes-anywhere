@@ -4,7 +4,7 @@ repo_update: true
 repo_upgrade: all
 
 apt_sources:
-  - source: "deb https://apt.dockerproject.org/repo ubuntu-wily main"
+  - source: "deb https://apt.dockerproject.org/repo ubuntu-xenial main"
     key: |
       -----BEGIN PGP PUBLIC KEY BLOCK-----
       mQINBFWln24BEADrBl5p99uKh8+rpvqJ48u4eTtjeXAWbslJotmC/CakbNSqOb9o
