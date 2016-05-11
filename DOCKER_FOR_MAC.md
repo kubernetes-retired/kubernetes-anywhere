@@ -36,13 +36,13 @@ otherwise some features may not work as expected.
 
 > If you have installed Google Cloud SDK (`gcloud`), you will have `kubectl`, just make sure to run `gcloud components update`.
 
-To confirm all is working correctly, run `kubectl cluster-info && kubectl get nodes` and you should see one node called `docker` on the list, i.e.:
+To confirm all is working correctly, run `kubectl cluster-info && kubectl get nodes` and you should see one node called `moby` on the list, i.e.:
 
 ```
 > kubectl cluster-info && kubectl get nodes
 Kubernetes master is running at http://localhost:8080
 NAME      STATUS    AGE
-docker    Ready     5m
+moby      Ready     5m
 ```
 
 If the output you see is completely different, you might be talking to (or trying to talk to) another cluster. To check,
@@ -52,7 +52,7 @@ please try to specify explicit address like this:
 > kubectl -s http://localhost:8080 cluster-info && kubectl -s http://localhost:8080 get nodes
 Kubernetes master is running at http://localhost:8080
 NAME      STATUS    AGE
-docker    Ready     5m
+moby      Ready     5m
 ```
 
 If you would like to avoid passing `-s` flag each time, you can overwrite default configuration file like this:
