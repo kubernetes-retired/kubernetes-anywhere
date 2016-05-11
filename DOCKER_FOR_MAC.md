@@ -12,7 +12,7 @@ First, setup Weave Net:
 sudo curl --silent --location git.io/weave --output /usr/local/bin/weave
 sudo chmod +x /usr/local/bin/weave
 weave launch
-weave expose -h docker.weave.local
+weave expose -h moby.weave.local
 ```
 
 Next, bootstrap single-node local cluster with one command:
