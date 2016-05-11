@@ -171,6 +171,8 @@ write_files:
 
       systemctl daemon-reload
 
+      docker -v || env DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-unauthenticated --force-yes  docker-engine
+
       systemctl enable docker.service
       systemctl start docker.service
 
