@@ -8,7 +8,7 @@ apiserver:
   hostname: "kube-apiserver.weave.local"
   restart: "always"
   links: [ "etcd" ]
-  ports: [ "127.0.0.1:${APISERVER_LOCAL_PORT}:${APISERVER_LOCAL_PORT}" ]
+  ports: [ "${APISERVER_LOCAL_BIND}:${APISERVER_LOCAL_PORT}:${APISERVER_LOCAL_PORT}" ]
   volumes_from: [ "kube-apiserver-pki" ]
   environment:
     FORCE_LOCAL_APISERVER: "yes"
@@ -48,14 +48,3 @@ proxy:
   environment:
     USE_CNI:
     FORCE_USERSPACE_PROXY:
-
-#apiproxy:
-#  image: "weaveworks/kubernetes-anywhere:toolbox-${KUBERNETES_RELEASE}"
-#  hostname: "kube-apiproxy.weave.local"
-#  restart: "always"
-#  links: [ "apiserver" ]
-#  ports: [ "127.0.0.1:${APIPROXY_PORT}:${APIPROXY_PORT}" ]
-#  volumes_from: [ "kube-toolbox-pki" ]
-#  command: "start-apiproxy"
-#  environment:
-#    APIPROXY_PORT:
