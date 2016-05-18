@@ -19,5 +19,5 @@ _bin_sh=(
   ./docker-images/weave-fix-nameserver.sh
 )
 
-shellcheck -s bash "${_bin_bash[@]}"
-shellcheck -s sh "${_bin_sh[@]}"
+shellcheck -x -s bash "${_bin_bash[@]}"
+shellcheck -x -s sh "${_bin_sh[@]}"
