@@ -1,0 +1,47 @@
+#!/bin/bash -x
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+source "./config"
+
+dir="./docker-images"
+
+printf "FROM gcr.io/google_containers/hyperkube:%s\n%s\n" \
+  "${kubernetes_release}" "${common}" \
+  | docker build --tag="temp/hyperkube" -
+
+for i in kubelet proxy apiserver controller-manager scheduler ; do
+  docker build \
+    --tag="${image_prefix}${i}-${kubernetes_release}" \
+    --file="${dir}/${i}.dockerfile" "${dir}"
+done
+
+printf "FROM gcr.io/google_containers/etcd:2.2.1\n%s\n" "${common}" \
+  | docker build --tag="temp/etcd" -
+
+docker build \
+  --tag="${image_prefix}etcd-${kubernetes_release}" \
+  --file="${dir}/etcd.dockerfile" "${dir}"
+
+printf "FROM centos:7\nENV KUBERNETES_ANYWHERE_TOOLBOX_IMAGE=%s\n%s\n" \
+  "${image_prefix}toolbox-${kubernetes_release}" "${common}" \
+  | docker build --tag="temp/toolbox" -
+
+docker build \
+  --tag="${image_prefix}toolbox-${kubernetes_release}" \
+  --build-arg="KUBERNETES_RELEASE=${kubernetes_release}" \
+  --build-arg="DOCKER_RELEASE=${toolbox_docker_release}" \
+  --build-arg="COMPOSE_RELEASE=${toolbox_compose_release}" \
+  --build-arg="JQ_RELEASE=${toolbox_jq_release}" \
+  --build-arg="EASYRSA_RELEASE=${toolbox_easyrsa_release}" \
+  --file="${dir}/toolbox.dockerfile" "${dir}"
+
+for c in "${components[@]}" ; do
+  img="${image_prefix}${c}"
+  docker tag "${img}-${kubernetes_release}" "${img}-${kubernetes_release_short}"
+  if [ "${kubernetes_release}" = "${default_kubernetes_release}" ] ; then
+    docker tag "${img}-${kubernetes_release}" "${image_prefix}${c}"
+  fi
+done
