@@ -1,81 +1,18 @@
-#!/bin/bash -x
+#!/bin/bash
 
 set -o errexit
 set -o nounset
 set -o pipefail
 
-do_build() {
-  [ -n "${NO_BUILD+x}" ] || docker build "$@"
-}
+src="$(git rev-parse --show-toplevel)"
+source "${src}/config"
 
-do_push() {
-  [ -n "${NO_PUSH+x}" ] || docker push "${1}"
-}
+if [ -z "${NO_BUILD+x}" ] ; then
+  echo "Building images for Kubernetes version ${kubernetes_release}..."
+  "${src}/build" "$@"
+fi
 
-git_repo="https://github.com/weaveworks/weave-kubernetes-anywhere"
-git_rev=$(git rev-parse @)
-
-dir="$(git rev-parse --show-toplevel)/docker-images"
-
-default_kubernetes_release="v1.2.4"
-
-kubernetes_release=${1:-"${default_kubernetes_release}"}
-kubernetes_release_base="${kubernetes_release/-[a-z]*\.[0-9]/}"
-kubernetes_release_short="${kubernetes_release_base%.*}"
-
-toolbox_docker_release="1.10.3"
-toolbox_compose_release="1.7.0"
-toolbox_jq_release="1.5"
-toolbox_easyrsa_release="3.0.1"
-
-image_prefix=${2:-"weaveworks/kubernetes-anywhere:"}
-
-common="
-LABEL io.k8s.release=${kubernetes_release}
-LABEL works.weave.role=system
-LABEL com.git-scm.repo=${git_repo}
-LABEL com.git-scm.rev=${git_rev}
-ENV KUBERNETES_RELEASE=${kubernetes_release}
-ENV KUBERNETES_RELEASE_SHORT=${kubernetes_release_short}
-"
-
-printf "FROM gcr.io/google_containers/hyperkube:%s\n%s\n" \
-  "${kubernetes_release}" "${common}" \
-  | do_build --tag="temp/hyperkube" -
-
-for i in kubelet proxy apiserver controller-manager scheduler ; do
-  do_build \
-    --tag="${image_prefix}${i}-${kubernetes_release}" \
-    --file="${dir}/${i}.dockerfile" "${dir}"
-done
-
-printf "FROM gcr.io/google_containers/etcd:2.2.1\n%s\n" "${common}" \
-  | do_build --tag="temp/etcd" -
-
-do_build \
-  --tag="${image_prefix}etcd-${kubernetes_release}" \
-  --file="${dir}/etcd.dockerfile" "${dir}"
-
-printf "FROM centos:7\nENV KUBERNETES_ANYWHERE_TOOLBOX_IMAGE=%s\n%s\n" \
-  "${image_prefix}toolbox-${kubernetes_release}" "${common}" \
-  | do_build --tag="temp/toolbox" -
-
-do_build \
-  --tag="${image_prefix}toolbox-${kubernetes_release}" \
-  --build-arg="KUBERNETES_RELEASE=${kubernetes_release}" \
-  --build-arg="DOCKER_RELEASE=${toolbox_docker_release}" \
-  --build-arg="COMPOSE_RELEASE=${toolbox_compose_release}" \
-  --build-arg="JQ_RELEASE=${toolbox_jq_release}" \
-  --build-arg="EASYRSA_RELEASE=${toolbox_easyrsa_release}" \
-  --file="${dir}/toolbox.dockerfile" "${dir}"
-
-for c in kubelet proxy apiserver controller-manager scheduler toolbox etcd ; do
-  img="${image_prefix}${c}"
-  do_push "${img}-${kubernetes_release}"
-  docker tag "${img}-${kubernetes_release}" "${img}-${kubernetes_release_short}"
-  do_push "${img}-${kubernetes_release_short}"
-  if [ "${kubernetes_release}" = "${default_kubernetes_release}" ] ; then
-    docker tag "${img}-${kubernetes_release}" "${image_prefix}${c}"
-    do_push "${img}"
-  fi
-done
+if [ -z "${NO_PUSH+x}" ] ; then
+  echo "Pushing images for Kubernetes version ${kubernetes_release}..."
+  "${src}/push" "$@"
+fi
