@@ -5,7 +5,7 @@ addons:
     sources:
       - debian-sid    # Grab shellcheck from the Debian repo (o_O)
     packages:
-      - shellcheck
+      - cabal-install
 
 services:
   - docker
@@ -14,6 +14,9 @@ env:
   - DOCKER_RELEASE="1.10.3" WEAVE_RELEASE="v1.5.1" KUBERNETES_RELEASE="v1.2.4" FORCE_USERSPACE_PROXY="yes"
 
 install:
+  - export PATH="${HOME}/.cabal/bin:${PATH}"
+  - cabal update
+  - cabal install shellcheck
   - sudo service docker stop
   - sudo curl --silent --location https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_RELEASE} --output /usr/bin/docker
   - sudo chmod +x /usr/bin/docker
