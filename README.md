@@ -104,9 +104,8 @@ module "kubernetes-anywhere-aws-ec2" {
     source         = "github.com/weaveworks/weave-kubernetes-anywhere/examples/aws-ec2-terraform"
     aws_access_key = "${var.aws_access_key}"
     aws_secret_key = "${var.aws_secret_key}"
-    aws_region     = "us-east-1" # currently the only supported region as it uses ECR
-
-    cluster                = "weave1"
+    aws_region     = "us-east-1"
+    cluster        = "weave1"
 
     # You can also set instance types with node_instance_type/master_instance_type/etcd_instance_type
     # For SSH access, you will need to create a key named kubernetes-anywhere or set ec2_key_name
@@ -128,8 +127,9 @@ Once instances are up, you can login to any of the 3 worker nodes or the master 
 install anything else with `yum`. If you login with agent forwarding enabled (`ssh -A`), toolbox
 will pick it up, so you can clone your private repo!
 
-Besides all the usual things, such as VPC and ASG, this example features an EC2 Container Registry
+Besides all the usual things, such as VPC and ASG, this example features an EC2 Container Registry (ECR)
 for storing [PKI container images](#containerized-provisioning-of-certificates--way-easier-then-ever).
+ECR is currently available in `us-east-1`, `us-west-2` and `eu-west-1`.
 
 ## Launching a Multi-node Cluster (A General How-To)
 
