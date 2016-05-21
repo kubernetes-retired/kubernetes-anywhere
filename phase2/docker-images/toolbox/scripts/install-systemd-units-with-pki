@@ -19,8 +19,8 @@ set -o pipefail
 set -o nounset
 
 for unit in /etc/toolbox/systemd-units/common/* ; do
-  install --mode=0644 --owner=0 --group=0 "${unit}" /host-systemd/
+  install -o 0 -g 0 -m 0644 "${unit}" /host-systemd/
 done
 for unit in /etc/toolbox/systemd-units/with-pki/* ; do
-  install --mode=0644 --owner=0 --group=0 "${unit}" /host-systemd/
+  install -o 0 -g 0 -m 0644 "${unit}" /host-systemd/
 done

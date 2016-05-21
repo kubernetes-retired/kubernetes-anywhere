@@ -41,7 +41,7 @@ docker build \
   --tag="${image_prefix}etcd-${kubernetes_release}" \
   --file="${dir}/etcd.dockerfile" "${dir}"
 
-printf "FROM centos:7\nENV KUBERNETES_ANYWHERE_TOOLBOX_IMAGE=%s\n%s\n" \
+printf "FROM alpine:${toolbox_alpine_release}\nENV KUBERNETES_ANYWHERE_TOOLBOX_IMAGE=%s\n%s\n" \
   "${image_prefix}toolbox-${kubernetes_release}-${git_rev_short}" "${common}" \
   | docker build --tag="temp/toolbox" -
 
@@ -50,6 +50,7 @@ docker build \
   --build-arg="KUBERNETES_RELEASE=${kubernetes_release}" \
   --build-arg="DOCKER_RELEASE=${toolbox_docker_release}" \
   --build-arg="COMPOSE_RELEASE=${toolbox_compose_release}" \
+  --build-arg="AWSCLI_RELEASE=${toolbox_awscli_release}" \
   --build-arg="JQ_RELEASE=${toolbox_jq_release}" \
   --build-arg="EASYRSA_RELEASE=${toolbox_easyrsa_release}" \
   --file="${dir}/toolbox.dockerfile" "${dir}"

@@ -9,9 +9,11 @@ kubernetes_release=${1:-"${default_kubernetes_release}"}
 kubernetes_release_base="${kubernetes_release/-[a-z]*\.[0-9]/}"
 kubernetes_release_short="${kubernetes_release_base%.*}"
 
+toolbox_alpine_release="3.3"
 toolbox_docker_release="1.10.3"
-toolbox_compose_release="1.7.0"
-toolbox_jq_release="1.5"
+toolbox_compose_release="1.7.1"
+toolbox_awscli_release="1.10.32"
+toolbox_jq_release="1.5-r0"
 toolbox_easyrsa_release="3.0.1"
 
 image_prefix=${2:-"weaveworks/kubernetes-anywhere:"}
