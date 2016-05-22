@@ -8,7 +8,8 @@ set -o pipefail
 
 ln -s /etc/toolbox/scripts/* /usr/bin/
 
-apk add --update-cache --no-progress bash jq git curl socat nmap-ncat py-pip openssl bind-tools iproute2 iptables util-linux
+apk add --update-cache --no-progress bash "jq=1.5-r0" git curl socat nmap-ncat py-pip openssl bind-tools iproute2 iptables util-linux
+rm -rf /var/cache/apk/*
 
 pip install "awscli==${AWSCLI_RELEASE}" "docker-compose==${COMPOSE_RELEASE}"
 
