@@ -30,6 +30,9 @@ install:
   - weave status
   - docker ps
   - docker images
+  - ps -ef | grep docker
+  - systemctl cat docker || true
+  - systemctl status docker || true
 
 script:
   - ./test-shellcheck
