@@ -51,23 +51,34 @@ write_files:
 
       export HOME=/root
 
-      toolbox=${KUBERNETES_ANYWHERE_TOOLBOX_IMAGE:-"weaveworks/kubernetes-anywhere:toolbox"}
-      sudo docker pull $toolbox
+      toolbox="${KUBERNETES_ANYWHERE_TOOLBOX_IMAGE:-"weaveworks/kubernetes-anywhere:toolbox"}"
+      sudo docker pull "${toolbox}"
 
-      sudo docker pull ${KUBERNETES_ANYWHERE_TOOLBOX_PKI_IMAGE}
+      sudo docker pull "${KUBERNETES_ANYWHERE_TOOLBOX_PKI_IMAGE}"
 
       ## TODO: find a way to avoid garbage
-      pki=$(sudo docker run --detach ${KUBERNETES_ANYWHERE_TOOLBOX_PKI_IMAGE})
+      pki="$(sudo docker run --detach "${KUBERNETES_ANYWHERE_TOOLBOX_PKI_IMAGE}")"
 
-      args="--volume=/var/run/weave/weave.sock:/docker.sock --volumes-from=${pki}"
+      args=(
+        "--volume=/var/run/weave/weave.sock:/docker.sock"
+        "--volumes-from=${pki}"
+      )
 
-      if [ -n "${SSH_AUTH_SOCK}" ] ; then
-        args="${args} --volume=${SSH_AUTH_SOCK}:/agent.sock --env=SSH_AUTH_SOCK=/agent.sock"
+      if tty > /dev/null 2>&1 ; then
+        args+=(
+          "--tty"
+          "--interactive"
+        )
       fi
 
-      exec sudo docker --host="unix:///var/run/weave/weave.sock" run \
-        --tty --interactive ${args} \
-          $toolbox $@
+      if [ -n "${SSH_AUTH_SOCK}" ] ; then
+        args+=(
+          "--volume=${SSH_AUTH_SOCK}:/agent.sock"
+          "--env=SSH_AUTH_SOCK=/agent.sock"
+        )
+      fi
+
+      exec sudo docker --host="unix:///var/run/weave/weave.sock" run "${args[@]}" "${toolbox}" "$@"
 
   - path: /etc/kubernetes-anywhere.env
     permissions: '0644'
