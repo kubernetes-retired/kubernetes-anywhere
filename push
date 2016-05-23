@@ -10,6 +10,7 @@ for c in "${components[@]}" ; do
   img="${image_prefix}${c}"
   docker push "${img}-${kubernetes_release}"
   docker push "${img}-${kubernetes_release_short}"
+  docker push "${img}-${kubernetes_release}-${git_rev_short}"
   if [ "${kubernetes_release}" = "${default_kubernetes_release}" ] ; then
     docker push "${img}"
   fi

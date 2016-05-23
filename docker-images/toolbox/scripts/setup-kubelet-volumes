@@ -3,11 +3,11 @@
 KUBERNETES_ANYWHERE_TOOLBOX_IMAGE=${KUBERNETES_ANYWHERE_TOOLBOX_IMAGE:-'weaveworks/kubernetes-anywhere:toolbox'}
 
 mount_make_rshared() {
-  echo "Calling \`mount  --make-rshared /\` to ensure \`kubelet-volumes\` is functional"
+  echo "Calling \`mount --make-rshared /\` to ensure \`kubelet-volumes\` is functional"
   docker run \
     --pid="host" \
     --privileged="true" \
-    "${KUBERNETES_ANYWHERE_TOOLBOX_IMAGE}" nsenter --mount=/proc/1/ns/mnt -- mount --make-rshared /
+    "${KUBERNETES_ANYWHERE_TOOLBOX_IMAGE}" nsenter --mount=/proc/1/ns/mnt -- mount --make-rshared / /
 }
 
 if [[ $(docker inspect --format='{{.State.Status}}' kubelet-volumes 2> /dev/null) = 'created' ]]
