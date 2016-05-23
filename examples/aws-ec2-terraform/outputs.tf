@@ -17,3 +17,7 @@ output "kubernetes-master-pki-repository" {
 output "kubernetes-node-pki-repository" {
     value = "${aws_ecr_repository.kubernetes-node-pki-repository.registry_id}.dkr.ecr.${var.aws_region}.amazonaws.com/${aws_ecr_repository.kubernetes-node-pki-repository.name}"
 }
+
+output "kubernetes-master-ip" {
+    value = "${aws_instance.kubernetes-master.public_ip}"
+}
