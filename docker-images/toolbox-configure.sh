@@ -73,11 +73,11 @@ rm -f redis-*.yaml frontend-*.yaml
 ## without PKI service accounts don't work, neither does API disco
 
 cp addons-v1.1.yaml addons-v1.1-no-pki.yaml
-sed 's|# \(- -kube_master_url=http://kube-apiserver.weave.local:8080\)$|\1|' \
+sed 's|#\(- -kube_master_url=http://kube-apiserver.weave.local:8080\)$|\1|' \
   -i addons-v1.1-no-pki.yaml
 
 cp -a addons-v1.2.yaml addons-v1.2-no-pki.yaml
-sed 's|# \(- --kube_master_url=http://kube-apiserver.weave.local:8080\)$|\1|' \
+sed 's|#\(- --kube_master_url=http://kube-apiserver.weave.local:8080\)$|\1|' \
   -i addons-v1.2-no-pki.yaml
 
 ln -s "addons-${KUBERNETES_RELEASE_SHORT}.yaml" addons.yaml
