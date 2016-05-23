@@ -52,9 +52,9 @@ write_files:
       export HOME=/root
 
       toolbox="${KUBERNETES_ANYWHERE_TOOLBOX_IMAGE:-"weaveworks/kubernetes-anywhere:toolbox"}"
-      sudo docker pull "${toolbox}"
+      (sudo docker pull "${toolbox}" >&2)
 
-      sudo docker pull "${KUBERNETES_ANYWHERE_TOOLBOX_PKI_IMAGE}"
+      (sudo docker pull "${KUBERNETES_ANYWHERE_TOOLBOX_PKI_IMAGE}" >&2)
 
       ## TODO: find a way to avoid garbage
       pki="$(sudo docker run --detach "${KUBERNETES_ANYWHERE_TOOLBOX_PKI_IMAGE}")"
@@ -79,6 +79,7 @@ write_files:
       fi
 
       exec sudo docker --host="unix:///var/run/weave/weave.sock" run "${args[@]}" "${toolbox}" "$@"
+
 
   - path: /etc/kubernetes-anywhere.env
     permissions: '0644'
