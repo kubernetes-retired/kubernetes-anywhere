@@ -1,6 +1,7 @@
 #!/bin/bash -x
 
 cd /opt/EasyRSA
+mkdir etc
 
 set -o errexit
 set -o nounset
@@ -26,12 +27,13 @@ function generate_token() {
 
 kubectl config --kubeconfig="cluster.conf" set-cluster secure-cluster \
   --server="https://kube-apiserver.weave.local:6443" \
-  --certificate-authority="kube-ca.crt"
+  --certificate-authority="pki/ca.crt" \
+  --embed-certs
 
-for user in kubelet proxy controller-manager scheduler admin; do
+for user in kubelet proxy controller-manager scheduler admin ; do
   cp cluster.conf "${user}.conf"
   token=$(generate_token)
-  echo "${token},${user},${user}" >> known_tokens.csv
+  echo "${token},${user},${user}" >> etc/known_tokens.csv
   kubectl config --kubeconfig="${user}.conf" set-credentials $user --token="${token}"
   kubectl config --kubeconfig="${user}.conf" set-context kubernetes-anywhere --cluster="secure-cluster" --user="${user}"
   kubectl config --kubeconfig="${user}.conf" use-context kubernetes-anywhere
@@ -39,67 +41,55 @@ done
 
 vol="/srv/kubernetes"
 
-cat > apiserver-pki.dockerfile <<EOF
-FROM alpine
-LABEL io.k8s/KubernetesAnywhere/role=apiserver-pki
+common="
+FROM tianon/true
 LABEL io.k8s/KubernetesAnywhere/pki=true
+"
+
+cat > apiserver-pki.dockerfile <<EOF
+${common}
+LABEL io.k8s/KubernetesAnywhere/role=apiserver-pki
 VOLUME ${vol}
 ADD pki/ca.crt ${vol}/kube-ca.crt
 ADD pki/issued/kube-apiserver.crt ${vol}/kube-apiserver.crt
 ADD pki/private/kube-apiserver.key ${vol}/kube-apiserver.key
-ADD known_tokens.csv ${vol}/known_tokens.csv
-ENTRYPOINT [ "/bin/true" ]
+ADD etc/known_tokens.csv ${vol}/known_tokens.csv
 EOF
 
 cat > kubelet-pki.dockerfile <<EOF
-FROM alpine
+${common}
 LABEL io.k8s/KubernetesAnywhere/role=kubelet-pki
-LABEL io.k8s/KubernetesAnywhere/pki=true
 VOLUME ${vol}/kubelet
-ADD pki/ca.crt ${vol}/kubelet/kube-ca.crt
 ADD kubelet.conf ${vol}/kubelet/kubeconfig
-ENTRYPOINT [ "/bin/true" ]
 EOF
 
 cat > proxy-pki.dockerfile <<EOF
-FROM alpine
+${common}
 LABEL io.k8s/KubernetesAnywhere/role=proxy-pki
-LABEL io.k8s/KubernetesAnywhere/pki=true
 VOLUME ${vol}/kube-proxy
-ADD pki/ca.crt ${vol}/kube-proxy/kube-ca.crt
 ADD proxy.conf ${vol}/kube-proxy/kubeconfig
-ENTRYPOINT [ "/bin/true" ]
 EOF
 
 cat > controller-manager-pki.dockerfile <<EOF
-FROM alpine
+${common}
 LABEL io.k8s/KubernetesAnywhere/role=controller-manager-pki
-LABEL io.k8s/KubernetesAnywhere/pki=true
 VOLUME ${vol}/kube-controller-manager
-ADD pki/ca.crt ${vol}/kube-controller-manager/kube-ca.crt
 ADD pki/private/kube-apiserver.key ${vol}/kube-controller-manager/kube-apiserver.key
 ADD controller-manager.conf ${vol}/kube-controller-manager/kubeconfig
-ENTRYPOINT [ "/bin/true" ]
 EOF
 
 cat > scheduler-pki.dockerfile <<EOF
-FROM alpine
+${common}
 LABEL io.k8s/KubernetesAnywhere/role=scheduler-pki
-LABEL io.k8s/KubernetesAnywhere/pki=true
 VOLUME ${vol}/kube-scheduler
-ADD pki/ca.crt ${vol}/kube-scheduler/kube-ca.crt
 ADD scheduler.conf ${vol}/kube-scheduler/kubeconfig
-ENTRYPOINT [ "/bin/true" ]
 EOF
 
 cat > toolbox-pki.dockerfile <<EOF
-FROM alpine
+${common}
 LABEL io.k8s/KubernetesAnywhere/role=toolbox-pki
-LABEL io.k8s/KubernetesAnywhere/pki=true
 VOLUME /root/.kube
-ADD pki/ca.crt /root/.kube/kube-ca.crt
 ADD admin.conf /root/.kube/config
-ENTRYPOINT [ "/bin/true" ]
 EOF
 
 for i in apiserver kubelet proxy controller-manager scheduler toolbox
