@@ -1,6 +1,7 @@
 ## build configuration
 git_repo="https://github.com/weaveworks/weave-kubernetes-anywhere"
 git_rev=$(git rev-parse @)
+git_rev_short=$(git rev-parse --short @)
 
 default_kubernetes_release="v1.2.4"
 
