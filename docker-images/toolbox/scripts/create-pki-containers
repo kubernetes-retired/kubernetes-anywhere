@@ -95,6 +95,17 @@ ADD pki/ca.crt /root/.kube/kube-ca.crt
 ADD admin.conf /root/.kube/config
 EOF
 
-for i in apiserver kubelet proxy controller-manager scheduler toolbox
+cat > toolbox-admin-pki.dockerfile <<EOF
+${common}
+LABEL io.k8s/KubernetesAnywhere/role=toolbox-admin-pki
+VOLUME /opt/EasyRSA/pki
+ADD pki /opt/EasyRSA/pki
+VOLUME /opt/EasyRSA/etc
+ADD etc /opt/EasyRSA/etc
+VOLUME /root/.kube
+ADD admin.conf /root/.kube/config
+EOF
+
+for i in apiserver kubelet proxy controller-manager scheduler toolbox toolbox-admin
 do docker build -t kubernetes-anywhere:${i}-pki -f ./${i}-pki.dockerfile ./
 done

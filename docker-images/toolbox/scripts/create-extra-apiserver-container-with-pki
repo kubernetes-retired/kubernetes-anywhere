@@ -1,0 +1,36 @@
+#!/bin/bash -x
+
+cd /opt/EasyRSA
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+if [ ! -d /opt/EasyRSA/pki ] && [ ! -d /opt/EasyRSA/etc ] ; then
+  exit 1
+fi
+
+if [ "$#" -lt 1 ] ; then
+  exit 2
+fi
+
+sans="${1}"
+
+name="kube-apiserver-extra-${2:-"$(date +%s)"}"
+
+./easyrsa \
+  "--subject-alt-name=${sans}" \
+  build-server-full "${name}" nopass
+
+path="/srv/kubernetes"
+
+## There is no equivalent of `--volumes-from` for a pod, so we simply build all-in-one image here
+cat > apiserver-pki-extra.dockerfile <<EOF
+FROM ${KUBERNETES_ANYWHERE_APISERVER_IMAGE:-"weaveworks/kubernetes-anywhere:apiserver-${KUBERNETES_RELEASE}"}
+ADD pki/ca.crt ${path}/kube-ca.crt
+ADD pki/issued/${name}.crt ${path}/kube-apiserver.crt
+ADD pki/private/${name}.key ${path}/kube-apiserver.key
+ADD etc/known_tokens.csv ${path}/known_tokens.csv
+EOF
+
+docker build -t "kubernetes-anywhere:${name}" -f ./apiserver-pki-extra.dockerfile ./
