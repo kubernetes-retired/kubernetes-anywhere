@@ -22,7 +22,7 @@ then
     --tls-cert-file="${config}/kube-apiserver.crt"
     --tls-private-key-file="${config}/kube-apiserver.key"
     --client-ca-file="${config}/kube-ca.crt"
-    --token-auth-file="/srv/kubernetes/known_tokens.csv"
+    --token-auth-file="${config}/known_tokens.csv"
     --admission-control="NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota"
   )
   if [ "${FORCE_LOCAL_APISERVER}" = "yes" ]
