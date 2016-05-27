@@ -37,6 +37,7 @@ kubelet:
   volumes_from: [ "kubelet-volumes", "kubelet-pki" ]
   environment:
     USE_CNI:
+    WEAVE_VERSION:
 
 proxy:
   privileged: true

@@ -12,6 +12,7 @@ ENV FORCE_LOCAL_APISERVER="no"
 ENV APIPROXY_PORT="8001"
 ENV APISERVER_LOCAL_PORT="8080"
 ENV APISERVER_LOCAL_BIND="127.0.0.1"
+ENV WEAVE_VERSION=1.5.2
 ADD toolbox /etc/toolbox
 ADD toolbox-configure.sh /tmp/toolbox-configure.sh
 RUN /tmp/toolbox-configure.sh

@@ -41,6 +41,7 @@ docker build \
 for c in "${components[@]}" ; do
   img="${image_prefix}${c}"
   docker tag "${img}-${kubernetes_release}" "${img}-${kubernetes_release_short}"
+  docker tag "${img}-${kubernetes_release}" "${img}-${kubernetes_release}-${git_rev_short}"
   if [ "${kubernetes_release}" = "${default_kubernetes_release}" ] ; then
     docker tag "${img}-${kubernetes_release}" "${image_prefix}${c}"
   fi
