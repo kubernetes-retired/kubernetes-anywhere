@@ -1,0 +1,12 @@
+#!/bin/bash -x
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+source "./config"
+
+for c in "${components[@]}" ; do
+  img="${image_prefix}${c}"
+  docker push "${img}-${kubernetes_release}-${git_rev_short}"
+done
