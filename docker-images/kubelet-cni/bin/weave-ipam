@@ -2,4 +2,4 @@
 docker run --rm --privileged --net=host --pid=host -i \
   -e CNI_VERSION -e CNI_COMMAND -e CNI_CONTAINERID -e CNI_NETNS \
   -e CNI_IFNAME -e CNI_ARGS -e CNI_PATH \
-  weaveworks/plugin:${WEAVE_VERSION:-"latest"} --cni-ipam
+  "weaveworks/plugin:${WEAVE_VERSION:-"${WEAVE_VERSION_DEFAULT}"}" --cni-ipam
