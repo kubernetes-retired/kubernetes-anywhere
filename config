@@ -23,6 +23,7 @@ LABEL com.git-scm.repo=${git_repo}
 LABEL com.git-scm.rev=${git_rev}
 ENV KUBERNETES_RELEASE=${kubernetes_release}
 ENV KUBERNETES_RELEASE_SHORT=${kubernetes_release_short}
+ENV KUBERNETES_ANYWHERE_REV=${git_rev_short}
 "
 
 components=(kubelet proxy apiserver controller-manager scheduler toolbox etcd)

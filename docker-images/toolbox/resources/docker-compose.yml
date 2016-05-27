@@ -1,10 +1,10 @@
 etcd:
-  image: "weaveworks/kubernetes-anywhere:etcd-${KUBERNETES_RELEASE}"
+  image: "weaveworks/kubernetes-anywhere:etcd-${KUBERNETES_RELEASE}-${KUBERNETES_ANYWHERE_REV}"
   hostname: "etcd1.weave.local"
   restart: "always"
 
 apiserver:
-  image: "weaveworks/kubernetes-anywhere:apiserver-${KUBERNETES_RELEASE}"
+  image: "weaveworks/kubernetes-anywhere:apiserver-${KUBERNETES_RELEASE}-${KUBERNETES_ANYWHERE_REV}"
   hostname: "kube-apiserver.weave.local"
   restart: "always"
   links: [ "etcd" ]
@@ -15,14 +15,14 @@ apiserver:
     APISERVER_LOCAL_PORT:
 
 scheduler:
-  image: "weaveworks/kubernetes-anywhere:scheduler-${KUBERNETES_RELEASE}"
+  image: "weaveworks/kubernetes-anywhere:scheduler-${KUBERNETES_RELEASE}-${KUBERNETES_ANYWHERE_REV}"
   hostname: "kube-scheduler.weave.local"
   restart: "always"
   links: [ "apiserver" ]
   volumes_from: [ "kube-scheduler-pki" ]
 
 controller-manager:
-  image: "weaveworks/kubernetes-anywhere:controller-manager-${KUBERNETES_RELEASE}"
+  image: "weaveworks/kubernetes-anywhere:controller-manager-${KUBERNETES_RELEASE}-${KUBERNETES_ANYWHERE_REV}"
   hostname: "kube-controller-manager.weave.local"
   restart: "always"
   links: [ "apiserver" ]
@@ -32,7 +32,7 @@ kubelet:
   privileged: true
   net: host
   pid: host
-  image: "weaveworks/kubernetes-anywhere:kubelet-${KUBERNETES_RELEASE}"
+  image: "weaveworks/kubernetes-anywhere:kubelet-${KUBERNETES_RELEASE}-${KUBERNETES_ANYWHERE_REV}"
   restart: "always"
   volumes_from: [ "kubelet-volumes", "kubelet-pki" ]
   environment:
@@ -43,7 +43,7 @@ proxy:
   privileged: true
   net: host
   pid: host
-  image: "weaveworks/kubernetes-anywhere:proxy-${KUBERNETES_RELEASE}"
+  image: "weaveworks/kubernetes-anywhere:proxy-${KUBERNETES_RELEASE}-${KUBERNETES_ANYWHERE_REV}"
   restart: "always"
   volumes_from: [ "kube-proxy-pki" ]
   environment:
