@@ -26,6 +26,7 @@ else
 
   def_docker_root="/var/lib/docker"
   def_kubelet_root="/var/lib/kubelet"
+  def_kubelet_logs="/var/log/containers"
 
   if [ -d /rootfs/etc ] && [ -f /rootfs/etc/os-release ]
   then
@@ -33,18 +34,25 @@ else
       boot2docker)
         docker_root="/mnt/sda1/${def_docker_root}"
         kubelet_root="/mnt/sda1/${def_kubelet_root}"
+        kubelet_logs="/mnt/sda1/${def_kubelet_logs}"
         mkdir -p "/rootfs/${kubelet_root}"
-        ln -sf "${kubelet_root}" "/rootfs/var/lib/kubelet"
+        mkdir -p "/rootfs/${kubelet_logs}"
+        ln -sf "${kubelet_root}" "/rootfs/${def_kubelet_root}"
+        ln -sf "${kubelet_logs}" "/rootfs/${def_kubelet_logs}"
         volumes+=(
           "${docker_root}:${docker_root}:rw"
           "${def_docker_root}:${def_docker_root}:rw"
           "${kubelet_root}:${def_kubelet_root}:rw,rshared"
+          "${kubelet_logs}:${def_kubelet_logs}:rw"
         )
         ;;
       *)
+        mkdir -p "/rootfs/${kubelet_root}"
+        mkdir -p "/rootfs/${kubelet_logs}"
         volumes+=(
           "${def_docker_root}/:${def_docker_root}:rw"
           "${def_kubelet_root}:${def_kubelet_root}:rw,rshared"
+          "${def_kubelet_logs}:${def_kubelet_logs}:rw"
         )
         ;;
     esac
