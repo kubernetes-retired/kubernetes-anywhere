@@ -1,6 +1,9 @@
 #!/bin/bash -e
 _bin_bash=(
   "${BASH_SOURCE[0]}"
+  ./build
+  ./push
+  ./push-only-latest-tag
   ./build-and-push
   ./test-docker-compose
   ./docker-images/toolbox-configure.sh
