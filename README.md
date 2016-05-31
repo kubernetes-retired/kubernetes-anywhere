@@ -35,8 +35,8 @@ all cluster component, including etcd, on top of Weave Net.
 ![Travis CI](https://img.shields.io/travis/weaveworks/kubernetes-anywhere.svg?style=flat-square)
 
 [docker-hub]: https://hub.docker.com/r/weaveworks/kubernetes-anywhere/tags/
-[docker-images]: https://github.com/weaveworks/weave-kubernetes-anywhere/tree/master/docker-images
-[build-and-publish]: https://github.com/weaveworks/weave-kubernetes-anywhere/blob/master/build-and-push
+[docker-images]: https://github.com/weaveworks/weave-kubernetes-anywhere/tree/master/phase2/docker-images
+[build-and-publish]: https://github.com/weaveworks/weave-kubernetes-anywhere/blob/master/phase2/docker-images/build-and-push
 
 # Enough said — Go, try it!
 
@@ -101,7 +101,7 @@ Instantiate the module like this:
 
 ```HCL
 module "kubernetes-anywhere-aws-ec2" {
-    source         = "github.com/weaveworks/weave-kubernetes-anywhere/examples/aws-ec2-terraform"
+    source         = "github.com/weaveworks/weave-kubernetes-anywhere/phase1/aws-ec2-terraform"
     aws_access_key = "${var.aws_access_key}"
     aws_secret_key = "${var.aws_secret_key}"
     aws_region     = "us-east-1"
@@ -120,7 +120,7 @@ terraform apply # it may error, simply re-run if it did
 
 This will create a cluster of 7 EC2 instances in a VPC. This cluster will have 3 etcd nodes,
 one master and 3 workers.  All resources will be tagged `KubernetesCluster=weave1`.
-The module code can be found in [`examples/aws-ec2-terraform`][aws-ec2-terraform].
+The module code can be found in [`phase1/aws-ec2-terraform`][aws-ec2-terraform].
 
 Once instances are up, you can login to any of the 3 worker nodes or the master and run
 `kubernetes-anywhere-toolbox`, and run `kubectl` from there. You can also use `curl` or `git`, or
@@ -298,7 +298,7 @@ One way to distribute the certificates and configuration files for all the compo
 
 If one assumes that their registry is a secure place, TLS configuration can be done transparently.
 
-First run [a helper script](https://github.com/weaveworks/weave-kubernetes-anywhere/blob/master/docker-images/toolbox/scripts/create-pki-containers) bundled in `weaveworks/kubernetes-anywhere:toolbox`:
+First run [a helper script](https://github.com/weaveworks/weave-kubernetes-anywhere/blob/master/phase2/docker-images/toolbox/scripts/create-pki-containers) bundled in `weaveworks/kubernetes-anywhere:toolbox`:
 
 ```
 docker run -v /var/run/docker.sock:/docker.sock weaveworks/kubernetes-anywhere:toolbox create-pki-containers
@@ -383,7 +383,7 @@ images without changing the version of Kubernetes base image, but you can use Do
 if you feel uncertain/paranoid and don't want any automatic updates.
 
 These images are based on upstream `gcr.io/google_containers/hyperkube` and incorporate small shell scripts that
-pass correct arguments to each of the components. You may wish to explore [`docker-images`][docker-images]
+pass correct arguments to each of the components. You may wish to explore [`phase2/docker-images`][docker-images]
 directory, if you wish to know what goes in exactly.
 
 You may wish to vendor these images yourself, in that case you can use [`build-and-push`][build-and-publish],
@@ -398,10 +398,10 @@ If you want push it to a repository of your own called `joe/mykube`, you can inv
 ./build-and-push v1.3.0-alpha.2 joe/mykube
 ```
 
-[aws-ec2-terraform]: https://github.com/weaveworks/weave-kubernetes-anywhere/tree/master/examples/aws-ec2-terraform
-[google-compute-engine]: https://github.com/weaveworks/weave-kubernetes-anywhere/tree/master/examples/google-compute-engine
-[docker-machine]: https://github.com/weaveworks/weave-kubernetes-anywhere/tree/master/examples/docker-machine
-[docker-images]: https://github.com/weaveworks/weave-kubernetes-anywhere/tree/master/docker-images
+[aws-ec2-terraform]: https://github.com/weaveworks/weave-kubernetes-anywhere/tree/master/phase1/aws-ec2-terraform
+[google-compute-engine]: https://github.com/weaveworks/weave-kubernetes-anywhere/tree/master/phase1/google-compute-engine
+[docker-machine]: https://github.com/weaveworks/weave-kubernetes-anywhere/tree/master/phase1/docker-machine
+[docker-images]: https://github.com/weaveworks/weave-kubernetes-anywhere/tree/master/phase2/docker-images
 [docker-hub]: https://hub.docker.com/r/weaveworks/kubernetes-anywhere/tags/
 
 ## Known Issues / TODOs

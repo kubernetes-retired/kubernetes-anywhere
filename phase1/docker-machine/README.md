@@ -1,6 +1,6 @@
 ```
 git clone https://github.com/weaveworks/weave-kubernetes-anywhere
-cd examples/docker-machine
+cd phase1/docker-machine
 ```
 
 Make sure you have Docker Toolbox v1.10 (or later) installed.

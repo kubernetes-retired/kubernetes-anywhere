@@ -11,7 +11,7 @@ and much easier to setup and operate.
 You will need to dowload the code first:
 ```
 git clone https://github.com/weaveworks/weave-kubernetes-anywhere
-cd examples/google-compute-engine
+cd phase1/google-compute-engine
 ```
 
 Make sure you have default project and zone setup, you can run `gcloud init` to do this.

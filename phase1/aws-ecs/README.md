@@ -6,7 +6,7 @@ Running Kubernetes on ECS might seeem odd at first, however it provides the user
 
 ### Setup ECS cluster
 ```
-cd examples/aws-ecs/
+cd phase1/aws-ecs/
 ./create-cluster.sh
 ./ecs-deploy-services.sh
 ./ecs-docker-ps.sh
