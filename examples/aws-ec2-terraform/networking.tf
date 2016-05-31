@@ -20,7 +20,7 @@ resource "aws_internet_gateway" "kubernetes-igw" {
 }
 
 resource "aws_security_group" "kubernetes-main-sg" {
-    name        = "kubernetes-master-kubernetes"
+    name        = "kubernetes-${var.cluster}"
     description = "Kubernetes Anywhere security group applied to all nodes"
     vpc_id      = "${aws_vpc.kubernetes-vpc.id}"
 
