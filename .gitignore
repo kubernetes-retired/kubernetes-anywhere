@@ -1,0 +1,4 @@
+.tmp
+.config
+.config.old
+.config.json
