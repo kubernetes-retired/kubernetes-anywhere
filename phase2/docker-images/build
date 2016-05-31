@@ -18,9 +18,11 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-source "./config"
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
-dir="./docker-images"
+dir="$(pwd)"
+
+source "./config"
 
 printf "FROM gcr.io/google_containers/hyperkube:%s\n%s\n" \
   "${kubernetes_release}" "${common}" \

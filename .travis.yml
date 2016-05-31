@@ -32,9 +32,10 @@ install:
   - docker images
 
 script:
-  - ./test-shellcheck
-  - ./build "${KUBERNETES_RELEASE}"
-  - ./test-docker-compose
+  - shellcheck -x -s bash ./phase1/google-compute-engine/{create,delete}-cluster.sh
+  - make -C phase2/docker-images lint
+  - make -C phase2/docker-images build
+  - make -C phase2/docker-images test
   - docker ps
   - docker images
   - weave status dns
