@@ -412,7 +412,7 @@ If you want push it to a repository of your own called `joe/mykube`, you can inv
   - `kubectl` can only talk to the API server if it is running on Weave Net ([#38][])
   - Default Debian 8 installations have an issue whith memory cgroup (see [FIXES.md](FIXES.md))
 
-[docker/issue#19625]: https://github.com/docker/docker/issues/19625#issuecomment-202168866
+[docker/docker#19625]: https://github.com/docker/docker/issues/19625#issuecomment-202168866
 [#38]: https://github.com/weaveworks/kubernetes-anywhere/issues/38
 [#60]: https://github.com/weaveworks/kubernetes-anywhere/issues/60
 [weaveworks/weave#2094]: https://github.com/weaveworks/weave/issues/2094
