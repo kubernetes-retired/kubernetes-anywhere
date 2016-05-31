@@ -7,6 +7,12 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+sans="DNS:kubernetes,DNS:kubernetes.default,DNS:kubernetes.default.svc,DNS:kubernetes.default.svc.cluster.local,DNS:kube-apiserver.weave.local,IP:10.16.0.1,IP:127.0.0.1"
+
+if [ $# -eq 1 ] ; then
+  sans="${sans},${1}"
+fi
+
 ./easyrsa init-pki > /dev/null 2>&1
 
 ./easyrsa --batch \
@@ -14,7 +20,7 @@ set -o pipefail
   build-ca nopass > /dev/null 2>&1
 
 ./easyrsa \
-  "--subject-alt-name=DNS:kubernetes,DNS:kubernetes.default,DNS:kubernetes.default.svc,DNS:kubernetes.default.svc.cluster.local,DNS:kube-apiserver.weave.local,IP:10.16.0.1,IP:127.0.0.1" \
+  "--subject-alt-name=${sans}" \
   build-server-full kube-apiserver nopass > /dev/null 2>&1
 
 #./easyrsa build-client-full kubecfg nopass > /dev/null 2>&1
