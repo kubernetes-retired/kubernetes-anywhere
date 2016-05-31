@@ -77,7 +77,7 @@ write_files:
       USE_CNI="yes"
       WEAVEPROXY_ARGS="--no-detect-tls --rewrite-inspect --log-level=debug"
       WEAVE_INIT_PEER_COUNT="--init-peer-count 7"
-      WEAVE_SCRIPT_VERSION="v1.4.5"
+      WEAVE_SCRIPT_VERSION="v1.5.2"
       ETCD_CLUSTER_SIZE="3"
       CLOUD_PROVIDER="aws"
       DOCKER_ARGS="--host=fd:// --storage-driver=overlay"
