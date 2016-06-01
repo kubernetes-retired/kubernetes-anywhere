@@ -6,7 +6,7 @@ lint:
 	  ./push \
 	  ./push-only-latest-tag \
 	  ./build-and-push \
-	  ./test-single-node \
+	  ./test-local-docker \
 	  ./toolbox-configure.sh \
 	  ./toolbox/scripts/* \
 	  ./apiserver-anywhere.sh \
