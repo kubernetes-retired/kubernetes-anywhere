@@ -13,7 +13,6 @@
 # limitations under the License.
 
 resource "aws_launch_configuration" "kubernetes-node-group" {
-    name                        = "kubernetes-node-group-${var.cluster}"
     image_id                    = "${module.ubuntu_ami.ami_id}"
     instance_type               = "${var.node_instance_type}"
     iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-node.name}"
@@ -29,11 +28,15 @@ resource "aws_launch_configuration" "kubernetes-node-group" {
         volume_size           = 32
         delete_on_termination = true
     }
+
+    lifecycle {
+        create_before_destroy = true
+    }
 }
 
 resource "aws_autoscaling_group" "kubernetes-node-group" {
     name                      = "kubernetes-node-group-${var.cluster}"
-    launch_configuration      = "${aws_launch_configuration.kubernetes-node-group.name}"
+    launch_configuration      = "${aws_launch_configuration.kubernetes-node-group.id}"
     vpc_zone_identifier       = ["${aws_subnet.kubernetes-subnet.id}"]
     desired_capacity          = "${var.node_count}"
     max_size                  = "${var.node_count}"
