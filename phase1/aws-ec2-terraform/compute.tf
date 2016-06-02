@@ -61,7 +61,10 @@ resource "aws_instance" "kubernetes-master" {
     monitoring                  = false
     key_name                    = "${var.ec2_key_name}"
     subnet_id                   = "${aws_subnet.kubernetes-subnet.id}"
-    vpc_security_group_ids      = ["${aws_security_group.kubernetes-main-sg.id}"]
+    vpc_security_group_ids      = [
+      "${aws_security_group.kubernetes-main-sg.id}",
+      "${aws_security_group.kubernetes-master-sg.id}",
+    ]
     associate_public_ip_address = true
     source_dest_check           = true
     iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-master.name}"
