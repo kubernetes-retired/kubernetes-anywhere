@@ -24,6 +24,11 @@ resource "aws_vpc" "kubernetes-vpc" {
     }
 }
 
+resource "aws_eip" "kubernetes-master" {
+    vpc      = true
+    instance = "${aws_instance.kubernetes-master.id}"
+}
+
 resource "aws_internet_gateway" "kubernetes-igw" {
     vpc_id = "${aws_vpc.kubernetes-vpc.id}"
 
@@ -70,6 +75,24 @@ resource "aws_security_group" "kubernetes-main-sg" {
         from_port       = 0
         to_port         = 0
         protocol        = "-1"
+        cidr_blocks     = ["0.0.0.0/0"]
+    }
+
+    tags {
+        "KubernetesCluster" = "kubernetes-${var.cluster}"
+        "Name"              = "kubernetes-main-sg"
+    }
+}
+
+resource "aws_security_group" "kubernetes-master-sg" {
+    name        = "kubernetes-master-${var.cluster}"
+    description = "Kubernetes Anywhere security group applied to master"
+    vpc_id      = "${aws_vpc.kubernetes-vpc.id}"
+
+    ingress {
+        from_port       = 443
+        to_port         = 443
+        protocol        = "tcp"
         cidr_blocks     = ["0.0.0.0/0"]
     }
 
