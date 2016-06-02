@@ -1,0 +1,5 @@
+#!/bin/bash -x
+exec ansible-playbook \
+  --inventory-file=/etc/toolbox/ansible/inventory \
+  --connection=chroot \
+  "/etc/toolbox/ansible/${1:-"default"}.yml"

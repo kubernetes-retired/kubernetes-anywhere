@@ -25,11 +25,17 @@ ln -s /etc/toolbox/scripts/* /usr/bin/
 apk add --update-cache --no-progress \
   bash curl sed \
   "jq=${JQ_RELEASE}" \
-  git openssl util-linux py-pip \
-  socat nmap-ncat bind-tools iproute2 iptables
-rm -rf /var/cache/apk/*
+  git openssl util-linux py-pip libffi \
+  socat nmap-ncat bind-tools iproute2 iptables \
+  openssl-dev libffi-dev python-dev build-base
 
-pip install "awscli==${AWSCLI_RELEASE}" "docker-compose==${COMPOSE_RELEASE}"
+pip install "ansible==${ANSIBLE_RELEASE}" "boto==${BOTO_RELEASE}" "awscli==${AWSCLI_RELEASE}" "docker-compose==${COMPOSE_RELEASE}"
+
+## remove build-only dependencies
+apk del openssl-dev libffi-dev python-dev build-base
+
+## keep package cache clean
+rm -rf /var/cache/apk/*
 
 curl="curl --silent --location"
 

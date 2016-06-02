@@ -50,6 +50,8 @@ docker build \
   --build-arg="KUBERNETES_RELEASE=${kubernetes_release}" \
   --build-arg="DOCKER_RELEASE=${toolbox_docker_release}" \
   --build-arg="COMPOSE_RELEASE=${toolbox_compose_release}" \
+  --build-arg="ANSIBLE_RELEASE=${toolbox_ansible_release}" \
+  --build-arg="BOTO_RELEASE=${toolbox_boto_release}" \
   --build-arg="AWSCLI_RELEASE=${toolbox_awscli_release}" \
   --build-arg="JQ_RELEASE=${toolbox_jq_release}" \
   --build-arg="EASYRSA_RELEASE=${toolbox_easyrsa_release}" \
