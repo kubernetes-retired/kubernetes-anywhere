@@ -1,0 +1,18 @@
+[Unit]
+Description=Authenticate to Amazon EC2 Container Registry
+After=docker.service network-online.target
+Requires=docker.service network-online.target
+Before=kubelet.service kube-proxy.service
+Before=kube-apiserver.service kube-scheduler.service kube-controller-manager.service
+[Service]
+Type=simple
+Environment=KUBERNETES_ANYWHERE_TOOLBOX_IMAGE=weaveworks/kubernetes-anywhere:toolbox
+EnvironmentFile=/etc/kubernetes-anywhere.env
+ExecStartPre=/bin/mkdir -p /root/.docker/
+ExecStart=/usr/bin/docker run \
+    -v /root/.docker/:/root/.docker/ \
+    -v /var/run/docker.sock:/docker.sock \
+      $KUBERNETES_ANYWHERE_TOOLBOX_IMAGE ecr-login
+[Install]
+WantedBy=kubernetes-master.target
+WantedBy=kubernetes-node.target

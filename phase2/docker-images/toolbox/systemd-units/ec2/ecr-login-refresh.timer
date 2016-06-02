@@ -1,0 +1,9 @@
+[Unit]
+Description=Refresh Amazon EC2 Container Registry token
+[Timer]
+OnBootSec=1h
+OnUnitInactiveSec=1h
+Unit=ecr-login.service
+[Install]
+WantedBy=kubernetes-master.target
+WantedBy=kubernetes-node.target
