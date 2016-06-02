@@ -1,0 +1,38 @@
+- hosts: auto
+  tasks:
+  - name: hello 
+    shell: echo "Hello, Ansible!"
+
+  - name: Gather Facts
+    action: ec2_facts
+
+  - name: Check if EC2 instance exists
+    ec2_remote_facts:
+      region: "{{ ansible_ec2_placement_region }}"
+      filters:
+        "instance-id": "{{ ansible_ec2_instance_id }}"
+    register: ec2_describe_instance
+    delegate_to: localhost
+  
+  - name: Debug ec2_remote_facts
+    debug: msg="{{ ec2_describe_instance.instances[0].tags }}"
+
+  - name: Set Kubernetes EC2 facts
+    set_fact:
+      kubernetes_cluster: "{{ ec2_describe_instance.instances[0].tags.KubernetesCluster }}"
+      kubernetes_role: "{{ ec2_describe_instance.instances[0].tags.Name }}"
+
+  - name: Kubernetes Cluster
+    debug: msg="{{ kubernetes_cluster }}"
+
+  - name: Find all cluster members
+    ec2_remote_facts:
+      region: "{{ ansible_ec2_placement_region }}"
+      filters:
+        "tag:KubernetesCluster": "{{ kubernetes_cluster }}"
+    register: ec2_describe_cluster
+    delegate_to: localhost
+
+  - name: Set Kubernetes Cluster members
+    set_fact:
+      kubernetes_cluster_memebers: "{{ ec2_describe_cluster.instances | map(attribute='private_ip_address') | list }}"
