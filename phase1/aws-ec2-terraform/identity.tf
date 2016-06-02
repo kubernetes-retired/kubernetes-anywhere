@@ -25,6 +25,7 @@ resource "aws_iam_instance_profile" "kubernetes-node" {
 }
 
 resource "aws_iam_instance_profile" "kubernetes-etcd" {
+    count = "${signum(var.standalone_etcd_cluster_size)}"
     name  = "kubernetes-etcd-${var.cluster}"
     path  = "/"
     roles = ["${aws_iam_role.kubernetes-etcd.name}"]
@@ -56,6 +57,7 @@ resource "aws_iam_role" "kubernetes-node" {
 }
 
 resource "aws_iam_role" "kubernetes-etcd" {
+    count              = "${signum(var.standalone_etcd_cluster_size)}"
     name               = "kubernetes-etcd-${var.cluster}"
     path               = "/"
     assume_role_policy = "${var.iam_common_assume_role_policy}"
@@ -142,6 +144,7 @@ POLICY
 }
 
 resource "aws_iam_role_policy" "kubernetes-etcd" {
+    count  = "${signum(var.standalone_etcd_cluster_size)}"
     name   = "kubernetes-etcd-${var.cluster}"
     role   = "${aws_iam_role.kubernetes-etcd.name}"
     policy = <<POLICY

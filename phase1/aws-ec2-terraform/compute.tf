@@ -22,7 +22,7 @@ resource "aws_launch_configuration" "kubernetes-node-group" {
     key_name                    = "${var.ec2_key_name}"
     security_groups             = ["${aws_security_group.kubernetes-main-sg.id}"]
     associate_public_ip_address = true
-    user_data                   = "${file("${path.module}/${var.cluster_config_flavour}-user-data.yaml")}"
+    user_data                   = "${file("${path.module}/phase2_implementations/${var.phase2_implementation}.yaml")}"
 
     root_block_device {
         volume_type           = "gp2"
@@ -35,9 +35,9 @@ resource "aws_autoscaling_group" "kubernetes-node-group" {
     name                      = "kubernetes-node-group-${var.cluster}"
     launch_configuration      = "${aws_launch_configuration.kubernetes-node-group.name}"
     vpc_zone_identifier       = ["${aws_subnet.kubernetes-subnet.id}"]
-    desired_capacity          = 3
-    max_size                  = 3
-    min_size                  = 3
+    desired_capacity          = "${var.node_count}"
+    max_size                  = "${var.node_count}"
+    min_size                  = "${var.node_count}"
     health_check_grace_period = 0
     health_check_type         = "EC2"
 
@@ -68,7 +68,7 @@ resource "aws_instance" "kubernetes-master" {
     associate_public_ip_address = true
     source_dest_check           = true
     iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-master.name}"
-    user_data                   = "${file("${path.module}/${var.cluster_config_flavour}-user-data.yaml")}"
+    user_data                   = "${file("${path.module}/phase2_implementations/${var.phase2_implementation}.yaml")}"
 
     ebs_block_device {
         device_name           = "/dev/sdb"
@@ -90,10 +90,10 @@ resource "aws_instance" "kubernetes-master" {
 }
 
 resource "aws_instance" "kubernetes-etcd" {
-    count                       = 3
+    count                       = "${var.standalone_etcd_cluster_size}"
     ami                         = "${module.ubuntu_ami.ami_id}"
     ebs_optimized               = false
-    instance_type               = "${var.etcd_instance_type}"
+    instance_type               = "${var.standalone_etcd_instance_type}"
     monitoring                  = false
     key_name                    = "${var.ec2_key_name}"
     subnet_id                   = "${aws_subnet.kubernetes-subnet.id}"
@@ -101,7 +101,7 @@ resource "aws_instance" "kubernetes-etcd" {
     associate_public_ip_address = true
     source_dest_check           = true
     iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-etcd.name}"
-    user_data                   = "${file("${path.module}/${var.cluster_config_flavour}-user-data.yaml")}"
+    user_data                   = "${file("${path.module}/phase2_implementations/${var.phase2_implementation}.yaml")}"
 
     ebs_block_device {
         device_name           = "/dev/sdb"
