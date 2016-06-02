@@ -28,3 +28,10 @@
   - name: Set cluster member list
     set_fact:
       kubernetes_cluster_memebers: "{{ ec2_describe_cluster.instances | map(attribute='private_ip_address') | list }}"
+
+  - name: Install all systemd units
+    copy: src="{{ item }}" dest="/etc/systemd/system/" owner="root" group="root" mode="0644"
+    with_fileglob:
+      - "/etc/toolbox/systemd-units/common/*"
+      - "/etc/toolbox/systemd-units/ec2/*"
+      - "/etc/toolbox/systemd-units/with-pki/*"
