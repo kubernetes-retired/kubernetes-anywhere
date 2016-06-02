@@ -53,13 +53,6 @@ resource "aws_security_group" "kubernetes-main-sg" {
     }
 
     ingress {
-        from_port       = 4040
-        to_port         = 4040
-        protocol        = "tcp"
-        cidr_blocks     = ["0.0.0.0/0"]
-    }
-
-    ingress {
         from_port       = 6783
         to_port         = 6783
         protocol        = "tcp"
