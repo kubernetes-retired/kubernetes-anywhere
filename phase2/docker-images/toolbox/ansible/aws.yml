@@ -29,9 +29,29 @@
     set_fact:
       kubernetes_cluster_memebers: "{{ ec2_describe_cluster.instances | map(attribute='private_ip_address') | list }}"
 
+  - name: Fetch instance identity document
+    uri:
+      url: "http://169.254.169.254/latest/dynamic/instance-identity/document"
+      method: "GET"
+      return_content: "yes"
+    register: ec2_instance_identity_document
+
+  - name: Store instance identity document
+    ## it doesn't return the right headers, so we have to parse it
+    set_fact:
+      ec2_instance_identity: "{{ ec2_instance_identity_document.content | from_json }}"
+
+  - name: Store ECR PKI image path prefix fact
+    set_fact:
+      ecr_pki_image_path_prefix: "{{ ec2_instance_identity.accountId }}.dkr.ecr.{{ ansible_ec2_placement_region }}.amazonaws.com"
+
   - name: Install all systemd units
     copy: src="{{ item }}" dest="/etc/systemd/system/" owner="root" group="root" mode="0644"
     with_fileglob:
       - "/etc/toolbox/systemd-units/common/*"
       - "/etc/toolbox/systemd-units/ec2/*"
       - "/etc/toolbox/systemd-units/with-pki/*"
+
+  - name: Create PKI image config for master
+    copy: dest="/etc/kubernetes-anywhere-pki-images2.env"
+          content="KUBERNETES_ANYWHERE_APISERVER_PKI_IMAGE=\"{{ ecr_pki_image_path_prefix }}/{{ kubernetes_cluster }}/master/pki:apiserver\"\n"
