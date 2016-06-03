@@ -8,8 +8,10 @@ Documentation=http://kubernetes.io/
 [Service]
 Environment=KUBERNETES_ANYWHERE_APISERVER_IMAGE=weaveworks/kubernetes-anywhere:apiserver
 Environment=KUBERNETES_ANYWHERE_APISERVER_PKI_IMAGE=kubernetes-anywhere:apiserver-pki
-EnvironmentFile=-/etc/kubernetes-anywhere.env
-EnvironmentFile=-/etc/kubernetes-anywhere-pki-images.env
+EnvironmentFile=-/etc/kubernetes-anywhere/base.env
+EnvironmentFile=-/etc/kubernetes-anywhere/images.env
+EnvironmentFile=-/etc/kubernetes-anywhere/pki-images.env
+EnvironmentFile=-/etc/kubernetes-anywhere/local.env
 ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_APISERVER_IMAGE
 ExecStartPre=-/usr/bin/docker pull $KUBERNETES_ANYWHERE_APISERVER_PKI_IMAGE
 ExecStartPre=-/usr/bin/docker rm -f kube-apiserver

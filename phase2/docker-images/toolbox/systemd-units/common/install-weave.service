@@ -13,7 +13,8 @@ Type=oneshot
 RemainAfterExit=yes
 TimeoutStartSec=0
 Environment=WEAVE_SCRIPT_VERSION=latest_release
-EnvironmentFile=-/etc/kubernetes-anywhere.env
+EnvironmentFile=-/etc/kubernetes-anywhere/base.env
+EnvironmentFile=-/etc/kubernetes-anywhere/local.env
 ExecStartPre=/usr/bin/curl \
   --silent \
   --location \

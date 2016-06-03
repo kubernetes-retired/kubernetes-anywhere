@@ -7,7 +7,10 @@ Before=kube-apiserver.service kube-scheduler.service kube-controller-manager.ser
 [Service]
 Type=simple
 Environment=KUBERNETES_ANYWHERE_TOOLBOX_IMAGE=weaveworks/kubernetes-anywhere:toolbox
-EnvironmentFile=/etc/kubernetes-anywhere.env
+EnvironmentFile=-/etc/kubernetes-anywhere/base.env
+EnvironmentFile=-/etc/kubernetes-anywhere/images.env
+EnvironmentFile=-/etc/kubernetes-anywhere/pki-images.env
+EnvironmentFile=-/etc/kubernetes-anywhere/local.env
 ExecStartPre=/bin/mkdir -p /root/.docker/
 ExecStart=/usr/bin/docker run \
     -v /root/.docker/:/root/.docker/ \

@@ -10,7 +10,8 @@ Type=oneshot
 RemainAfterExit=yes
 TimeoutStartSec=0
 Environment=WEAVE_EXPOSE_FQDN=%H.weave.local
-EnvironmentFile=-/etc/kubernetes-anywhere.env
+EnvironmentFile=-/etc/kubernetes-anywhere/base.env
+EnvironmentFile=-/etc/kubernetes-anywhere/local.env
 ExecStart=/usr/local/bin/weave expose -h $WEAVE_EXPOSE_FQDN
 ExecStop=/usr/local/bin/weave hide
 [Install]

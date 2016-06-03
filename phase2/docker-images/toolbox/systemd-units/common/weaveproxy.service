@@ -6,7 +6,8 @@ Requires=install-weave.service
 Description=Weave Net proxy for Docker API
 Documentation=http://docs.weave.works/
 [Service]
-EnvironmentFile=-/etc/kubernetes-anywhere.env
+EnvironmentFile=-/etc/kubernetes-anywhere/base.env
+EnvironmentFile=-/etc/kubernetes-anywhere/local.env
 ExecStartPre=/usr/local/bin/weave launch-proxy $WEAVEPROXY_ARGS
 ExecStart=/usr/bin/docker attach weaveproxy
 Restart=on-failure
