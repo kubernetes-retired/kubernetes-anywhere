@@ -1,34 +1,6 @@
 - hosts: auto
   tasks:
 
-  - name: Gather general EC2 facts
-    action: ec2_facts
-
-  - name: Fetch all metadata about this instance
-    ec2_remote_facts:
-      region: "{{ ansible_ec2_placement_region }}"
-      filters:
-        "instance-id": "{{ ansible_ec2_instance_id }}"
-    register: ec2_describe_instance
-    delegate_to: localhost
-
-  - name: Store cluster membership facts for this instance
-    set_fact:
-      kubernetes_cluster: "{{ ec2_describe_instance.instances[0].tags.KubernetesCluster }}"
-      kubernetes_role: "{{ ec2_describe_instance.instances[0].tags.Name }}"
-
-  - name: Fetch metadata about all other cluster members
-    ec2_remote_facts:
-      region: "{{ ansible_ec2_placement_region }}"
-      filters:
-        "tag:KubernetesCluster": "{{ kubernetes_cluster }}"
-    register: ec2_describe_cluster
-    delegate_to: localhost
-
-  - name: Set cluster member list
-    set_fact:
-      kubernetes_cluster_memebers: "{{ ec2_describe_cluster.instances | map(attribute='private_ip_address') | list }}"
-
   - name: Fetch instance identity document
     uri:
       url: "http://169.254.169.254/latest/dynamic/instance-identity/document"
@@ -41,9 +13,34 @@
     set_fact:
       ec2_instance_identity: "{{ ec2_instance_identity_document.content | from_json }}"
 
+  - name: Fetch all metadata about this instance
+    ec2_remote_facts:
+      region: "{{ ec2_instance_identity.region }}"
+      filters:
+        "instance-id": "{{ ec2_instance_identity.instanceId }}"
+    register: ec2_describe_instance
+    delegate_to: localhost
+
+  - name: Store cluster membership facts for this instance
+    set_fact:
+      kubernetes_cluster: "{{ ec2_describe_instance.instances[0].tags.KubernetesCluster }}"
+      kubernetes_role: "{{ ec2_describe_instance.instances[0].tags.Name }}"
+      ecr_pki_image_path_prefix: "{{ ec2_instance_identity.accountId }}.dkr.ecr.{{ ec2_instance_identity.region }}.amazonaws.com"
+
+  - name: Fetch metadata about all other cluster members
+    ec2_remote_facts:
+      region: "{{ ec2_instance_identity.region }}"
+      filters:
+        "tag:KubernetesCluster": "{{ kubernetes_cluster }}"
+    register: ec2_describe_cluster
+    delegate_to: localhost
+
+  - name: Set cluster member list
+    set_fact:
+      kubernetes_cluster_memebers: "{{ ec2_describe_cluster.instances | map(attribute='private_ip_address') | list }}"
+
   - name: Store ECR PKI image path prefix fact
     set_fact:
-      ecr_pki_image_path_prefix: "{{ ec2_instance_identity.accountId }}.dkr.ecr.{{ ansible_ec2_placement_region }}.amazonaws.com"
 
   - name: Install all systemd units
     copy: src="{{ item }}" dest="/etc/systemd/system/" owner="root" group="root" mode="0644"
