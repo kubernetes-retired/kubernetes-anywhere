@@ -8,7 +8,7 @@ Documentation=http://docs.weave.works/
 [Service]
 TimeoutStartSec=0
 EnvironmentFile=-/etc/kubernetes-anywhere.env
-ExecStartPre=/usr/local/bin/weave launch-router $WEAVE_INIT_PEER_COUNT $WEAVE_KNOW_PEERS $WEAVE_ARGS
+ExecStartPre=/usr/local/bin/weave launch-router $WEAVE_ARGS $WEAVE_INIT_PEER_COUNT $WEAVE_KNOWN_PEERS
 ExecStart=/usr/bin/docker attach weave
 Restart=on-failure
 ExecStop=/usr/local/bin/weave stop-router
