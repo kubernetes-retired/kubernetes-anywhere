@@ -15,7 +15,8 @@ lint:
 	  ./proxy-anywhere.sh \
 	  ./scheduler-anywhere.sh \
 	  ./kubelet-cni/bin/weave-net \
-	  ./kubelet-cni/bin/weave-ipam
+	  ./kubelet-cni/bin/weave-ipam \
+	  ./toolbox/ansible/files/*.sh
 	@shellcheck -x -s sh \
 	  ./etcd-anywhere.sh \
 	  ./weave-fix-nameserver.sh
