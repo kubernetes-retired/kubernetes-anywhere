@@ -50,5 +50,11 @@
       - "/etc/toolbox/systemd-units/with-pki/*"
 
   - name: Create PKI image config for master
+    when: kubernetes_role == "kubernetes-master"
     copy: dest="/etc/kubernetes-anywhere-pki-images2.env"
-          content="KUBERNETES_ANYWHERE_APISERVER_PKI_IMAGE=\"{{ ecr_pki_image_path_prefix }}/{{ kubernetes_cluster }}/master/pki:apiserver\"\n"
+          content="{% for c in [ 'toolbox', 'apiserver', 'scheduler', 'controller-manager' ] %}KUBERNETES_ANYWHERE_{{ c | upper | replace('-', '_') }}_PKI_IMAGE=\"{{ ecr_pki_image_path_prefix }}/{{ kubernetes_cluster }}/master/pki:{{ c }}\"\n{% endfor %}"
+
+  - name: Create PKI image config for nodes
+    when: kubernetes_role == "kubernetes-node"
+    copy: dest="/etc/kubernetes-anywhere-pki-images2.env"
+          content="{% for c in [ 'toolbox', 'kubelet', 'proxy' ] %}KUBERNETES_ANYWHERE_{{ c | upper | replace('-', '_') }}_PKI_IMAGE=\"{{ ecr_pki_image_path_prefix }}/{{ kubernetes_cluster }}/master/pki:{{ c }}\"\n{% endfor %}"
