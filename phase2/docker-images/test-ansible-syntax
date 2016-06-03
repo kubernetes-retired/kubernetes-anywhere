@@ -1,0 +1,7 @@
+#!/bin/bash
+exec docker run \
+  weaveworks/kubernetes-anywhere:toolbox \
+    ansible-playbook \
+      --syntax-check \
+      --inventory-file="/etc/toolbox/ansible/inventory" \
+      /etc/toolbox/ansible/aws.yml

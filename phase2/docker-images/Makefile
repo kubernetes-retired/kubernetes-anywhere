@@ -24,6 +24,7 @@ build:
 
 test:
 	./test-local-docker
+	./test-ansible-syntax
 
 push:
 	./$@ $(KUBERNETES_RELEASE)
