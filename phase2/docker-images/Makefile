@@ -15,11 +15,13 @@ lint:
 	  ./proxy-anywhere.sh \
 	  ./scheduler-anywhere.sh \
 	  ./kubelet-cni/bin/weave-net \
-	  ./kubelet-cni/bin/weave-ipam \
-	  ./toolbox/ansible/files/*.sh
+	  ./kubelet-cni/bin/weave-ipam
 	@shellcheck -x -s sh \
 	  ./etcd-anywhere.sh \
 	  ./weave-fix-nameserver.sh
+	@shellcheck -x -s bash \
+	    -e SC1091 \
+	    ./toolbox/ansible/files/toolbox.sh
 build:
 	./$@ $(KUBERNETES_RELEASE)
 
