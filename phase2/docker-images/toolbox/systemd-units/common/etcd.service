@@ -4,6 +4,7 @@ After=weave-network.target
 [Service]
 Environment=KUBERNETES_ANYWHERE_ETCD_IMAGE=weaveworks/kubernetes-anywhere:etcd
 Environment=ETCD_NODE_NAME=etcd1
+Environment=ETCD_CLUSTER_SIZE=1
 EnvironmentFile=-/etc/kubernetes-anywhere/base.env
 EnvironmentFile=-/etc/kubernetes-anywhere/images.env
 EnvironmentFile=-/etc/kubernetes-anywhere/pki-images.env

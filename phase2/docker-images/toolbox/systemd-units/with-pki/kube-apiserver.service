@@ -8,6 +8,7 @@ Documentation=http://kubernetes.io/
 [Service]
 Environment=KUBERNETES_ANYWHERE_APISERVER_IMAGE=weaveworks/kubernetes-anywhere:apiserver
 Environment=KUBERNETES_ANYWHERE_APISERVER_PKI_IMAGE=kubernetes-anywhere:apiserver-pki
+Environment=ETCD_CLUSTER_SIZE=1
 EnvironmentFile=-/etc/kubernetes-anywhere/base.env
 EnvironmentFile=-/etc/kubernetes-anywhere/images.env
 EnvironmentFile=-/etc/kubernetes-anywhere/pki-images.env
