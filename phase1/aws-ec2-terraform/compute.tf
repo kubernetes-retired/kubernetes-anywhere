@@ -29,13 +29,10 @@ resource "aws_launch_configuration" "kubernetes-node-group" {
         delete_on_termination = true
     }
 
-    lifecycle {
-        create_before_destroy = true
-    }
+    lifecycle { create_before_destroy = true }
 }
 
 resource "aws_autoscaling_group" "kubernetes-node-group" {
-    name                      = "kubernetes-node-group-${var.cluster}"
     launch_configuration      = "${aws_launch_configuration.kubernetes-node-group.id}"
     vpc_zone_identifier       = ["${aws_subnet.kubernetes-subnet.id}"]
     desired_capacity          = "${var.node_count}"
@@ -43,6 +40,8 @@ resource "aws_autoscaling_group" "kubernetes-node-group" {
     min_size                  = "${var.node_count}"
     health_check_grace_period = 0
     health_check_type         = "EC2"
+
+    lifecycle { create_before_destroy = true }
 
     tag {
         key                  = "KubernetesCluster"
@@ -86,6 +85,8 @@ resource "aws_instance" "kubernetes-master" {
         delete_on_termination = true
     }
 
+    lifecycle { create_before_destroy = true }
+
     tags {
         "KubernetesCluster" = "kubernetes-${var.cluster}"
         "Name"              = "kubernetes-master"
@@ -119,6 +120,8 @@ resource "aws_instance" "kubernetes-etcd" {
         delete_on_termination = true
     }
 
+    lifecycle { create_before_destroy = true }
+
     tags {
         "KubernetesCluster"      = "kubernetes-${var.cluster}"
         "Name"                   = "kubernetes-etcd"
@@ -127,9 +130,13 @@ resource "aws_instance" "kubernetes-etcd" {
 }
 
 resource "aws_ecr_repository" "kubernetes-master-pki-repository" {
-  name = "kubernetes-${var.cluster}/master/pki"
+    name = "kubernetes-${var.cluster}/master/pki"
+
+    lifecycle { create_before_destroy = true }
 }
 
 resource "aws_ecr_repository" "kubernetes-node-pki-repository" {
-  name = "kubernetes-${var.cluster}/node/pki"
+    name = "kubernetes-${var.cluster}/node/pki"
+
+    lifecycle { create_before_destroy = true }
 }

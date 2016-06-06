@@ -18,6 +18,8 @@ resource "aws_vpc" "kubernetes-vpc" {
     enable_dns_support   = true
     instance_tenancy     = "default"
 
+    lifecycle { create_before_destroy = true }
+
     tags {
         "KubernetesCluster" = "kubernetes-${var.cluster}"
         "Name"              = "kubernetes-vpc"
@@ -27,10 +29,14 @@ resource "aws_vpc" "kubernetes-vpc" {
 resource "aws_eip" "kubernetes-master" {
     vpc      = true
     instance = "${aws_instance.kubernetes-master.id}"
+
+    lifecycle { create_before_destroy = true }
 }
 
 resource "aws_internet_gateway" "kubernetes-igw" {
     vpc_id = "${aws_vpc.kubernetes-vpc.id}"
+
+    lifecycle { create_before_destroy = true }
 
     tags {
         "KubernetesCluster" = "kubernetes-${var.cluster}"
@@ -78,6 +84,8 @@ resource "aws_security_group" "kubernetes-main-sg" {
         cidr_blocks     = ["0.0.0.0/0"]
     }
 
+    lifecycle { create_before_destroy = true }
+
     tags {
         "KubernetesCluster" = "kubernetes-${var.cluster}"
         "Name"              = "kubernetes-main-sg"
@@ -95,6 +103,8 @@ resource "aws_security_group" "kubernetes-master-sg" {
         protocol        = "tcp"
         cidr_blocks     = ["0.0.0.0/0"]
     }
+
+    lifecycle { create_before_destroy = true }
 
     tags {
         "KubernetesCluster" = "kubernetes-${var.cluster}"
@@ -124,6 +134,8 @@ resource "aws_network_acl" "kubernetes-acl" {
         cidr_block = "0.0.0.0/0"
     }
 
+    lifecycle { create_before_destroy = true }
+
     tags {
         "KubernetesCluster" = "kubernetes-${var.cluster}"
         "Name"              = "kubernetes-acl"
@@ -134,6 +146,8 @@ resource "aws_subnet" "kubernetes-subnet" {
     vpc_id                  = "${aws_vpc.kubernetes-vpc.id}"
     cidr_block              = "172.20.0.0/24"
     map_public_ip_on_launch = false
+
+    lifecycle { create_before_destroy = true }
 
     tags {
         "KubernetesCluster" = "kubernetes-${var.cluster}"
@@ -148,9 +162,13 @@ resource "aws_route_table" "kubernetes-routes" {
         cidr_block = "0.0.0.0/0"
         gateway_id = "${aws_internet_gateway.kubernetes-igw.id}"
     }
+
+    lifecycle { create_before_destroy = true }
 }
 
 resource "aws_route_table_association" "kubernetes-routes" {
     route_table_id = "${aws_route_table.kubernetes-routes.id}"
     subnet_id = "${aws_subnet.kubernetes-subnet.id}"
+
+    lifecycle { create_before_destroy = true }
 }
