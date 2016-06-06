@@ -94,6 +94,7 @@
 
   - name: Tag master PKI images
     delegate_to: localhost
+    when: kubernetes_role == "kubernetes-master"
     shell: "docker tag \"kubernetes-anywhere:{{ item }}-pki\" \"{{ master_pki_prefix }}:{{ item }}\""
     with_items:
       - apiserver
@@ -103,6 +104,7 @@
 
   - name: Push master PKI images to ECR
     delegate_to: localhost
+    when: kubernetes_role == "kubernetes-master"
     shell: "docker push \"{{ master_pki_prefix }}:{{ item }}\""
     with_items:
       - apiserver
@@ -112,6 +114,7 @@
 
   - name: Tag node PKI images
     delegate_to: localhost
+    when: kubernetes_role == "kubernetes-master"
     shell: "docker tag \"kubernetes-anywhere:{{ item }}-pki\" \"{{ node_pki_prefix }}:{{ item }}\""
     with_items:
       - kubelet
@@ -120,6 +123,7 @@
 
   - name: Push node PKI images to ECR
     delegate_to: localhost
+    when: kubernetes_role == "kubernetes-master"
     shell: "docker push \"{{ node_pki_prefix }}:{{ item }}\""
     with_items:
       - kubelet
