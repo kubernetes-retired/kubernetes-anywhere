@@ -39,7 +39,7 @@
 
   - name: Set cluster member list
     set_fact:
-      kubernetes_cluster_memebers: "{{ ec2_describe_cluster.instances | map(attribute='private_ip_address') | list }}"
+      kubernetes_cluster_memebers: "{{ ec2_describe_cluster.instances | map(attribute='private_ip_address') | ipv4 | list }}"
 
   - name: Install all systemd units
     copy: src="{{ item }}" dest="/etc/systemd/system/" owner="root" group="root" mode="0644"

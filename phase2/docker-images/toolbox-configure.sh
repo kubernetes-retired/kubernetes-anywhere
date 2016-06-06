@@ -29,7 +29,12 @@ apk add --update-cache --no-progress \
   socat nmap-ncat bind-tools iproute2 iptables \
   openssl-dev libffi-dev python-dev build-base
 
-pip install "ansible==${ANSIBLE_RELEASE}" "boto==${BOTO_RELEASE}" "awscli==${AWSCLI_RELEASE}" "docker-compose==${COMPOSE_RELEASE}"
+pip install \
+  "ansible==${ANSIBLE_RELEASE}" \
+  "boto==${BOTO_RELEASE}" \
+  "awscli==${AWSCLI_RELEASE}" \
+  "docker-compose==${COMPOSE_RELEASE}" \
+  "netaddr"
 
 ## remove build-only dependencies
 apk del openssl-dev libffi-dev python-dev build-base
