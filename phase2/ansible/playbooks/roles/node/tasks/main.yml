@@ -1,4 +1,42 @@
-- include: kubeconfig.yml
-- include: etc.yml
-- include: kubelet.yml
-- include: kubectl.yml
+# write the kubeconfig file
+- shell: cat '/srv/kubernetes/kubelet.pem'
+  register: kubelet_pem_cmd
+- shell: cat '/srv/kubernetes/kubelet-key.pem'
+  register: kubelet_key_pem_cmd
+- shell: cat '/srv/kubernetes/ca.pem'
+  register: ca_pem_cmd
+- name: write kubeconfig
+  jsonnet:
+    src: "kubeconfig.jsonnet"
+    dest: "/srv/kubernetes/kubeconfig.json"
+    mode: 0644
+
+# install kubectl
+- name: download kubectl
+  get_url:
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.2.3/bin/linux/amd64/kubectl
+    dest: /usr/local/bin/kubectl
+    mode: 0777
+    checksum: sha256:394853edd409a721bcafe4f1360009ef9f845050719fe7d6fc7176f45cc92a8c
+
+# prepare the /etc dierectory
+- name: ensure /etc/kubernetes/manifests directory
+  file:
+    path: /etc/kubernetes/manifests
+    owner: root
+    state: directory
+    mode: 0755
+- name: write effective config
+  jsonnet:
+    src: effective_config.jsonnet
+    dest: /etc/kubernetes/effective_config.json
+    mode: 0644
+
+# install kubelet
+- template:
+    src: kubelet.service.j2
+    dest: /etc/systemd/system/kubelet.service
+- command: systemctl --system daemon-reload
+- service:
+    name: kubelet
+    state: started

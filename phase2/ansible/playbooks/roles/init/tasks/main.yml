@@ -1,1 +1,1 @@
-- include: python.yml
+- script: maybe_install_python.sh
