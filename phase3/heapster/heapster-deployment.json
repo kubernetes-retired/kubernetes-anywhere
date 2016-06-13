@@ -1,0 +1,52 @@
+{
+  "apiVersion": "extensions/v1beta1",
+  "kind": "Deployment",
+  "metadata": {
+    "labels": {
+      "k8s-app": "heapster",
+      "kubernetes.io/cluster-service": "true",
+      "version": "v1.1.0.beta2"
+    },
+    "name": "heapster-v1.1.0.beta2",
+    "namespace": "kube-system"
+  },
+  "spec": {
+    "replicas": 1,
+    "selector": {
+      "matchLabels": {
+        "k8s-app": "heapster",
+        "version": "v1.1.0.beta2"
+      }
+    },
+    "template": {
+      "metadata": {
+        "labels": {
+          "k8s-app": "heapster",
+          "version": "v1.1.0.beta2"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "command": [
+              "/heapster",
+              "--source=kubernetes.summary_api:''"
+            ],
+            "image": "gcr.io/google_containers/heapster:v1.1.0-beta2",
+            "name": "heapster",
+            "resources": {
+              "limits": {
+                "cpu": "100m",
+                "memory": "200Mi"
+              },
+              "requests": {
+                "cpu": "100m",
+                "memory": "200Mi"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
