@@ -26,7 +26,7 @@ systemd-run --unit=docker.service /usr/bin/docker daemon
 
 if ! [ -x /usr/bin/weave ] ; then
   echo "Installing current version of Weave Net"
-  curl --silent --location http://git.io/weave --output /usr/bin/weave
+  curl --silent --location https://git.io/weave --output /usr/bin/weave
   chmod +x /usr/bin/weave
   /usr/bin/weave setup
 fi
@@ -59,7 +59,7 @@ list_weave_peers_in_group() {
 
 if ! [ -x /usr/bin/scope ] ; then
   echo "Installing current version of Weave Scope"
-  curl --silent --location http://git.io/scope --output /usr/bin/scope
+  curl --silent --location https://git.io/scope --output /usr/bin/scope
   chmod +x /usr/bin/scope
 fi
 
