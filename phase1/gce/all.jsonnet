@@ -1,4 +1,4 @@
 local cfg = import "../../.config.json";
 {
-  "gce.tf": (import "lib/gce.jsonnet")(cfg),
+  ["gce-%(instance_prefix)s.tf" % cfg.phase1]: (import "gce.jsonnet")(cfg),
 }
