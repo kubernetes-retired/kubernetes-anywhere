@@ -4,7 +4,7 @@
 
 ### Goals and Motivation
 
-Learning how to deploy Kubernetes is hard because the default deployment automation ([`cluster/kube-up.sh`](https://github.com/kubernetes/kubernetes/blob/master/cluster/kube-up.sh) is opaque. We can do better, and by doing better we enable users to run Kubernetes in more places.
+Learning how to deploy Kubernetes is hard because the default deployment automation [`cluster/kube-up.sh`](https://github.com/kubernetes/kubernetes/blob/master/cluster/kube-up.sh) is opaque. We can do better, and by doing better we enable users to run Kubernetes in more places.
 
 This implementation will be considered successful if it:
   * is portable across many deployment targets (e.g. at least GCE/AWS/Azure)
