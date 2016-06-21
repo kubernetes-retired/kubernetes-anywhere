@@ -4,6 +4,8 @@ SHELL=/bin/bash
 
 .PHONY: config echo-config
 
+IMAGE_NAME?=kubernetes-anywhere
+IMAGE_VERSION?=v0.0.1
 
 # sorry windows and non amd64
 UNAME_S := $(shell uname -s)
@@ -51,10 +53,21 @@ deploy destroy: .config.json
 do:
 	( cd "phase1/$$(jq -r '.phase1.cloud_provider' .config.json)"; ./do $(WHAT) )
 
+docker-build:
+	docker build -t $(IMAGE_NAME):$(IMAGE_VERSION) .
+
+docker-run: docker-build
+	docker run -it --net=host $(IMAGE_NAME):$(IMAGE_VERSION) /bin/bash
+
+docker-dev: docker-build
+	docker run -it --net=host -v `pwd`:/root/kubernetes-anywhere $(IMAGE_NAME):$(IMAGE_VERSION) /bin/bash
+
+
 clean:
 	rm -rf .tmp
 	rm -rf phase3/.tmp
-	rm -rf phase1/gce/out
+	rm -rf phase1/gce/.tmp
+	rm -rf phase1/azure/.tmp
 
 fmt:
 	for f in $$(find . -name '*.jsonnet'); do jsonnet fmt -i -n 2 $${f}; done;

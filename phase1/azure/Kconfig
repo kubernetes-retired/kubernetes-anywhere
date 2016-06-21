@@ -1,0 +1,76 @@
+menu "Azure configuration"
+
+config phase1.azure.image_publisher
+	string "Base Virtual Machine OS Image"
+	default "canonical"
+	help
+		The publisher of the base image used for the VirtualMachines.
+config phase1.azure.image_offer
+	string "Base Virtual Machine OS Image"
+	default "ubuntuserver"
+	help
+		The offer of the base image used for the VirtualMachines.
+config phase1.azure.image_sku
+	string "Base Virtual Machine OS Image"
+	default "16.04.0-LTS"
+	help
+		The sku of the base image used for the VirtualMachines.
+config phase1.azure.image_version
+	string "Base Virtual Machine OS Image"
+	default "latest"
+	help
+		The version of the base image used for the VirtualMachines.
+
+config phase1.azure.master_vm_size
+	string "Virtual Machine Size (Master)"
+	default "Standard_D1_v2"
+	help
+		The size of VirtualMachine to deploy.
+
+config phase1.azure.node_vm_size
+	string "Virtual Machine Size (Node)"
+	default "Standard_D1_v2"
+	help
+		The size of VirtualMachine to deploy.
+
+config phase1.azure.master_private_ip
+	string "Private IP address of Master"
+	default "10.0.1.4"
+	help
+		The private ip address of master
+
+config phase1.azure.location
+	string "Resource Location"
+	default "westus"
+	help
+		The Azure location to use.
+
+config phase1.azure.admin_username
+	string "Virtual Machine Admin Username"
+	default "kube"
+
+config phase1.azure.admin_password
+	string "Virtual Machine Admin Password"
+	default "AzureKubernet3s!"
+
+config phase1.azure.tenant_id
+	string "ActiveDirectory ServicePrincipal ClientSecret"
+	help
+		The ClientSecret of the Service Account to be used by the cluster components.
+
+config phase1.azure.subscription_id
+	string "ActiveDirectory ServicePrincipal ClientSecret"
+	help
+		The ClientSecret of the Service Account to be used by the cluster components.
+
+config phase1.azure.client_id
+	string "ActiveDirectory ServicePrincipal ClientID"
+	help
+		The ClientID of the Service Account to be used by the cluster components.
+
+config phase1.azure.client_secret
+	string "ActiveDirectory ServicePrincipal ClientSecret"
+	help
+		The ClientSecret of the Service Account to be used by the cluster components.
+
+endmenu

@@ -1,0 +1,11 @@
+{
+  "tenantId": "${tenantId}",
+  "subscriptionId": "${subscriptionId}",
+  "adClientId": "${adClientId}",
+  "adClientSecret": "${adClientSecret}",
+  "resourceGroup": "${resourceGroup}",
+  "location": "${location}",
+  "subnetName": "${subnetName}",
+  "securityGroupName": "${securityGroupName}",
+  "vnetName": "${vnetName}"
+}

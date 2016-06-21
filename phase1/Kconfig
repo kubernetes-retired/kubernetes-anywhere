@@ -20,10 +20,14 @@ menuconfig phase1.cloud_provider
 	help
 	  The cloud provider you would like to deploy to.
 
-	  Valid options are (gce).
+	  Valid options are (gce, azure).
 
 if phase1.cloud_provider = "gce"
 	source "phase1/gce/Kconfig"
+endif
+
+if phase1.cloud_provider = "azure"
+	source "phase1/azure/Kconfig"
 endif
 
 endmenu
