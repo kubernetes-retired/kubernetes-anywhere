@@ -30,6 +30,11 @@ function(cfg)
     },
   });
   {
+    output: {
+      [names.master_ip]: {
+        value: "${google_compute_address.%(master_ip)s.address}" % names,
+      },
+    },
     provider: {
       google: {
         credentials: "${file(\"account.json\")}",
