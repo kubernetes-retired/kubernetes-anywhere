@@ -1,0 +1,36 @@
+#! /bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+set -x
+
+cd "${BASH_SOURCE%/*}"
+
+gen() {
+  mkdir -p .tmp/
+  jsonnet -J ../../ --multi .tmp/ all.jsonnet
+}
+
+deploy() {
+  gen
+  terraform apply .tmp
+}
+
+destroy() {
+  terraform destroy .tmp
+}
+
+case "${1:-}" in
+  "")
+    ;;
+  "deploy")
+    deploy
+    ;;
+  "destroy")
+    destroy
+    ;;
+  "gen")
+    gen
+    ;;
+esac

@@ -1,9 +1,0 @@
-#! /bin/bash
-
-set -o errexit
-set -o pipefail
-set -o nounset
-
-cd "${BASH_SOURCE%/*}"
-mkdir -p .tmp/
-jsonnet -J ../../ --multi .tmp/ all.jsonnet

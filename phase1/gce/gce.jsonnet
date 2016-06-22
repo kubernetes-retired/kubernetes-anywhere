@@ -124,7 +124,7 @@ function(cfg)
               nat_ip: "${google_compute_address.%(master_ip)s.address}" % names,
             },
           }],
-          metadata_startup_script: std.escapeStringDollars(importstr "../configure-vm.sh"),
+          metadata_startup_script: std.escapeStringDollars(importstr "configure-vm.sh"),
           metadata: {
             "k8s-role": "master",
             "k8s-deploy-bucket": names.release_bucket,
@@ -143,7 +143,7 @@ function(cfg)
           name: names.instance_template,
           tags: ["%(instance_prefix)s-node" % p1],
           metadata: {
-            "startup-script": std.escapeStringDollars(importstr "../configure-vm.sh"),
+            "startup-script": std.escapeStringDollars(importstr "configure-vm.sh"),
             "k8s-role": "node",
             "k8s-deploy-bucket": names.release_bucket,
             "k8s-config": config_metadata_template % [names.master_ip, "node"],

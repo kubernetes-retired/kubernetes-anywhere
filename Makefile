@@ -45,6 +45,11 @@ menuconfig: .tmp/mconf
 echo-config: .config.json
 	cat $<
 
+deploy destroy: .config.json
+	$(MAKE) do WHAT=$@
+
+do:
+	( cd "phase1/$$(jq -r '.phase1.cloud_provider' .config.json)"; ./do $(WHAT) )
 
 clean:
 	rm -rf .tmp
