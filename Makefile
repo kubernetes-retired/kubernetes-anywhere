@@ -40,7 +40,7 @@ menuconfig: .tmp/mconf
 	$(MAKE) config
 
 .config.json: .config
-	util/conig_to_json $< > $@
+	util/config_to_json $< > $@
 
 echo-config: .config.json
 	cat $<
