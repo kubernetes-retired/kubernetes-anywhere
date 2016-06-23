@@ -1,19 +1,35 @@
-# a big docker file meant for depolying min-turnup
 FROM ubuntu
 
-RUN apt-get update
-RUN apt-get install -y curl vim jq libssl-dev openssl zip make sudo
+# Install basics
+RUN apt-get update && apt-get -y upgrade \
+    && apt-get install -y git curl vim jq libssl-dev openssl zip make sudo \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN curl -sSL --fail -o /usr/local/bin/jsonnet \
-  "https://storage.googleapis.com/kube-deploy/jsonnet/adf169b1e4a4ba170f58b47111ed88552fae42c8"
-RUN chmod +x /usr/local/bin/jsonnet
-
+# Install Terraform
+ENV TERRAFORM_VERSION 0.7.0-rc1
 RUN curl -sSL --fail \
-  "https://releases.hashicorp.com/terraform/0.6.16/terraform_0.6.16_linux_amd64.zip" \
-  -o /tmp/tf.zip \
-  && unzip -d /usr/local/bin /tmp/tf.zip \
-  && rm /tmp/tf.zip
+    "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" \
+    -o /tmp/tf.zip \
+    && unzip -d /usr/local/bin /tmp/tf.zip \
+    && rm /tmp/tf.zip
 
-WORKDIR /root/min-turnup
+# Azure - Required dependencies 
+RUN apt-get update && apt-get -y upgrade && \
+    apt-get install -y nodejs npm && \
+    rm -rf /var/lib/apt/lists/*
+RUN npm install -g azure-cli
 
-CMD bash
+# Install Jsonnet
+ENV JSONNET_GIT_TAG v0.8.8
+RUN cd /tmp \
+    && git clone https://github.com/google/jsonnet \
+    && cd jsonnet \
+    && git checkout ${JSONNET_GIT_TAG} \
+    && make \
+    && cp jsonnet /usr/bin/jsonnet
+
+WORKDIR /root/kubernetes-anywhere
+
+ADD . /root/kubernetes-anywhere/
+
+CMD make
