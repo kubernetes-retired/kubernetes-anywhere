@@ -49,5 +49,5 @@ docker run \
   --net=host \
   -v /:/host_root \
   -v /etc/kubernetes/k8s_config.json:/opt/playbooks/config.json:ro \
-  gcr.io/mikedanese-k8s/install-k8s:v1 \
+  gcr.io/mikedanese-k8s/install-k8s:v2 \
   /opt/do_role.sh "${ROLE}"

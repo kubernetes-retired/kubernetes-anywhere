@@ -1,4 +1,4 @@
-TAG=v1
+TAG=v2
 IMAGE=gcr.io/mikedanese-k8s/install-k8s
 
 build:
