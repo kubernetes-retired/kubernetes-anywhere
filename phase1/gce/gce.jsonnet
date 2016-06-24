@@ -1,4 +1,5 @@
 function(cfg)
+  local tf = import "phase1/tf.jsonnet";
   local p1 = cfg.phase1;
   local gce = p1.gce;
   local names = {
@@ -29,6 +30,13 @@ function(cfg)
       addons_config: (import "phase3/all.jsonnet")(cfg),
     },
   });
+  local kubeconfig(user) =
+    std.manifestJson(
+      tf.pki.kubeconfig_from_certs(
+        user,
+        "root",
+        "https://${google_compute_address.%(master_ip)s.address}" % names
+      ));
   {
     output: {
       [names.master_ip]: {
@@ -53,23 +61,6 @@ function(cfg)
         [names.master_ip]: {
           name: names.master_ip,
           region: gce.region,
-          provisioner: [
-            {
-              "local-exec": {
-                command: |||
-                  cat <<EOF > ../../phase1b/crypto/san-extras
-                  DNS.1 = kubernetes
-                  DNS.2 = kubernetes.default
-                  DNS.3 = kubernetes.default.svc
-                  DNS.4 = kubernetes.default.svc.cluster.local
-                  DNS.5 = %(master_instance)s
-                  IP.1 = ${google_compute_address.%(master_ip)s.address}
-                  IP.2 = 10.0.0.1
-                  EOF
-                ||| % names,
-              },
-            },
-          ],
         },
       },
       google_compute_firewall: {
@@ -127,8 +118,10 @@ function(cfg)
           metadata_startup_script: std.escapeStringDollars(importstr "configure-vm.sh"),
           metadata: {
             "k8s-role": "master",
-            "k8s-deploy-bucket": names.release_bucket,
             "k8s-config": config_metadata_template % [names.master_ip, "master"],
+            "k8s-ca-public-key": "${tls_self_signed_cert.root.cert_pem}",
+            "k8s-apisever-public-key": "${tls_locally_signed_cert.master.cert_pem}",
+            "k8s-apisever-private-key": "${tls_private_key.master.private_key_pem}",
           },
           disk: [{
             image: gce.os_image,
@@ -147,6 +140,7 @@ function(cfg)
             "k8s-role": "node",
             "k8s-deploy-bucket": names.release_bucket,
             "k8s-config": config_metadata_template % [names.master_ip, "node"],
+            "k8s-node-kubeconfig": kubeconfig("node"),
           },
           disk: [{
             source_image: gce.os_image,
@@ -168,60 +162,48 @@ function(cfg)
           target_size: p1.num_nodes,
         },
       },
-      null_resource: {
-        crypto_assets: {
-          depends_on: [
-            "google_compute_address.%(master_ip)s" % names,
+
+      // Public Key Infrastructure
+      tls_private_key: {
+        [name]: tf.pki.private_key
+        for name in ["root", "node", "master", "admin"]
+      },
+      tls_self_signed_cert: {
+        root: tf.pki.tls_self_signed_cert("root"),
+      },
+      tls_cert_request: {
+        [name]: tf.pki.tls_cert_request(name)
+        for name in ["node", "admin"]
+      } {
+        master: tf.pki.tls_cert_request(
+          "master",
+          dns_names=[
+            "kubernetes",
+            "kubernetes.default",
+            "kubernetes.default.svc",
+            "kubernetes.default.svc.local",
+            "kubernetes.default.svc.local",
+            names.master_instance,
           ],
+          ip_addresses=[
+            "${google_compute_address.%(master_ip)s.address}" % names,
+            # master service ip, this depends on the cluster cidr
+            # so must be changed if/when we allow that to be configured
+            "10.0.0.1",
+          ]
+        ),
+      },
+      tls_locally_signed_cert: {
+        [name]: tf.pki.tls_locally_signed_cert(name, "root")
+        for name in ["node", "master", "admin"]
+      },
+      null_resource: {
+        kubeconfig: {
           provisioner: [{
             "local-exec": {
-              # clean is covering up a bug, perhaps in the makefile?
-              command: "make -C ../../phase1b/crypto clean && make -C ../../phase1b/crypto",
+              command: "echo '%s' > kubeconfig.json" % kubeconfig("admin"),
             },
           }],
-        },
-      },
-      google_storage_bucket: {
-        [names.release_bucket]: {
-          name: names.release_bucket,
-        },
-      },
-      google_storage_bucket_object: {
-        crypto_all: {
-          name: "crypto/all.tar",
-          source: "../../phase1b/crypto/all.tar",
-          bucket: names.release_bucket,
-          depends_on: [
-            "google_storage_bucket.%(release_bucket)s" % names,
-            "null_resource.crypto_assets",
-          ],
-        },
-        crypto_apiserver: {
-          name: "crypto/apiserver.tar",
-          source: "../../phase1b/crypto/apiserver.tar",
-          bucket: names.release_bucket,
-          depends_on: [
-            "google_storage_bucket.%(release_bucket)s" % names,
-            "null_resource.crypto_assets",
-          ],
-        },
-        crypto_kubelet: {
-          name: "crypto/kubelet.tar",
-          source: "../../phase1b/crypto/kubelet.tar",
-          bucket: names.release_bucket,
-          depends_on: [
-            "google_storage_bucket.%(release_bucket)s" % names,
-            "null_resource.crypto_assets",
-          ],
-        },
-        crypto_root: {
-          name: "crypto/root.tar",
-          source: "../../phase1b/crypto/root.tar",
-          bucket: names.release_bucket,
-          depends_on: [
-            "google_storage_bucket.%(release_bucket)s" % names,
-            "null_resource.crypto_assets",
-          ],
         },
       },
     },
