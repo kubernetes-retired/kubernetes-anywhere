@@ -1,8 +1,8 @@
 {
   pki:: {
     private_key: {
-      algorithm: "ECDSA",
-      ecdsa_curve: "P384",
+      algorithm: "RSA",
+      rsa_bits: 2048,
     },
     tls_cert_request(name, dns_names=[], ip_addresses=[]): {
       key_algorithm: "${tls_private_key.%s.algorithm}" % name,
