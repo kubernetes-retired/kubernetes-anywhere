@@ -29,7 +29,7 @@ function(cfg)
               "/hyperkube",
               "controller-manager",
               "--master=127.0.0.1:8080",
-              "--cluster-name=k-1",
+              "--cluster-name=" + cfg.phase1.instance_prefix,
               "--cluster-cidr=10.244.0.0/16",
               "--allocate-node-cidrs=true",
               "--cloud-provider=%s" % cfg.phase1.cloud_provider,
