@@ -1,4 +1,10 @@
 function(cfg)
+  local etcdPath =
+    if cfg.phase1.cloud_provider == "gce" then
+      "/mnt/master-pd/var/etcd"
+    else
+      "/var/etcd";
+
   {
     apiVersion: "v1",
     kind: "Pod",
@@ -62,7 +68,7 @@ function(cfg)
         {
           name: "varetcd",
           hostPath: {
-            path: "/mnt/master-pd/var/etcd",
+            path: etcdPath,
           },
         },
       ],

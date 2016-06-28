@@ -1,3 +1,6 @@
+local build_params(arr) =
+  std.flattenArrays(std.filter(function(a) a != null, arr));
+
 function(cfg)
   {
     apiVersion: "v1",
@@ -15,32 +18,31 @@ function(cfg)
       containers: [
         {
           name: "kube-apiserver",
-          image: "%(docker_registry)s/kube-apiserver:%(kubernetes_version)s" % cfg.phase2,
+          image: "%(docker_registry)s/hyperkube-amd64:%(kubernetes_version)s" % cfg.phase2,
           resources: {
             requests: {
               cpu: "250m",
             },
           },
-          command: [
-            "/bin/sh",
-            "-c",
-            |||
-              /usr/local/bin/kube-apiserver \
-                --address=127.0.0.1 \
-                --etcd-servers=http://127.0.0.1:2379 \
-                --cloud-provider=%(cloud_provider)s \
-                --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,ResourceQuota \
-                --service-cluster-ip-range=10.0.0.0/16 \
-                --client-ca-file=/srv/kubernetes/ca.pem \
-                --tls-cert-file=/srv/kubernetes/apiserver.pem \
-                --tls-private-key-file=/srv/kubernetes/apiserver-key.pem \
-                --secure-port=443 \
-                --allow-privileged \
-                --v=4
-            ||| % cfg.phase1,
-            # --basic-auth-file=/srv/kubernetes/basic_auth.csv \
-            # --token-auth-file=/srv/kubernetes/known_tokens.csv \
-          ],
+          command: build_params([
+            [
+              "/hyperkube",
+              "apiserver",
+              "--address=127.0.0.1",
+              "--etcd-servers=http://127.0.0.1:2379",
+              "--cloud-provider=%s" % cfg.phase1.cloud_provider,
+              "--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,ResourceQuota",
+              "--service-cluster-ip-range=10.0.0.0/16",
+              "--client-ca-file=/srv/kubernetes/ca.pem",
+              "--tls-cert-file=/srv/kubernetes/apiserver.pem",
+              "--tls-private-key-file=/srv/kubernetes/apiserver-key.pem",
+              "--secure-port=443",
+              "--allow-privileged",
+              "--v=4",
+            ],
+            if cfg.phase1.cloud_provider == "azure" then
+              ["--cloud-config=/etc/kubernetes/azure.json"],
+          ]),
           livenessProbe: {
             httpGet: {
               host: "127.0.0.1",
@@ -69,6 +71,11 @@ function(cfg)
               readOnly: true,
             },
             {
+              name: "etckube",
+              mountPath: "/etc/kubernetes",
+              readOnly: true,
+            },
+            {
               name: "etcssl",
               mountPath: "/etc/ssl",
               readOnly: true,
@@ -81,6 +88,12 @@ function(cfg)
           name: "srvkube",
           hostPath: {
             path: "/srv/kubernetes",
+          },
+        },
+        {
+          name: "etckube",
+          hostPath: {
+            path: "/etc/kubernetes",
           },
         },
         {

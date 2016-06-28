@@ -22,7 +22,7 @@ while read line; do
   field=$(echo "${line}" \
     | cut -f1 -d"=")
   value=$(echo "${line}" \
-    | cut -f2 -d"=" \
+    | cut -f2- -d"=" \
     | sed \
       -e 's/^y$/true/' \
       -e 's/^n$/false/')
