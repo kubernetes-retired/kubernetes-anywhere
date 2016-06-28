@@ -1,3 +1,6 @@
+local build_params(arr) =
+  std.flattenArrays(std.filter(function(a) a != null, arr));
+
 function(cfg)
   {
     apiVersion: "v1",
@@ -15,27 +18,28 @@ function(cfg)
       containers: [
         {
           name: "kube-controller-manager",
-          image: "%(docker_registry)s/kube-controller-manager:%(kubernetes_version)s" % cfg.phase2,
+          image: "%(docker_registry)s/hyperkube-amd64:%(kubernetes_version)s" % cfg.phase2,
           resources: {
             requests: {
               cpu: "200m",
             },
           },
-          command: [
-            "/bin/sh",
-            "-c",
-            |||
-              /usr/local/bin/kube-controller-manager \
-                --master=127.0.0.1:8080 \
-                --cluster-name=k-1 \
-                --cluster-cidr=10.244.0.0/16 \
-                --allocate-node-cidrs=true \
-                --cloud-provider=%(cloud_provider)s \
-                --service-account-private-key-file=/srv/kubernetes/apiserver-key.pem \
-                --root-ca-file=/srv/kubernetes/ca.pem \
-                --v=2
-            ||| % cfg.phase1,
-          ],
+          command: build_params([
+            [
+              "/hyperkube",
+              "controller-manager",
+              "--master=127.0.0.1:8080",
+              "--cluster-name=" + cfg.phase1.instance_prefix,
+              "--cluster-cidr=10.244.0.0/16",
+              "--allocate-node-cidrs=true",
+              "--cloud-provider=%s" % cfg.phase1.cloud_provider,
+              "--service-account-private-key-file=/srv/kubernetes/apiserver-key.pem",
+              "--root-ca-file=/srv/kubernetes/ca.pem",
+              "--v=2",
+            ],
+            if cfg.phase1.cloud_provider == "azure" then
+              ["--cloud-config=/etc/kubernetes/azure.json"],
+          ]),
           livenessProbe: {
             httpGet: {
               host: "127.0.0.1",
@@ -52,6 +56,11 @@ function(cfg)
               readOnly: true,
             },
             {
+              name: "etckube",
+              mountPath: "/etc/kubernetes",
+              readOnly: true,
+            },
+            {
               name: "etcssl",
               mountPath: "/etc/ssl",
               readOnly: true,
@@ -64,6 +73,12 @@ function(cfg)
           name: "srvkube",
           hostPath: {
             path: "/srv/kubernetes",
+          },
+        },
+        {
+          name: "etckube",
+          hostPath: {
+            path: "/etc/kubernetes",
           },
         },
         {

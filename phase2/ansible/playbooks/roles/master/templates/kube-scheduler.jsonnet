@@ -15,16 +15,17 @@ function(cfg)
       containers: [
         {
           name: "kube-scheduler",
-          image: "%(docker_registry)s/kube-scheduler:%(kubernetes_version)s" % cfg.phase2,
+          image: "%(docker_registry)s/hyperkube-amd64:%(kubernetes_version)s" % cfg.phase2,
           resources: {
             requests: {
               cpu: "100m",
             },
           },
           command: [
-            "/bin/sh",
-            "-c",
-            "/usr/local/bin/kube-scheduler --master=127.0.0.1:8080 --v=2",
+            "/hyperkube",
+            "scheduler",
+            "--master=127.0.0.1:8080",
+            "--v=2",
           ],
           livenessProbe: {
             httpGet: {
