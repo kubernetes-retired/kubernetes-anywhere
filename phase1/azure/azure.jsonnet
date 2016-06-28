@@ -94,7 +94,7 @@ function(config)
           resource_group_name: "${azurerm_resource_group.rg.name}",
           name: names.subnet,
           virtual_network_name: "${azurerm_virtual_network.vnet.name}",
-          address_prefix: "10.0.0.0/16",
+          address_prefix: "10.240.0.0/16",
           network_security_group_id: "${azurerm_network_security_group.sg.id}",
           route_table_id: "${azurerm_route_table.rt.id}",
         },
@@ -292,7 +292,7 @@ function(config)
             master_private_ip,
             # master service ip, this depends on the cluster cidr
             # so must be changed if/when we allow that to be configured
-            "10.3.0.1",
+            "10.0.0.1",
           ]
         ),
       },

@@ -35,7 +35,7 @@ ExecStart=/usr/bin/docker run \
             --network-plugin=kubenet \
             --reconcile-cidr \
 {% endif %}
-            --cluster-dns=10.3.0.10 \
+            --cluster-dns=10.0.0.10 \
             --cluster-domain=cluster.local \
             --v=2
 Restart=always

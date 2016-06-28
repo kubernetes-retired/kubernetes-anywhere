@@ -16,10 +16,10 @@ deploy() {
   gen
   
   # Workaround: https://github.com/hashicorp/terraform/issues/7153
-  terraform apply .tmp || true
+  terraform apply -state=./.tmp/terraform.tfstate .tmp || true
   
   # TODO: this dumps tfstate into ./azure/ rather than ./azure/.tmp/
-  terraform apply .tmp
+  terraform apply -state=./.tmp/terraform.tfstate .tmp
 }
 
 destroy() {

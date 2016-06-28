@@ -35,7 +35,7 @@ config phase1.azure.node_vm_size
 
 config phase1.azure.master_private_ip
 	string "Private IP address of Master"
-	default "10.0.1.4"
+	default "10.240.1.4"
 	help
 		The private ip address of master
 
