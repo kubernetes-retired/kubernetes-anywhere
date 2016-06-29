@@ -3,3 +3,4 @@
 .config.old
 .config.json
 **/kubeconfig.json
+clusters/

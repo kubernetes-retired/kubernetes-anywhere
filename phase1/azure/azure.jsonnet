@@ -192,7 +192,7 @@ function(config)
             apiserver_cert_pem: "${base64encode(tls_locally_signed_cert.master.cert_pem)}",
             apiserver_key_pem: "${base64encode(tls_private_key.master.private_key_pem)}",
             node_kubeconfig: kubeconfig("node"),
-            k8s_config: "${base64encode(file(\"../../.config.json\"))}",
+            k8s_config: "${base64encode(file(\"./config.json\"))}",
             azure_json: "${base64encode(template_file.azure_json.rendered)}",
           },
         },
@@ -305,7 +305,7 @@ function(config)
         kubeconfig: {
           provisioner: [{
             "local-exec": {
-              command: "echo '%s' > ./.tmp/kubeconfig.json" % kubeconfig("admin"),
+              command: "echo '%s' > ./kubeconfig.json" % kubeconfig("admin"),
             },
           }],
         },
