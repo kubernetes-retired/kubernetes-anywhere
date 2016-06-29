@@ -22,21 +22,16 @@ KCONFIG_FILES = $(shell find . -name 'Kconfig')
 default:
 	$(MAKE) config
 
-.tmp/conf:
-	mkdir -p .tmp; curl -sSL --fail -o "$@" \
-		"https://storage.googleapis.com/public-mikedanese-k8s/kconfig/$(CONF_TOOL_VERSION)/$(OS)/conf"; \
-	chmod +x "$@"
-
-.tmp/mconf:
-	mkdir -p .tmp; curl -sSL --fail -o "$@" \
-		"https://storage.googleapis.com/public-mikedanese-k8s/kconfig/$(CONF_TOOL_VERSION)/$(OS)/mconf"; \
+.tmp/conf .tmp/mconf:
+	mkdir -p $(dir $@)
+	curl -sSL --fail -o "$@" "https://storage.googleapis.com/public-mikedanese-k8s/kconfig/$(CONF_TOOL_VERSION)/$(OS)/$(shell basename $@)"
 	chmod +x "$@"
 
 config: .tmp/conf
-	CONFIG_="" .tmp/conf Kconfig
+	CONFIG_="." .tmp/conf Kconfig
 
 menuconfig: .tmp/mconf
-	CONFIG_="" .tmp/mconf Kconfig
+	CONFIG_="." .tmp/mconf Kconfig
 
 .config: .tmp/conf $(KCONFIG_FILES)
 	$(MAKE) config

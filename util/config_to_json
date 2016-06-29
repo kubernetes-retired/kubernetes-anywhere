@@ -16,20 +16,14 @@ if [[ "$#" != 1 ]]; then
 fi
 
 KCONFIG="$1"
-OUT="{}"
 
-while read line; do
-  field=$(echo "${line}" \
-    | cut -f1 -d"=")
-  value=$(echo "${line}" \
-    | cut -f2- -d"=" \
-    | sed \
-      -e 's/^y$/true/' \
-      -e 's/^n$/false/')
-  OUT=$(
-    echo "${OUT}" |
-      jq ".${field}=${value}")
-done < <(cat "${KCONFIG}" \
-  | sed -r -e '/^(\s*#.*)?$/d')
+read_input_and_strip_comments() {
+  sed -r -e '/^(\s*#.*)?$/d' "${KCONFIG}"
+}
 
-echo "${OUT}"
+convert_boolean_types() {
+  sed -e 's/\(=\)[yY]$/\1true/' -e 's/\(=\)[nN]$/\1false/'
+}
+
+## `jq -n ".foo=true|.bar=false"` will generate `{ "foo": true, "bar": false }`
+jq -n "$(read_input_and_strip_comments | convert_boolean_types | paste -sd "|" -)"
