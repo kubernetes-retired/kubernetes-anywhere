@@ -32,6 +32,7 @@ install:
   - docker images
 
 script:
+  - shellcheck -x -s bash ./util/config_to_json
   - shellcheck -x -s bash ./phase1/google-compute-engine/{create,delete}-cluster.sh
   - make -C phase2/docker-images lint
   - make -C phase2/docker-images build
