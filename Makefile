@@ -28,10 +28,10 @@ default:
 	chmod +x "$@"
 
 config: .tmp/conf
-	CONFIG_="" .tmp/conf Kconfig
+	CONFIG_="." .tmp/conf Kconfig
 
 menuconfig: .tmp/mconf
-	CONFIG_="" .tmp/mconf Kconfig
+	CONFIG_="." .tmp/mconf Kconfig
 
 .config: .tmp/conf $(KCONFIG_FILES)
 	$(MAKE) config
