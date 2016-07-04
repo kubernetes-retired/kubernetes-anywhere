@@ -9,7 +9,7 @@
 
 First, setup Weave Net:
 ```
-sudo curl --silent --location git.io/weave --output /usr/local/bin/weave
+sudo curl --silent --location https://git.io/weave --output /usr/local/bin/weave
 sudo chmod +x /usr/local/bin/weave
 weave launch
 weave expose -h moby.weave.local
