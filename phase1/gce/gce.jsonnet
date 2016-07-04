@@ -3,13 +3,13 @@ function(cfg)
   local p1 = cfg.phase1;
   local gce = p1.gce;
   local names = {
-    instance_template: "%(instance_prefix)s-minion-instance-template" % p1,
-    instance_group: "%(instance_prefix)s-minion-group" % p1,
-    master_instance: "%(instance_prefix)s-master" % p1,
-    master_ip: "%(instance_prefix)s-master-ip" % p1,
-    master_firewall_rule: "%(instance_prefix)s-master-https" % p1,
-    minion_firewall_rule: "%(instance_prefix)s-minion-all" % p1,
-    release_bucket: "%s-kube-deploy-%s" % [gce.project, p1.instance_prefix],
+    instance_template: "%(cluster_name)s-minion-instance-template" % p1,
+    instance_group: "%(cluster_name)s-minion-group" % p1,
+    master_instance: "%(cluster_name)s-master" % p1,
+    master_ip: "%(cluster_name)s-master-ip" % p1,
+    master_firewall_rule: "%(cluster_name)s-master-https" % p1,
+    minion_firewall_rule: "%(cluster_name)s-minion-all" % p1,
+    release_bucket: "%s-kube-deploy-%s" % [gce.project, p1.cluster_name],
   };
   local instance_defaults = {
     machine_type: gce.instance_type,
@@ -81,7 +81,7 @@ function(cfg)
             ports: ["443"],
           }],
           source_ranges: ["0.0.0.0/0"],
-          target_tags: ["%(instance_prefix)s-master" % p1],
+          target_tags: ["%(cluster_name)s-master" % p1],
         },
         [names.minion_firewall_rule]: {
           name: names.minion_firewall_rule,
@@ -98,7 +98,7 @@ function(cfg)
             "172.16.0.0/12",
             "192.168.0.0/16",
           ],
-          target_tags: ["%(instance_prefix)s-node" % p1],
+          target_tags: ["%(cluster_name)s-node" % p1],
         },
       },
       google_compute_instance: {
@@ -106,8 +106,8 @@ function(cfg)
           name: names.master_instance,
           zone: gce.zone,
           tags: [
-            "%(instance_prefix)s-master" % p1,
-            "%(instance_prefix)s-node" % p1,
+            "%(cluster_name)s-master" % p1,
+            "%(cluster_name)s-node" % p1,
           ],
           network_interface: [{
             network: "${google_compute_network.network.name}",
@@ -134,7 +134,7 @@ function(cfg)
       google_compute_instance_template: {
         [names.instance_template]: instance_defaults {
           name: names.instance_template,
-          tags: ["%(instance_prefix)s-node" % p1],
+          tags: ["%(cluster_name)s-node" % p1],
           metadata: {
             "startup-script": std.escapeStringDollars(importstr "configure-vm.sh"),
             "k8s-role": "node",
@@ -157,7 +157,7 @@ function(cfg)
           name: names.instance_group,
           instance_template: "${google_compute_instance_template.%(instance_template)s.self_link}" % names,
           update_strategy: "NONE",
-          base_instance_name: "%(instance_prefix)s-minion" % p1,
+          base_instance_name: "%(cluster_name)s-minion" % p1,
           zone: gce.zone,
           target_size: p1.num_nodes,
         },
