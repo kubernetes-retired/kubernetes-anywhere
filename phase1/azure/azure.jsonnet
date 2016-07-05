@@ -3,19 +3,19 @@ function(config)
   local cfg = config.phase1;
   local master_private_ip = cfg.azure.master_private_ip;
   local names = {
-    resource_group: "%(instance_prefix)s" % cfg,
-    master_public_ip: "%(instance_prefix)s-master-pip" % cfg,
-    availability_set: "%(instance_prefix)s-as" % cfg,
-    storage_account: "${replace(\"%(instance_prefix)sstrg\", \"-\", \"\")}" % cfg,
-    storage_container: "strg%(instance_prefix)s" % cfg,
-    vnet: "%(instance_prefix)s-vnet" % cfg,
-    subnet: "%(instance_prefix)s-subnet" % cfg,
-    route_table: "%(instance_prefix)s" % cfg,
-    security_group: "%(instance_prefix)s-nsg" % cfg,
-    master_nic: "%(instance_prefix)s-master-nic" % cfg,
-    master_vm: "%(instance_prefix)s-master" % cfg,
-    node_nic: "%(instance_prefix)s-node-nic" % cfg,
-    node_vm: "%(instance_prefix)s-node" % cfg,
+    resource_group: "%(cluster_name)s" % cfg,
+    master_public_ip: "%(cluster_name)s-master-pip" % cfg,
+    availability_set: "%(cluster_name)s-as" % cfg,
+    storage_account: "${replace(\"%(cluster_name)sstrg\", \"-\", \"\")}" % cfg,
+    storage_container: "strg%(cluster_name)s" % cfg,
+    vnet: "%(cluster_name)s-vnet" % cfg,
+    subnet: "%(cluster_name)s-subnet" % cfg,
+    route_table: "%(cluster_name)s" % cfg,
+    security_group: "%(cluster_name)s-nsg" % cfg,
+    master_nic: "%(cluster_name)s-master-nic" % cfg,
+    master_vm: "%(cluster_name)s-master" % cfg,
+    node_nic: "%(cluster_name)s-node-nic" % cfg,
+    node_vm: "%(cluster_name)s-node" % cfg,
   };
   local kubeconfig(user) =
     std.manifestJson(
@@ -107,8 +107,8 @@ function(config)
         },
       },
       azurerm_network_security_rule: {
-        [cfg.instance_prefix + "-master-ssh"]: {
-          name: "%(instance_prefix)s-master-ssh" % cfg,
+        [cfg.cluster_name + "-master-ssh"]: {
+          name: "%(cluster_name)s-master-ssh" % cfg,
           priority: 100,
           direction: "Inbound",
           access: "Allow",
@@ -120,8 +120,8 @@ function(config)
           resource_group_name: "${azurerm_resource_group.rg.name}",
           network_security_group_name: "${azurerm_network_security_group.sg.name}",
         },
-        [cfg.instance_prefix + "-master-ssl"]: {
-          name: "%(instance_prefix)s-master-ssl" % cfg,
+        [cfg.cluster_name + "-master-ssl"]: {
+          name: "%(cluster_name)s-master-ssl" % cfg,
           priority: 110,
           direction: "Inbound",
           access: "Allow",

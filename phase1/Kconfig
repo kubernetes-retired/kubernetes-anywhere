@@ -8,11 +8,13 @@ config phase1.num_nodes
 	help
 	  The number of nodes you would like to provision.
 
-config phase1.instance_prefix
-	string "instance prefix"
+config phase1.cluster_name
+	string "cluster name"
 	default "kubernetes"
 	help
-	  A prefix to append to all instance names.
+	  An identifier to use for this cluster.
+	  This is used for compute instance names as a prefix,
+	  and for naming any other cloud provider resources.
 
 menuconfig phase1.cloud_provider
 	string "cloud provider"
