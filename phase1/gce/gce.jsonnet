@@ -98,7 +98,7 @@ function(cfg)
             "172.16.0.0/12",
             "192.168.0.0/16",
           ],
-          target_tags: ["%(cluster_name)s-node" % p1],
+          target_tags: ["%(cluster_name)s-minion" % p1],
         },
       },
       google_compute_instance: {
@@ -107,7 +107,7 @@ function(cfg)
           zone: gce.zone,
           tags: [
             "%(cluster_name)s-master" % p1,
-            "%(cluster_name)s-node" % p1,
+            "%(cluster_name)s-minion" % p1,
           ],
           network_interface: [{
             network: "${google_compute_network.network.name}",
