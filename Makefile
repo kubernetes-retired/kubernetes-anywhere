@@ -42,7 +42,7 @@ menuconfig: .tmp/mconf
 # i'm awful at make, clean this up
 prep:
 	$(eval CLOUD_PROVIDER := $(shell jq -r '.phase1.cloud_provider' .config.json))
-	$(eval INSTANCE_PREFIX=$(shell jq -r '.phase1.instance_prefix' .config.json))
+	$(eval INSTANCE_PREFIX=$(shell jq -r '.phase1.cluster_name' .config.json))
 	$(eval DEST=clusters/$(CLOUD_PROVIDER)/$(INSTANCE_PREFIX))
 	mkdir -p "$(DEST)"
 	cp -a "phase1/$(CLOUD_PROVIDER)/." "$(DEST)/"
@@ -56,7 +56,7 @@ deploy destroy: prep
 
 do:
 	$(eval CLOUD_PROVIDER := $(shell jq -r '.phase1.cloud_provider' .config.json))
-	$(eval INSTANCE_PREFIX=$(shell jq -r '.phase1.instance_prefix' .config.json))
+	$(eval INSTANCE_PREFIX=$(shell jq -r '.phase1.cluster_name' .config.json))
 	$(eval DEST=clusters/$(CLOUD_PROVIDER)/$(INSTANCE_PREFIX))
 	( cd "$(DEST)"; ./do $(WHAT) )
 
