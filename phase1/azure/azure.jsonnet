@@ -182,6 +182,7 @@ function(config)
             subnetName: "${azurerm_subnet.subnet.name}",
             securityGroupName: "${azurerm_network_security_group.sg.name}",
             vnetName: "${azurerm_virtual_network.vnet.name}",
+            routeTableName: "${azurerm_route_table.rt.name}",
           },
         },
         configure_vm: {

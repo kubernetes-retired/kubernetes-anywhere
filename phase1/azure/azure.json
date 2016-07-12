@@ -7,5 +7,6 @@
   "location": "${location}",
   "subnetName": "${subnetName}",
   "securityGroupName": "${securityGroupName}",
-  "vnetName": "${vnetName}"
+  "vnetName": "${vnetName}",
+  "routeTableName": "${routeTableName}"
 }
