@@ -175,8 +175,8 @@ function(config)
           vars: {
             tenantId: "${var.tenant_id}",
             subscriptionId: "${var.subscription_id}",
-            adClientId: "${var.client_id}",
-            adClientSecret: "${var.client_secret}",
+            aadClientId: "${var.client_id}",
+            aadClientSecret: "${var.client_secret}",
             resourceGroup: "${azurerm_resource_group.rg.name}",
             location: "${azurerm_resource_group.rg.location}",
             subnetName: "${azurerm_subnet.subnet.name}",

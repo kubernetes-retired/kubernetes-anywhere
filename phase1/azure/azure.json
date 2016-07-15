@@ -1,8 +1,8 @@
 {
   "tenantId": "${tenantId}",
   "subscriptionId": "${subscriptionId}",
-  "adClientId": "${adClientId}",
-  "adClientSecret": "${adClientSecret}",
+  "aadClientId": "${aadClientId}",
+  "aadClientSecret": "${aadClientSecret}",
   "resourceGroup": "${resourceGroup}",
   "location": "${location}",
   "subnetName": "${subnetName}",
