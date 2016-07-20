@@ -122,6 +122,7 @@ function(cfg)
             "k8s-ca-public-key": "${tls_self_signed_cert.root.cert_pem}",
             "k8s-apisever-public-key": "${tls_locally_signed_cert.master.cert_pem}",
             "k8s-apisever-private-key": "${tls_private_key.master.private_key_pem}",
+            "k8s-master-kubeconfig": kubeconfig("master"),
           },
           disk: [{
             image: gce.os_image,
