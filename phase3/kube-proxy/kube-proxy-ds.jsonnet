@@ -27,15 +27,12 @@ function(cfg)
               },
               name: "kube-proxy",
               command: [
-                "/bin/sh",
-                "-c",
-                |||
-                  kube-proxy \
-                    --kubeconfig=/srv/kubernetes/kubeconfig.json \
-                    --resource-container=\"\"
-                |||,
+                  "/hyperkube",
+                  "proxy",
+                  "--kubeconfig=/srv/kubernetes/kubeconfig.json",
+                  "--resource-container=\"\"",
               ],
-              image: "%(docker_registry)s/kube-proxy:%(kubernetes_version)s" % cfg.phase2,
+              image: "%(docker_registry)s/hyperkube-amd64:%(kubernetes_version)s" % cfg.phase2,
               volumeMounts: [
                 {
                   readOnly: true,
