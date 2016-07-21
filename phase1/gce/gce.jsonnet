@@ -3,12 +3,12 @@ function(cfg)
   local p1 = cfg.phase1;
   local gce = p1.gce;
   local names = {
-    instance_template: "%(cluster_name)s-minion-instance-template" % p1,
-    instance_group: "%(cluster_name)s-minion-group" % p1,
+    instance_template: "%(cluster_name)s-node-instance-template" % p1,
+    instance_group: "%(cluster_name)s-node-group" % p1,
     master_instance: "%(cluster_name)s-master" % p1,
     master_ip: "%(cluster_name)s-master-ip" % p1,
     master_firewall_rule: "%(cluster_name)s-master-https" % p1,
-    minion_firewall_rule: "%(cluster_name)s-minion-all" % p1,
+    node_firewall_rule: "%(cluster_name)s-node-all" % p1,
     release_bucket: "%s-kube-deploy-%s" % [gce.project, p1.cluster_name],
   };
   local instance_defaults = {
@@ -83,8 +83,8 @@ function(cfg)
           source_ranges: ["0.0.0.0/0"],
           target_tags: ["%(cluster_name)s-master" % p1],
         },
-        [names.minion_firewall_rule]: {
-          name: names.minion_firewall_rule,
+        [names.node_firewall_rule]: {
+          name: names.node_firewall_rule,
           network: "${google_compute_network.network.name}",
           allow: [
             { protocol: "tcp" },
@@ -98,7 +98,7 @@ function(cfg)
             "172.16.0.0/12",
             "192.168.0.0/16",
           ],
-          target_tags: ["%(cluster_name)s-minion" % p1],
+          target_tags: ["%(cluster_name)s-node" % p1],
         },
       },
       google_compute_instance: {
@@ -107,7 +107,7 @@ function(cfg)
           zone: gce.zone,
           tags: [
             "%(cluster_name)s-master" % p1,
-            "%(cluster_name)s-minion" % p1,
+            "%(cluster_name)s-node" % p1,
           ],
           network_interface: [{
             network: "${google_compute_network.network.name}",
@@ -157,7 +157,7 @@ function(cfg)
           name: names.instance_group,
           instance_template: "${google_compute_instance_template.%(instance_template)s.self_link}" % names,
           update_strategy: "NONE",
-          base_instance_name: "%(cluster_name)s-minion" % p1,
+          base_instance_name: "%(cluster_name)s-node" % p1,
           zone: gce.zone,
           target_size: p1.num_nodes,
         },
