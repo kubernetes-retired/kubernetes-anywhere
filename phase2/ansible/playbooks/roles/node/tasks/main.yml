@@ -20,3 +20,6 @@
     name: kubelet
     state: started
     enabled: yes
+
+- include: azure/ephemeral-drive.yml
+  when: phase1.azure.use_ephemeral_drive
