@@ -30,7 +30,7 @@
       ],
     },
     tls_locally_signed_cert(name, signer): {
-      cert_request_pem: "${tls_cert_request.%s.cert_request_pem}" % name,
+      cert_request_pem: "${data.tls_cert_request.%s.cert_request_pem}" % name,
       ca_key_algorithm: "${tls_private_key.%s.algorithm}" % signer,
       ca_private_key_pem: "${tls_private_key.%s.private_key_pem}" % signer,
       ca_cert_pem: "${tls_self_signed_cert.%s.cert_pem}" % signer,

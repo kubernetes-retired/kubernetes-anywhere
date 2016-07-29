@@ -6,7 +6,7 @@ RUN apt-get update && apt-get -y upgrade \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Terraform
-ENV TERRAFORM_VERSION 0.7.0-rc1
+ENV TERRAFORM_VERSION 0.7.0-rc3
 RUN curl -sSL --fail \
     "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" \
     -o /tmp/tf.zip \
@@ -20,9 +20,7 @@ RUN apt-get update && apt-get -y upgrade && \
 RUN npm install -g azure-cli
 
 # Install Jsonnet
-# ENV JSONNET_GIT_TAG v0.8.8
-#     (too old - std.manifestJson is missing)
-ENV JSONNET_GIT_TAG master
+ENV JSONNET_GIT_TAG v0.8.9
 RUN cd /tmp \
     && git clone https://github.com/google/jsonnet \
     && cd jsonnet \

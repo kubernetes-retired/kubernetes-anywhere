@@ -59,3 +59,5 @@ docker run \
   -v /etc/kubernetes/k8s_config.json:/opt/playbooks/config.json:ro \
   "$installer_container" \
   /opt/do_role.sh "$ROLE"
+
+reboot

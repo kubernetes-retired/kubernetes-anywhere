@@ -73,4 +73,14 @@ config phase1.azure.client_secret
 	help
 		The ClientSecret of the Service Account to be used by the cluster components.
 
+config phase1.azure.use_premium_storage
+	bool "Whether or not to use premium storage"
+	help
+		Whether or not to use Premium_LRS as a storage account
+
+config phase1.azure.use_ephemeral_drive
+	bool "Whether or not to use ephemeral drive"
+	help
+		Whether or not to mount the ephmeral drive at /var/lib/docker 
+
 endmenu

@@ -8,22 +8,21 @@ set -x
 cd "${BASH_SOURCE%/*}"
 
 gen() {
-  mkdir -p .tmp/
-  jsonnet -J ../../ --multi .tmp/ all.jsonnet
+  jsonnet -J ../../../ --multi ./ all.jsonnet
 }
 
 deploy() {
   gen
-  
+
   # Workaround: https://github.com/hashicorp/terraform/issues/7153
-  terraform apply -state=./.tmp/terraform.tfstate .tmp || true
-  
+  terraform apply || true
+
   # TODO: this dumps tfstate into ./azure/ rather than ./azure/.tmp/
-  terraform apply -state=./.tmp/terraform.tfstate .tmp
+  terraform apply
 }
 
 destroy() {
-  terraform destroy .tmp
+  terraform destroy
 }
 
 case "${1:-}" in

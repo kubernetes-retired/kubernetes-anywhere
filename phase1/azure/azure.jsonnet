@@ -2,6 +2,7 @@ function(config)
   local tf = import "phase1/tf.jsonnet";
   local cfg = config.phase1;
   local master_private_ip = cfg.azure.master_private_ip;
+  local storage_type = if cfg.azure.use_premium_storage then "Premium_LRS" else "Standard_LRS";
   local names = {
     resource_group: "%(cluster_name)s" % cfg,
     master_public_ip: "%(cluster_name)s-master-pip" % cfg,
@@ -44,6 +45,59 @@ function(config)
         client_secret: "${var.client_secret}",
       },
     },
+    data: {
+      tls_cert_request: {
+        [name]: tf.pki.tls_cert_request(name)
+        for name in ["node", "admin"]
+      } {
+        master: tf.pki.tls_cert_request(
+          "master",
+          dns_names=[
+            "kubernetes",
+            "kubernetes.default",
+            "kubernetes.default.svc",
+            "kubernetes.default.svc.local",
+            "kubernetes.default.svc.local",
+            names.master_vm,
+          ],
+          ip_addresses=[
+            "${azurerm_public_ip.pip.ip_address}",
+            master_private_ip,
+            # master service ip, this depends on the cluster cidr
+            # so must be changed if/when we allow that to be configured
+            "10.0.0.1",
+          ]
+        ),
+      },
+      template_file: {
+        azure_json: {
+          template: "${file(\"azure.json\")}",
+          vars: {
+            tenantId: "${var.tenant_id}",
+            subscriptionId: "${var.subscription_id}",
+            aadClientId: "${var.client_id}",
+            aadClientSecret: "${var.client_secret}",
+            resourceGroup: "${azurerm_resource_group.rg.name}",
+            location: "${azurerm_resource_group.rg.location}",
+            subnetName: "${azurerm_subnet.subnet.name}",
+            securityGroupName: "${azurerm_network_security_group.sg.name}",
+            vnetName: "${azurerm_virtual_network.vnet.name}",
+            routeTableName: "${azurerm_route_table.rt.name}",
+          },
+        },
+        configure_vm: {
+          template: "${file(\"configure-vm.sh\")}",
+          vars: {
+            root_ca_public_pem: "${base64encode(tls_self_signed_cert.root.cert_pem)}",
+            apiserver_cert_pem: "${base64encode(tls_locally_signed_cert.master.cert_pem)}",
+            apiserver_key_pem: "${base64encode(tls_private_key.master.private_key_pem)}",
+            node_kubeconfig: kubeconfig("node"),
+            k8s_config: "${base64encode(file(\"./config.json\"))}",
+            azure_json: "${base64encode(data.template_file.azure_json.rendered)}",
+          },
+        },
+      },
+    },
     resource: {
       azurerm_resource_group: {
         rg: {
@@ -56,7 +110,7 @@ function(config)
           resource_group_name: "${azurerm_resource_group.rg.name}",
           name: names.storage_account,
           location: "${azurerm_resource_group.rg.location}",
-          account_type: "Standard_LRS",
+          account_type: storage_type,
         },
       },
       azurerm_storage_container: {
@@ -169,34 +223,6 @@ function(config)
           count: cfg.num_nodes,
         },
       },
-      template_file: {
-        azure_json: {
-          template: "${file(\"azure.json\")}",
-          vars: {
-            tenantId: "${var.tenant_id}",
-            subscriptionId: "${var.subscription_id}",
-            aadClientId: "${var.client_id}",
-            aadClientSecret: "${var.client_secret}",
-            resourceGroup: "${azurerm_resource_group.rg.name}",
-            location: "${azurerm_resource_group.rg.location}",
-            subnetName: "${azurerm_subnet.subnet.name}",
-            securityGroupName: "${azurerm_network_security_group.sg.name}",
-            vnetName: "${azurerm_virtual_network.vnet.name}",
-            routeTableName: "${azurerm_route_table.rt.name}",
-          },
-        },
-        configure_vm: {
-          template: "${file(\"configure-vm.sh\")}",
-          vars: {
-            root_ca_public_pem: "${base64encode(tls_self_signed_cert.root.cert_pem)}",
-            apiserver_cert_pem: "${base64encode(tls_locally_signed_cert.master.cert_pem)}",
-            apiserver_key_pem: "${base64encode(tls_private_key.master.private_key_pem)}",
-            node_kubeconfig: kubeconfig("node"),
-            k8s_config: "${base64encode(file(\"../../.config.json\"))}",
-            azure_json: "${base64encode(template_file.azure_json.rendered)}",
-          },
-        },
-      },
       azurerm_virtual_machine: {
         master_vm: {
           resource_group_name: names.resource_group,
@@ -224,7 +250,7 @@ function(config)
             computer_name: names.master_vm,
             admin_username: cfg.azure.admin_username,
             admin_password: cfg.azure.admin_password,
-            custom_data: "${base64encode(template_file.configure_vm.rendered)}",
+            custom_data: "${base64encode(data.template_file.configure_vm.rendered)}",
           },
 
           os_profile_linux_config: {
@@ -257,7 +283,7 @@ function(config)
             computer_name: names.node_vm + "-${count.index}",
             admin_username: cfg.azure.admin_username,
             admin_password: cfg.azure.admin_password,
-            custom_data: "${base64encode(template_file.configure_vm.rendered)}",
+            custom_data: "${base64encode(data.template_file.configure_vm.rendered)}",
           },
 
           os_profile_linux_config: {
@@ -274,29 +300,6 @@ function(config)
       tls_self_signed_cert: {
         root: tf.pki.tls_self_signed_cert("root"),
       },
-      tls_cert_request: {
-        [name]: tf.pki.tls_cert_request(name)
-        for name in ["node", "admin"]
-      } {
-        master: tf.pki.tls_cert_request(
-          "master",
-          dns_names=[
-            "kubernetes",
-            "kubernetes.default",
-            "kubernetes.default.svc",
-            "kubernetes.default.svc.local",
-            "kubernetes.default.svc.local",
-            names.master_vm,
-          ],
-          ip_addresses=[
-            "${azurerm_public_ip.pip.ip_address}",
-            master_private_ip,
-            # master service ip, this depends on the cluster cidr
-            # so must be changed if/when we allow that to be configured
-            "10.0.0.1",
-          ]
-        ),
-      },
       tls_locally_signed_cert: {
         [name]: tf.pki.tls_locally_signed_cert(name, "root")
         for name in ["node", "master", "admin"]
@@ -305,7 +308,7 @@ function(config)
         kubeconfig: {
           provisioner: [{
             "local-exec": {
-              command: "echo '%s' > ./.tmp/kubeconfig.json" % kubeconfig("admin"),
+              command: "echo '%s' > ./kubeconfig.json" % kubeconfig("admin"),
             },
           }],
         },

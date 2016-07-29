@@ -1,0 +1,15 @@
+- template:
+    src: azure/format-ephemeral.service
+    dest: /etc/systemd/system/format-ephemeral.service
+- command: systemctl --system daemon-reload
+
+- template:
+    src: azure/var-lib-docker.mount
+    dest: /etc/systemd/system/var-lib-docker.mount
+- command: systemctl --system daemon-reload
+
+# this is enabled but not started, need to figure out why
+# for now rely on rebooting the node after ansible is done
+- service:
+    name: format-ephemeral
+    enabled: yes

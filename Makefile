@@ -39,24 +39,32 @@ menuconfig: .tmp/mconf
 .config.json: .config
 	util/config_to_json $< > $@
 
+# i'm awful at make, clean this up
+prep:
+	$(eval CLOUD_PROVIDER := $(shell jq -r '.phase1.cloud_provider' .config.json))
+	$(eval INSTANCE_PREFIX=$(shell jq -r '.phase1.cluster_name' .config.json))
+	$(eval DEST=clusters/$(CLOUD_PROVIDER)/$(INSTANCE_PREFIX))
+	mkdir -p "$(DEST)"
+	cp -a "phase1/$(CLOUD_PROVIDER)/." "$(DEST)/"
+	cp ".config.json" "$(DEST)/config.json"
+
 echo-config: .config.json
 	cat $<
 
-deploy destroy: .config.json
+deploy destroy: prep
 	$(MAKE) do WHAT=$@
 
 do:
-	( cd "phase1/$$(jq -r '.phase1.cloud_provider' .config.json)"; ./do $(WHAT) )
+	$(eval CLOUD_PROVIDER := $(shell jq -r '.phase1.cloud_provider' .config.json))
+	$(eval INSTANCE_PREFIX=$(shell jq -r '.phase1.cluster_name' .config.json))
+	$(eval DEST=clusters/$(CLOUD_PROVIDER)/$(INSTANCE_PREFIX))
+	( cd "$(DEST)"; ./do $(WHAT) )
 
 docker-build:
 	docker build -t $(IMAGE_NAME):$(IMAGE_VERSION) .
 
-docker-run: docker-build
-	docker run -it --net=host $(IMAGE_NAME):$(IMAGE_VERSION) /bin/bash
-
-docker-dev: docker-build
+env: docker-build
 	docker run -it --net=host -v `pwd`:/root/kubernetes-anywhere $(IMAGE_NAME):$(IMAGE_VERSION) /bin/bash
-
 
 clean:
 	rm -rf .tmp
