@@ -267,40 +267,6 @@ function(config)
           count: cfg.num_nodes,
         },
       },
-      tls_private_key: {
-        [name]: tf.pki.private_key
-        for name in ["root", "node", "master", "admin"]
-      },
-      tls_self_signed_cert: {
-        root: tf.pki.tls_self_signed_cert("root"),
-      },
-      tls_cert_request: {
-        [name]: tf.pki.tls_cert_request(name)
-        for name in ["node", "admin"]
-      } {
-        master: tf.pki.tls_cert_request(
-          "master",
-          dns_names=[
-            "kubernetes",
-            "kubernetes.default",
-            "kubernetes.default.svc",
-            "kubernetes.default.svc.local",
-            "kubernetes.default.svc.local",
-            names.master_vm,
-          ],
-          ip_addresses=[
-            "${azurerm_public_ip.pip.ip_address}",
-            master_private_ip,
-            # master service ip, this depends on the cluster cidr
-            # so must be changed if/when we allow that to be configured
-            "10.0.0.1",
-          ]
-        ),
-      },
-      tls_locally_signed_cert: {
-        [name]: tf.pki.tls_locally_signed_cert(name, "root")
-        for name in ["node", "master", "admin"]
-      },
       null_resource: {
         kubeconfig: {
           provisioner: [{
@@ -310,5 +276,5 @@ function(config)
           }],
         },
       },
-    },
+    } + tf.pki.cluster_tls([names.master_vm], ["${azurerm_public_ip.pip.ip_address}", master_private_ip]),
   }

@@ -165,39 +165,6 @@ function(cfg)
       },
 
       // Public Key Infrastructure
-      tls_private_key: {
-        [name]: tf.pki.private_key
-        for name in ["root", "node", "master", "admin"]
-      },
-      tls_self_signed_cert: {
-        root: tf.pki.tls_self_signed_cert("root"),
-      },
-      tls_cert_request: {
-        [name]: tf.pki.tls_cert_request(name)
-        for name in ["node", "admin"]
-      } {
-        master: tf.pki.tls_cert_request(
-          "master",
-          dns_names=[
-            "kubernetes",
-            "kubernetes.default",
-            "kubernetes.default.svc",
-            "kubernetes.default.svc.local",
-            "kubernetes.default.svc.local",
-            names.master_instance,
-          ],
-          ip_addresses=[
-            "${google_compute_address.%(master_ip)s.address}" % names,
-            # master service ip, this depends on the cluster cidr
-            # so must be changed if/when we allow that to be configured
-            "10.0.0.1",
-          ]
-        ),
-      },
-      tls_locally_signed_cert: {
-        [name]: tf.pki.tls_locally_signed_cert(name, "root")
-        for name in ["node", "master", "admin"]
-      },
       null_resource: {
         kubeconfig: {
           provisioner: [{
@@ -207,5 +174,5 @@ function(cfg)
           }],
         },
       },
-    },
+    } + tf.pki.cluster_tls([names.master_instance], ["${google_compute_address.%(master_ip)s.address}" % names]),
   }
