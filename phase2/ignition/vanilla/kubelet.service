@@ -1,0 +1,25 @@
+[Unit]
+Description=Kubernetes Kubelet Server
+Documentation=https://github.com/kubernetes/kubernetes
+
+[Service]
+ExecStartPre=/bin/mkdir -p /var/lib/kubelet
+ExecStartPre=/bin/mount --bind /var/lib/kubelet /var/lib/kubelet
+ExecStartPre=/bin/mount --make-shared /var/lib/kubelet
+ExecStart=/usr/bin/docker run \
+        --net=host \
+        --pid=host \
+        --privileged \
+        -v /sys:/sys:ro \
+        -v /var/run:/var/run:rw \
+        -v /var/lib/docker/:/var/lib/docker:rw \
+        -v /var/lib/kubelet/:/var/lib/kubelet:shared \
+        -v /srv/kubernetes:/srv/kubernetes:ro \
+        -v /etc/kubernetes:/etc/kubernetes:ro \
+        %(docker_registry)s/hyperkube-amd64:%(kubernetes_version)s \
+        /hyperkube kubelet %(kubelet_args)s
+Restart=always
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,17 @@
+#! /bin/sh
+
+set -o errexit
+set -o pipefail
+set -o nounset
+set -o xtrace
+
+export IGNITION_CFG_URL="oem:///ignite.json"
+
+mkdir -p /usr/share/oem
+jsonnet \
+  --output-file "/usr/share/oem/ignite.json" \
+  --tla-code-file "cfg=/etc/kubernetes/k8s_config.json" \
+  --jpath /opt/kubernetes-anywhere \
+  /opt/kubernetes-anywhere/ignite.jsonnet
+
+ignition -oem vanilla -stage files --root /mnt/root
