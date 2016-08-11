@@ -33,5 +33,5 @@ output "kubernetes-node-pki-repository" {
 }
 
 output "kubernetes-master-ip" {
-    value = "${aws_instance.kubernetes-master.public_ip}"
+    value = "${aws_eip.kubernetes-master.public_ip}"
 }

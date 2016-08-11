@@ -16,22 +16,29 @@ resource "aws_iam_instance_profile" "kubernetes-master" {
     name  = "kubernetes-master-${var.cluster}"
     path  = "/"
     roles = ["${aws_iam_role.kubernetes-master.name}"]
+
+    lifecycle { create_before_destroy = true }
 }
 
 resource "aws_iam_instance_profile" "kubernetes-node" {
     name  = "kubernetes-node-${var.cluster}"
     path  = "/"
     roles = ["${aws_iam_role.kubernetes-node.name}"]
+
+    lifecycle { create_before_destroy = true }
 }
 
 resource "aws_iam_instance_profile" "kubernetes-etcd" {
+    count = "${signum(var.standalone_etcd_cluster_size)}"
     name  = "kubernetes-etcd-${var.cluster}"
     path  = "/"
     roles = ["${aws_iam_role.kubernetes-etcd.name}"]
+
+    lifecycle { create_before_destroy = true }
 }
 
 variable "iam_common_assume_role_policy" {
-   default = <<POLICY
+    default = <<POLICY
 {
   "Version": "2012-10-17",
   "Statement": [{
@@ -41,24 +48,32 @@ variable "iam_common_assume_role_policy" {
   }]
 }
 POLICY
+    lifecycle { create_before_destroy = true }
 }
 
 resource "aws_iam_role" "kubernetes-master" {
     name               = "kubernetes-master-${var.cluster}"
     path               = "/"
     assume_role_policy = "${var.iam_common_assume_role_policy}"
+
+    lifecycle { create_before_destroy = true }
 }
 
 resource "aws_iam_role" "kubernetes-node" {
     name               = "kubernetes-node-${var.cluster}"
     path               = "/"
     assume_role_policy = "${var.iam_common_assume_role_policy}"
+
+    lifecycle { create_before_destroy = true }
 }
 
 resource "aws_iam_role" "kubernetes-etcd" {
+    count              = "${signum(var.standalone_etcd_cluster_size)}"
     name               = "kubernetes-etcd-${var.cluster}"
     path               = "/"
     assume_role_policy = "${var.iam_common_assume_role_policy}"
+
+    lifecycle { create_before_destroy = true }
 }
 
 resource "aws_iam_role_policy" "kubernetes-master" {
@@ -102,6 +117,8 @@ resource "aws_iam_role_policy" "kubernetes-master" {
   ]
 }
 POLICY
+
+    lifecycle { create_before_destroy = true }
 }
 
 resource "aws_iam_role_policy" "kubernetes-node" {
@@ -139,9 +156,12 @@ resource "aws_iam_role_policy" "kubernetes-node" {
   ]
 }
 POLICY
+
+    lifecycle { create_before_destroy = true }
 }
 
 resource "aws_iam_role_policy" "kubernetes-etcd" {
+    count  = "${signum(var.standalone_etcd_cluster_size)}"
     name   = "kubernetes-etcd-${var.cluster}"
     role   = "${aws_iam_role.kubernetes-etcd.name}"
     policy = <<POLICY
@@ -152,4 +172,6 @@ resource "aws_iam_role_policy" "kubernetes-etcd" {
   }]
 }
 POLICY
+
+    lifecycle { create_before_destroy = true }
 }

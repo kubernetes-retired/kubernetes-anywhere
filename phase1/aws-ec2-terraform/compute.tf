@@ -13,7 +13,6 @@
 # limitations under the License.
 
 resource "aws_launch_configuration" "kubernetes-node-group" {
-    name                        = "kubernetes-node-group-${var.cluster}"
     image_id                    = "${module.ubuntu_ami.ami_id}"
     instance_type               = "${var.node_instance_type}"
     iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-node.name}"
@@ -22,24 +21,27 @@ resource "aws_launch_configuration" "kubernetes-node-group" {
     key_name                    = "${var.ec2_key_name}"
     security_groups             = ["${aws_security_group.kubernetes-main-sg.id}"]
     associate_public_ip_address = true
-    user_data                   = "${file("${path.module}/${var.cluster_config_flavour}-user-data.yaml")}"
+    user_data                   = "${file("${path.module}/phase2_implementations/${var.phase2_implementation}.yaml")}"
 
     root_block_device {
         volume_type           = "gp2"
         volume_size           = 32
         delete_on_termination = true
     }
+
+    lifecycle { create_before_destroy = true }
 }
 
 resource "aws_autoscaling_group" "kubernetes-node-group" {
-    name                      = "kubernetes-node-group-${var.cluster}"
-    launch_configuration      = "${aws_launch_configuration.kubernetes-node-group.name}"
+    launch_configuration      = "${aws_launch_configuration.kubernetes-node-group.id}"
     vpc_zone_identifier       = ["${aws_subnet.kubernetes-subnet.id}"]
-    desired_capacity          = 3
-    max_size                  = 3
-    min_size                  = 3
+    desired_capacity          = "${var.node_count}"
+    max_size                  = "${var.node_count}"
+    min_size                  = "${var.node_count}"
     health_check_grace_period = 0
     health_check_type         = "EC2"
+
+    lifecycle { create_before_destroy = true }
 
     tag {
         key                  = "KubernetesCluster"
@@ -61,11 +63,14 @@ resource "aws_instance" "kubernetes-master" {
     monitoring                  = false
     key_name                    = "${var.ec2_key_name}"
     subnet_id                   = "${aws_subnet.kubernetes-subnet.id}"
-    vpc_security_group_ids      = ["${aws_security_group.kubernetes-main-sg.id}"]
+    vpc_security_group_ids      = [
+      "${aws_security_group.kubernetes-main-sg.id}",
+      "${aws_security_group.kubernetes-master-sg.id}",
+    ]
     associate_public_ip_address = true
     source_dest_check           = true
     iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-master.name}"
-    user_data                   = "${file("${path.module}/${var.cluster_config_flavour}-user-data.yaml")}"
+    user_data                   = "${file("${path.module}/phase2_implementations/${var.phase2_implementation}.yaml")}"
 
     ebs_block_device {
         device_name           = "/dev/sdb"
@@ -79,6 +84,8 @@ resource "aws_instance" "kubernetes-master" {
         volume_size           = 8
         delete_on_termination = true
     }
+
+    lifecycle { create_before_destroy = true }
 
     tags {
         "KubernetesCluster" = "kubernetes-${var.cluster}"
@@ -87,10 +94,10 @@ resource "aws_instance" "kubernetes-master" {
 }
 
 resource "aws_instance" "kubernetes-etcd" {
-    count                       = 3
+    count                       = "${var.standalone_etcd_cluster_size}"
     ami                         = "${module.ubuntu_ami.ami_id}"
     ebs_optimized               = false
-    instance_type               = "${var.etcd_instance_type}"
+    instance_type               = "${var.standalone_etcd_instance_type}"
     monitoring                  = false
     key_name                    = "${var.ec2_key_name}"
     subnet_id                   = "${aws_subnet.kubernetes-subnet.id}"
@@ -98,7 +105,7 @@ resource "aws_instance" "kubernetes-etcd" {
     associate_public_ip_address = true
     source_dest_check           = true
     iam_instance_profile        = "${aws_iam_instance_profile.kubernetes-etcd.name}"
-    user_data                   = "${file("${path.module}/${var.cluster_config_flavour}-user-data.yaml")}"
+    user_data                   = "${file("${path.module}/phase2_implementations/${var.phase2_implementation}.yaml")}"
 
     ebs_block_device {
         device_name           = "/dev/sdb"
@@ -112,6 +119,8 @@ resource "aws_instance" "kubernetes-etcd" {
         volume_size           = 8
         delete_on_termination = true
     }
+
+    lifecycle { create_before_destroy = true }
 
     tags {
         "KubernetesCluster"      = "kubernetes-${var.cluster}"
@@ -121,9 +130,13 @@ resource "aws_instance" "kubernetes-etcd" {
 }
 
 resource "aws_ecr_repository" "kubernetes-master-pki-repository" {
-  name = "kubernetes-${var.cluster}/master/pki"
+    name = "kubernetes-${var.cluster}/master/pki"
+
+    lifecycle { create_before_destroy = true }
 }
 
 resource "aws_ecr_repository" "kubernetes-node-pki-repository" {
-  name = "kubernetes-${var.cluster}/node/pki"
+    name = "kubernetes-${var.cluster}/node/pki"
+
+    lifecycle { create_before_destroy = true }
 }

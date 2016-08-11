@@ -27,11 +27,6 @@ variable "master_instance_type" {
     default     = "m3.xlarge"
 }
 
-variable "etcd_instance_type" {
-    description = "EC2 instance type for etcd node(s)"
-    default     = "t2.large"
-}
-
 variable "ec2_key_name" {
    description = "SSH key name to use for all of EC2 instances"
    default     = "kubernetes-anywhere"
@@ -45,7 +40,24 @@ variable "aws_region" {
    default     = "us-east-1"
 }
 
-variable "cluster_config_flavour" {
+variable "phase2_implementation" {
    description = "Flavour of the cluster config (secure or simple)"
-   default     = "secure-v1.2"
+   default     = "simple-weave-single-master"
+}
+
+variable "node_count" {
+  description  = "Number of nodes in the cluster"
+  default      = 2
+}
+
+variable "standalone_etcd_cluster_size" {
+  description  = "Number of etcd nodes in the cluster for standalone etcd"
+  # zero means it will not be configured at all, yet for it to work,
+  # one has to pick right value of `phase2_implementation`
+  default      = 0
+}
+
+variable "standalone_etcd_instance_type" {
+    description = "EC2 instance type for etcd node(s) in standalone etcd mode"
+    default     = "t2.large"
 }
