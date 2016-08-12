@@ -60,7 +60,7 @@ docker run \
   -v /run:/run \
   -v /etc/kubernetes:/etc/kubernetes \
   -v /var/lib/ignition:/usr/share/oem \
-  gcr.io/mikedanese-k8s/ignite:v2
+  gcr.io/mikedanese-k8s/ignite:v3
 
 systemctl enable kubelet
 systemctl start kubelet
