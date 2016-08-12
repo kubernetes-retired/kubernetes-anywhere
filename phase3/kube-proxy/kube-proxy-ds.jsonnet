@@ -27,10 +27,10 @@ function(cfg)
               },
               name: "kube-proxy",
               command: [
-                  "/hyperkube",
-                  "proxy",
-                  "--kubeconfig=/srv/kubernetes/kubeconfig.json",
-                  "--resource-container=\"\"",
+                "/hyperkube",
+                "proxy",
+                "--kubeconfig=/srv/kubernetes/kubeconfig.json",
+                "--resource-container=\"\"",
               ],
               image: "%(docker_registry)s/hyperkube-amd64:%(kubernetes_version)s" % cfg.phase2,
               volumeMounts: [
