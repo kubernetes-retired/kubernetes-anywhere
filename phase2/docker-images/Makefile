@@ -19,11 +19,15 @@ lint:
 	@shellcheck -x -s sh \
 	  ./etcd-anywhere.sh \
 	  ./weave-fix-nameserver.sh
+	@shellcheck -x -s bash \
+	    -e SC1091 \
+	    ./toolbox/ansible/files/toolbox.sh
 build:
 	./$@ $(KUBERNETES_RELEASE)
 
 test:
 	./test-local-docker
+	./test-ansible-syntax
 
 push:
 	./$@ $(KUBERNETES_RELEASE)

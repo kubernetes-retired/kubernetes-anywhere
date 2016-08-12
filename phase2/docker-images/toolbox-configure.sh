@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/sh -ex
 
 # Copyright 2016 The Kubernetes Authors All rights reserved.
 #
@@ -22,9 +22,25 @@ set -o pipefail
 
 ln -s /etc/toolbox/scripts/* /usr/bin/
 
-yum --assumeyes --quiet install openssl python-setuptools git-core iproute bind-utils nmap-ncat socat
+apk add --update-cache --no-progress \
+  bash curl sed \
+  "jq=${JQ_RELEASE}" \
+  git openssl util-linux py-pip libffi \
+  socat nmap-ncat bind-tools iproute2 iptables \
+  openssl-dev libffi-dev python-dev build-base
 
-easy_install awscli
+pip install \
+  "ansible==${ANSIBLE_RELEASE}" \
+  "boto==${BOTO_RELEASE}" \
+  "awscli==${AWSCLI_RELEASE}" \
+  "docker-compose==${COMPOSE_RELEASE}" \
+  "netaddr"
+
+## remove build-only dependencies
+apk del openssl-dev libffi-dev python-dev build-base
+
+## keep package cache clean
+rm -rf /var/cache/apk/*
 
 curl="curl --silent --location"
 
@@ -34,13 +50,11 @@ $curl "https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_RE
 $curl "https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_RELEASE}" \
   --output /usr/bin/docker
 
-$curl "https://github.com/docker/compose/releases/download/${COMPOSE_RELEASE}/docker-compose-Linux-x86_64" \
-  --output /usr/bin/compose \
+chmod +x /usr/bin/kubectl /usr/bin/docker
 
-$curl "https://github.com/stedolan/jq/releases/download/jq-${JQ_RELEASE}/jq-linux64" \
-  --output /usr/bin/jq
+ln -s /usr/bin/docker-compose /usr/bin/compose
 
-chmod +x /usr/bin/kubectl /usr/bin/docker /usr/bin/compose /usr/bin/jq
+mkdir /opt
 
 $curl "https://github.com/OpenVPN/easy-rsa/releases/download/${EASYRSA_RELEASE}/EasyRSA-${EASYRSA_RELEASE}.tgz" \
   | tar xz -C /opt

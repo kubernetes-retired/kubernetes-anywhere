@@ -6,8 +6,10 @@ Documentation=http://kubernetes.io/
 [Service]
 Environment=KUBERNETES_ANYWHERE_PROXY_IMAGE=weaveworks/kubernetes-anywhere:proxy
 Environment=KUBERNETES_ANYWHERE_PROXY_PKI_IMAGE=kubernetes-anywhere:proxy-pki
-EnvironmentFile=-/etc/kubernetes-anywhere.env
-EnvironmentFile=-/etc/kubernetes-anywhere-pki-images.env
+EnvironmentFile=-/etc/kubernetes-anywhere/base.env
+EnvironmentFile=-/etc/kubernetes-anywhere/images.env
+EnvironmentFile=-/etc/kubernetes-anywhere/pki-images.env
+EnvironmentFile=-/etc/kubernetes-anywhere/local.env
 ExecStartPre=/usr/bin/docker pull $KUBERNETES_ANYWHERE_PROXY_IMAGE
 ExecStartPre=-/usr/bin/docker pull $KUBERNETES_ANYWHERE_PROXY_PKI_IMAGE
 ExecStartPre=-/usr/bin/docker rm -f kube-proxy

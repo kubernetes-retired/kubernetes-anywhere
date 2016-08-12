@@ -1,0 +1,181 @@
+- hosts: auto
+  tasks:
+
+  - name: Fetch instance identity document
+    uri:
+      url: "http://169.254.169.254/latest/dynamic/instance-identity/document"
+      method: "GET"
+      return_content: "yes"
+    register: ec2_instance_identity_document
+
+  - name: Store instance identity document
+    ## it doesn't return the right headers, so we have to parse it
+    set_fact:
+      ec2_instance_identity: "{{ ec2_instance_identity_document.content | from_json }}"
+
+  - name: Fetch all metadata about this instance
+    delegate_to: localhost
+    ec2_remote_facts:
+      region: "{{ ec2_instance_identity.region }}"
+      filters:
+        "instance-id": "{{ ec2_instance_identity.instanceId }}"
+    register: ec2_describe_instance
+
+  - name: Store cluster membership facts for this instance
+    set_fact:
+      kubernetes_cluster: "{{ ec2_describe_instance.instances[0].tags.KubernetesCluster }}"
+      kubernetes_role: "{{ ec2_describe_instance.instances[0].tags.Name }}"
+      pki_registry_domain: "{{ ec2_instance_identity.accountId }}.dkr.ecr.{{ ec2_instance_identity.region }}.amazonaws.com"
+      aws_local_hostname: "{{ ec2_describe_instance.instances[0].private_dns_name }}"
+      toolbox_image: "{{ lookup('env','KUBERNETES_ANYWHERE_TOOLBOX_IMAGE') }}"
+
+  - name: Fetch metadata about all other cluster members
+    delegate_to: localhost
+    ec2_remote_facts:
+      region: "{{ ec2_instance_identity.region }}"
+      filters:
+        "tag:KubernetesCluster": "{{ kubernetes_cluster }}"
+    register: ec2_describe_cluster
+
+  - name: Set cluster member list
+    set_fact:
+      kubernetes_cluster_memebers: "{{ ec2_describe_cluster.instances | map(attribute='private_ip_address') | ipv4 | list }}"
+
+  - name: Install all systemd units
+    copy: src="{{ item }}" dest="/etc/systemd/system/" owner="root" group="root" mode="0644"
+    with_fileglob:
+      - "/etc/toolbox/systemd-units/common/*"
+      - "/etc/toolbox/systemd-units/ec2/*"
+      - "/etc/toolbox/systemd-units/with-pki/*"
+
+  - file: path=/etc/kubernetes-anywhere state=directory owner="root" group="root" mode="0755"
+
+  - name: Set hostname for kubelet to use
+    copy: dest="/etc/kubernetes-anywhere/local.env"
+                mode="0644" owner="root" group="root"
+                content="AWS_LOCAL_HOSTNAME=\"{{ aws_local_hostname }}\"\nWEAVE_KNOWN_PEERS=\"{{ kubernetes_cluster_memebers | join(' ') }}\"\n"
+
+  - name: Load new systemd units
+    shell: systemctl daemon-reload
+
+  - name: Enable base systemd units
+    shell: systemctl enable \
+             weave.service \
+             weaveproxy.service \
+             weaveplugin.service \
+             weave-expose.service \
+             weave-network.target
+
+  - name: Enable base systemd units
+    shell: systemctl start weave-network.target
+
+  - name: Start ECR login service
+    when: kubernetes_role == "kubernetes-master"
+    ## as master builds PKI images, it needs to login to ECR first
+    shell: systemctl start ecr-login.service
+
+  - name: Create PKI and push to ECR
+    ## TODO: this currently runs
+    delegate_to: localhost
+    when: kubernetes_role == "kubernetes-master"
+    ## this is to be done only once, so there is no unit for it
+    docker:
+      image: "{{ toolbox_image }}"
+      detach: false
+      volumes:
+        - "/root/.docker/:/root/.docker/"
+        - "/var/run/docker.sock:/docker.sock"
+      command: "create-pki-containers" ## TODO: pass public IP
+
+  - name: Set PKI facts
+    set_fact:
+      master_pki_prefix: "{{ pki_registry_domain }}/{{ kubernetes_cluster }}/master/pki"
+      node_pki_prefix: "{{ pki_registry_domain }}/{{ kubernetes_cluster }}/node/pki"
+
+  - name: Tag master PKI images
+    delegate_to: localhost
+    when: kubernetes_role == "kubernetes-master"
+    shell: "docker tag \"kubernetes-anywhere:{{ item }}-pki\" \"{{ master_pki_prefix }}:{{ item }}\""
+    with_items:
+      - apiserver
+      - scheduler
+      - controller-manager
+      - toolbox
+
+  - name: Push master PKI images to ECR
+    delegate_to: localhost
+    when: kubernetes_role == "kubernetes-master"
+    shell: "docker push \"{{ master_pki_prefix }}:{{ item }}\""
+    with_items:
+      - apiserver
+      - scheduler
+      - controller-manager
+      - toolbox
+
+  - name: Tag node PKI images
+    delegate_to: localhost
+    when: kubernetes_role == "kubernetes-master"
+    shell: "docker tag \"kubernetes-anywhere:{{ item }}-pki\" \"{{ node_pki_prefix }}:{{ item }}\""
+    with_items:
+      - kubelet
+      - proxy
+      - toolbox
+
+  - name: Push node PKI images to ECR
+    delegate_to: localhost
+    when: kubernetes_role == "kubernetes-master"
+    shell: "docker push \"{{ node_pki_prefix }}:{{ item }}\""
+    with_items:
+      - kubelet
+      - proxy
+      - toolbox
+
+  - name: Create PKI image config for master
+    when: kubernetes_role == "kubernetes-master"
+    copy: dest="/etc/kubernetes-anywhere/pki-images.env"
+          mode="0644" owner="root" group="root"
+          content="{% for c in [ 'toolbox', 'apiserver', 'scheduler', 'controller-manager' ] %}KUBERNETES_ANYWHERE_{{ c | upper | replace('-', '_') }}_PKI_IMAGE=\"{{ master_pki_prefix }}:{{ c }}\"\n{% endfor %}"
+
+  - name: Create PKI image config for nodes
+    when: kubernetes_role == "kubernetes-node"
+    copy: dest="/etc/kubernetes-anywhere/pki-images.env"
+          mode="0644" owner="root" group="root"
+          content="{% for c in [ 'toolbox', 'kubelet', 'proxy' ] %}KUBERNETES_ANYWHERE_{{ c | upper | replace('-', '_') }}_PKI_IMAGE=\"{{ node_pki_prefix }}:{{ c }}\"\n{% endfor %}"
+
+  - name: Enable units that run on master
+    when: kubernetes_role == "kubernetes-master"
+    ## as provisoning happens in parallel, some of the cluster components
+    ## will restat continously until dependencies become available
+    shell: systemctl enable \
+             etcd.service \
+             kube-apiserver.service \
+             kube-scheduler.service \
+             kube-controller-manager.service \
+             ecr-login.service \
+             ecr-login-refresh.timer \
+             kubernetes-master.target
+
+  - name: Start units on master
+    when: kubernetes_role == "kubernetes-master"
+    shell: systemctl start etcd.service kubernetes-master.target
+
+  - name: Enable units that run on nodes
+    when: kubernetes_role == "kubernetes-node"
+    ## as image names are determined on the basis of EC2 region name,
+    ## account number and instance tags, there is no need to login to ECR
+    ## at this point, but `erc-login.service` is expected to start shortly
+    shell: systemctl enable \
+             kubelet.service \
+             kube-proxy.service \
+             ecr-login.service \
+             ecr-login-refresh.timer \
+             kubernetes-node.target
+
+  - name: Start units on nodes
+    when: kubernetes_role == "kubernetes-node"
+    shell: systemctl start kubernetes-node.target
+
+  - name: Install toolbox wrapper
+    copy: dest="/usr/local/bin/kubernetes-anywhere-toolbox"
+          src="/etc/toolbox/ansible/files/toolbox.sh"
+          mode="0755" owner="root" group="root"
