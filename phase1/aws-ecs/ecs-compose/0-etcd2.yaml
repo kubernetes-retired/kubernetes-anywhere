@@ -1,5 +1,0 @@
-etcd2:
-  image: "weaveworks/kubernetes-anywhere:etcd"
-  cpu_shares: 3072
-  environment:
-    ETCD_CLUSTER_SIZE: "3"

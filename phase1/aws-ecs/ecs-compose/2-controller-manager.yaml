@@ -1,3 +1,0 @@
-kube-controller-manager:
-  image: "weaveworks/kubernetes-anywhere:controller-manager"
-  cpu_shares: 1024

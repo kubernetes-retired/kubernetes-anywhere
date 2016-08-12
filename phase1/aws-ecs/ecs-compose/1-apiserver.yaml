@@ -1,5 +1,0 @@
-kube-apiserver:
-  image: "weaveworks/kubernetes-anywhere:apiserver"
-  cpu_shares: 1024
-  environment:
-    ETCD_CLUSTER_SIZE: "3"
