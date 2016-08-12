@@ -1,4 +1,6 @@
-# Kubernetes Anywhere
+# Kubernetes Anywhere Original Design Proposal
+
+This is the original design proposal for Kubernetes Anywhere, which is kept here for posterity but may not be completely up to date.
 
 *{concise,reliable,cross-platform} turnup of Kubernetes clusters*
 
