@@ -19,7 +19,7 @@ function(cfg)
       on_host_maintenance: "MIGRATE",
     },
     network_interface: [{
-      network: "${google_compute_network.network.name}",
+      network: gce.network,
       access_config: {},
     }],
   };
@@ -51,12 +51,6 @@ function(cfg)
       },
     },
     resource: {
-      google_compute_network: {
-        network: {
-          name: gce.network,
-          auto_create_subnetworks: true,
-        },
-      },
       google_compute_address: {
         [names.master_ip]: {
           name: names.master_ip,
@@ -65,8 +59,8 @@ function(cfg)
       },
       google_compute_firewall: {
         ssh_all: {
-          name: "ssh-all",
-          network: "${google_compute_network.network.name}",
+          name: "%(cluster_name)s-ssh-all" % p1,
+          network: gce.network,
           allow: [{
             protocol: "tcp",
             ports: ["22"],
@@ -75,7 +69,7 @@ function(cfg)
         },
         [names.master_firewall_rule]: {
           name: names.master_firewall_rule,
-          network: "${google_compute_network.network.name}",
+          network: gce.network,
           allow: [{
             protocol: "tcp",
             ports: ["443"],
@@ -85,7 +79,7 @@ function(cfg)
         },
         [names.node_firewall_rule]: {
           name: names.node_firewall_rule,
-          network: "${google_compute_network.network.name}",
+          network: gce.network,
           allow: [
             { protocol: "tcp" },
             { protocol: "udp" },
@@ -110,7 +104,7 @@ function(cfg)
             "%(cluster_name)s-node" % p1,
           ],
           network_interface: [{
-            network: "${google_compute_network.network.name}",
+            network: gce.network,
             access_config: {
               nat_ip: "${google_compute_address.%(master_ip)s.address}" % names,
             },

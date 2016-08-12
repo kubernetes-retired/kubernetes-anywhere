@@ -31,5 +31,6 @@ config phase1.gce.zone
 
 config phase1.gce.network
 	string "network"
+        default "default"
 
 endmenu
