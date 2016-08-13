@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+set -x
+
+echo $KUBECONFIG
+
+num_nodes="(( $(cat ./.config.json | jq -r '.phase1.num_nodes') + 1 ))"
+
+while true; do
+  hcount=$(kubectl get nodes | grep 'Ready' | wc -l) || true
+  [[ "${hcount}" -ge "${num_nodes}" ]] && exit
+
+  echo "healthy nodes: wanted: ${num_nodes} actual:${hcount}"
+  sleep 5
+done

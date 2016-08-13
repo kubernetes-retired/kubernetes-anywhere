@@ -6,7 +6,7 @@ function(config)
     resource_group: "%(cluster_name)s" % cfg,
     master_public_ip: "%(cluster_name)s-master-pip" % cfg,
     availability_set: "%(cluster_name)s-as" % cfg,
-    storage_account: "${replace(\"%(cluster_name)sstrg\", \"-\", \"\")}" % cfg,
+    storage_account: "${replace(\"%(cluster_name)s\", \"-\", \"\")}" % cfg,
     storage_container: "strg%(cluster_name)s" % cfg,
     vnet: "%(cluster_name)s-vnet" % cfg,
     subnet: "%(cluster_name)s-subnet" % cfg,
