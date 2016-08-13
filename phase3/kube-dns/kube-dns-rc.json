@@ -28,7 +28,6 @@
         "containers": [
           {
             "args": [
-              "--domain=local.",
               "--dns-port=10053"
             ],
             "image": "gcr.io/google_containers/kubedns-amd64:1.3",
