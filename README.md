@@ -406,7 +406,7 @@ If you want push it to a repository of your own called `joe/mykube`, you can inv
 
 ## Known Issues / TODOs
 
-  - Using Docker Engine installed through the official package is subject to [docker/docker#19625][] (**see [Docker Engine Setup][DOCKER_SETUP.md])
+  - Using Docker Engine installed through the official package is subject to [docker/docker#19625][] (**see [Docker Engine Setup](DOCKER_SETUP.md))
   - Using single-node example without TLS breaks service accounts ([#60][])
   - `kube-proxy --proxy-mode=iptables` only works with Weave Net CNI plugin ([weaveworks/weave#2094][])
   - `kubectl` can only talk to the API server if it is running on Weave Net ([#38][])
