@@ -98,7 +98,7 @@
           },
           {
             "args": [
-              "-cmd=nslookup kubernetes.default.svc.local 127.0.0.1 >/dev/null",
+              "-cmd=nslookup kubernetes.default.svc.cluster.local 127.0.0.1 >/dev/null",
               "-port=8080"
             ],
             "image": "gcr.io/google_containers/exechealthz-amd64:1.0",
