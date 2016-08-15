@@ -53,9 +53,14 @@ jq ". + {\"role\": \"$ROLE\", \"master_ip\": \"$MASTER_IP\"}" "$config_file" > /
 installer_container="$(jq -r '.phase2.installer_container' "$config_file")"
 
 docker pull "$installer_container"
+
 docker run \
   --net=host \
-  -v /:/host_root \
-  -v /etc/kubernetes/k8s_config.json:/opt/playbooks/config.json:ro \
-  "$installer_container" \
-  /opt/do_role.sh "$ROLE"
+  -v /:/mnt/root \
+  -v /run:/run \
+  -v /etc/kubernetes:/etc/kubernetes \
+  -v /var/lib/ignition:/usr/share/oem \
+  "$installer_container"
+
+systemctl enable kubelet
+systemctl start kubelet

@@ -41,7 +41,7 @@ config phase1.azure.master_private_ip
 
 config phase1.azure.location
 	string "Resource Location"
-	default "westus"
+	default "westus2"
 	help
 		The Azure location to use.
 
@@ -51,7 +51,7 @@ config phase1.azure.admin_username
 
 config phase1.azure.admin_password
 	string "Virtual Machine Admin Password"
-	default "AzureKubernet3s!"
+	default "Ch@ng3ThisPassword"
 
 config phase1.azure.tenant_id
 	string "ActiveDirectory ServicePrincipal ClientSecret"

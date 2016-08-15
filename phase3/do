@@ -13,8 +13,10 @@ gen() {
 
 deploy() {
 	gen
-	kubectl apply -f ./.tmp/
+	mkdir -p /tmp/kubectl/
+	HOME=/tmp/kubectl kubectl apply -f ./.tmp/
 }
+
 
 case "${1:-}" in
   "")
