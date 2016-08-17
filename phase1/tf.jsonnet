@@ -32,7 +32,7 @@
       ],
     },
     tls_locally_signed_cert(name, signer): {
-      cert_request_pem: "${tls_cert_request.%s.cert_request_pem}" % name,
+      cert_request_pem: "${data.tls_cert_request.%s.cert_request_pem}" % name,
       ca_key_algorithm: "${tls_private_key.%s.algorithm}" % signer,
       ca_private_key_pem: "${tls_private_key.%s.private_key_pem}" % signer,
       ca_cert_pem: "${tls_self_signed_cert.%s.cert_pem}" % signer,
@@ -75,13 +75,7 @@
     // ip addresses will cause all certs to be recreated tainting clusters using the
     // old certificates (i.e. causing those clusters to be recreated by terraform).
     cluster_tls(master_instance_names, master_instance_ips):: {
-      tls_private_key: {
-        [name]: pki.private_key
-        for name in ["root", "node", "master", "admin"]
-      },
-      tls_self_signed_cert: {
-        root: pki.tls_self_signed_cert("root"),
-      },
+	  data: {
       tls_cert_request: {
         [name]: pki.tls_cert_request(name)
         for name in ["node", "admin"]
@@ -103,10 +97,20 @@
           ],
         ),
       },
+	  },
+      resource: {
+	  tls_private_key: {
+        [name]: pki.private_key
+        for name in ["root", "node", "master", "admin"]
+      },
+      tls_self_signed_cert: {
+        root: pki.tls_self_signed_cert("root"),
+      },
       tls_locally_signed_cert: {
         [name]: pki.tls_locally_signed_cert(name, "root")
         for name in ["node", "master", "admin"]
       },
+      }
     },
   },
 }

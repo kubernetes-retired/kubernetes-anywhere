@@ -24,7 +24,7 @@ function(config)
         "root",
         "https://${azurerm_public_ip.pip.ip_address}",
       ));
-  {
+  std.mergePatch({
     variable: {
       subscription_id: { default: cfg.azure.subscription_id },
       tenant_id: { default: cfg.azure.tenant_id },
@@ -42,6 +42,36 @@ function(config)
         tenant_id: "${var.tenant_id}",
         client_id: "${var.client_id}",
         client_secret: "${var.client_secret}",
+      },
+    },
+    data: {
+      template_file: {
+        azure_json: {
+          template: "${file(\"azure.json\")}",
+          vars: {
+            tenantId: "${var.tenant_id}",
+            subscriptionId: "${var.subscription_id}",
+            aadClientId: "${var.client_id}",
+            aadClientSecret: "${var.client_secret}",
+            resourceGroup: "${azurerm_resource_group.rg.name}",
+            location: "${azurerm_resource_group.rg.location}",
+            subnetName: "${azurerm_subnet.subnet.name}",
+            securityGroupName: "${azurerm_network_security_group.sg.name}",
+            vnetName: "${azurerm_virtual_network.vnet.name}",
+            routeTableName: "${azurerm_route_table.rt.name}",
+          },
+        },
+        configure_vm: {
+          template: "${file(\"configure-vm.sh\")}",
+          vars: {
+            root_ca_public_pem: "${base64encode(tls_self_signed_cert.root.cert_pem)}",
+            apiserver_cert_pem: "${base64encode(tls_locally_signed_cert.master.cert_pem)}",
+            apiserver_key_pem: "${base64encode(tls_private_key.master.private_key_pem)}",
+            node_kubeconfig: kubeconfig("node"),
+            k8s_config: "${base64encode(file(\"../../.config.json\"))}",
+            azure_json: "${base64encode(data.template_file.azure_json.rendered)}",
+          },
+        },
       },
     },
     resource: {
@@ -169,34 +199,6 @@ function(config)
           count: cfg.num_nodes,
         },
       },
-      template_file: {
-        azure_json: {
-          template: "${file(\"azure.json\")}",
-          vars: {
-            tenantId: "${var.tenant_id}",
-            subscriptionId: "${var.subscription_id}",
-            aadClientId: "${var.client_id}",
-            aadClientSecret: "${var.client_secret}",
-            resourceGroup: "${azurerm_resource_group.rg.name}",
-            location: "${azurerm_resource_group.rg.location}",
-            subnetName: "${azurerm_subnet.subnet.name}",
-            securityGroupName: "${azurerm_network_security_group.sg.name}",
-            vnetName: "${azurerm_virtual_network.vnet.name}",
-            routeTableName: "${azurerm_route_table.rt.name}",
-          },
-        },
-        configure_vm: {
-          template: "${file(\"configure-vm.sh\")}",
-          vars: {
-            root_ca_public_pem: "${base64encode(tls_self_signed_cert.root.cert_pem)}",
-            apiserver_cert_pem: "${base64encode(tls_locally_signed_cert.master.cert_pem)}",
-            apiserver_key_pem: "${base64encode(tls_private_key.master.private_key_pem)}",
-            node_kubeconfig: kubeconfig("node"),
-            k8s_config: "${base64encode(file(\"../../.config.json\"))}",
-            azure_json: "${base64encode(template_file.azure_json.rendered)}",
-          },
-        },
-      },
       azurerm_virtual_machine: {
         master_vm: {
           resource_group_name: names.resource_group,
@@ -224,7 +226,7 @@ function(config)
             computer_name: names.master_vm,
             admin_username: cfg.azure.admin_username,
             admin_password: cfg.azure.admin_password,
-            custom_data: "${base64encode(template_file.configure_vm.rendered)}",
+            custom_data: "${base64encode(data.template_file.configure_vm.rendered)}",
           },
 
           os_profile_linux_config: {
@@ -257,7 +259,7 @@ function(config)
             computer_name: names.node_vm + "-${count.index}",
             admin_username: cfg.azure.admin_username,
             admin_password: cfg.azure.admin_password,
-            custom_data: "${base64encode(template_file.configure_vm.rendered)}",
+            custom_data: "${base64encode(data.template_file.configure_vm.rendered)}",
           },
 
           os_profile_linux_config: {
@@ -276,5 +278,5 @@ function(config)
           }],
         },
       },
-    } + tf.pki.cluster_tls([names.master_vm], ["${azurerm_public_ip.pip.ip_address}", master_private_ip]),
-  }
+    },
+  }, tf.pki.cluster_tls([names.master_vm], ["${azurerm_public_ip.pip.ip_address}", master_private_ip]))
