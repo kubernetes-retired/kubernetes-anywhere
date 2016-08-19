@@ -6,7 +6,7 @@ RUN apt-get update && apt-get -y upgrade \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Terraform
-ENV TERRAFORM_VERSION 0.7.0
+ENV TERRAFORM_VERSION 0.7.1
 RUN curl -sSL --fail \
     "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" \
     -o /tmp/tf.zip \
