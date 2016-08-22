@@ -74,43 +74,48 @@
     // clusters or even multiple clusters but changing the list of master names or
     // ip addresses will cause all certs to be recreated tainting clusters using the
     // old certificates (i.e. causing those clusters to be recreated by terraform).
+
+    cluster_tls_data(master_instance_names, master_instance_ips):: {
+      tls_cert_request: {
+        [name]: pki.tls_cert_request(name)
+        for name in ["node", "admin"]
+      } {
+        master: pki.tls_cert_request(
+          "master",
+          dns_names=master_instance_names + [
+            # master service dns names
+            "kubernetes",
+            "kubernetes.default",
+            "kubernetes.default.svc",
+            "kubernetes.default.svc.local",
+            "kubernetes.default.svc.local",
+          ],
+          ip_addresses=master_instance_ips + [
+            # master service ip, this depends on the cluster cidr
+            # so must be changed if/when we allow that to be configured
+            "10.0.0.1",
+          ],
+        ),
+      },
+    },
+
+    cluster_tls_resources(master_instance_names, master_instance_ips):: {
+      tls_private_key: {
+        [name]: pki.private_key
+        for name in ["root", "node", "master", "admin"]
+      },
+      tls_self_signed_cert: {
+        root: pki.tls_self_signed_cert("root"),
+      },
+      tls_locally_signed_cert: {
+        [name]: pki.tls_locally_signed_cert(name, "root")
+        for name in ["node", "master", "admin"]
+      },
+    },
+
     cluster_tls(master_instance_names, master_instance_ips):: {
-      data: {
-        tls_cert_request: {
-          [name]: pki.tls_cert_request(name)
-          for name in ["node", "admin"]
-        } {
-          master: pki.tls_cert_request(
-            "master",
-            dns_names=master_instance_names + [
-              # master service dns names
-              "kubernetes",
-              "kubernetes.default",
-              "kubernetes.default.svc",
-              "kubernetes.default.svc.local",
-              "kubernetes.default.svc.local",
-            ],
-            ip_addresses=master_instance_ips + [
-              # master service ip, this depends on the cluster cidr
-              # so must be changed if/when we allow that to be configured
-              "10.0.0.1",
-            ],
-          ),
-        },
-      },
-      resource: {
-        tls_private_key: {
-          [name]: pki.private_key
-          for name in ["root", "node", "master", "admin"]
-        },
-        tls_self_signed_cert: {
-          root: pki.tls_self_signed_cert("root"),
-        },
-        tls_locally_signed_cert: {
-          [name]: pki.tls_locally_signed_cert(name, "root")
-          for name in ["node", "master", "admin"]
-        },
-      },
+      data: pki.cluster_tls_data(master_instance_names, master_instance_ips),
+      resource: pki.cluster_tls_resources(master_instance_names, master_instance_ips),
     },
   },
 }
