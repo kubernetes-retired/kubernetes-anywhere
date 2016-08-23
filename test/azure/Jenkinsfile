@@ -102,10 +102,10 @@ node {
 				sh("cp ./phase1/azure/.tmp/kubeconfig.json ./kubeconfig.json")
 				archiveArtifacts artifacts: 'kubeconfig.json', fingerprint: true
 
-
 				stage "Wait for Cluster"
-				sh("make validate")
-
+				timeout(time: 5, unit: 'MINUTES') {
+					sh("make validate")
+				}
 
 				stage 'Deploy Addons'
 				sh("make addons")
