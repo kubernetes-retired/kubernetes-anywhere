@@ -24,10 +24,10 @@ destroy() {
 case "${1:-}" in
   "")
     ;;
-  "deploy")
+  "deploy-cluster")
     deploy
     ;;
-  "destroy")
+  "destroy-cluster")
     destroy
     ;;
   "gen")

@@ -42,7 +42,7 @@ menuconfig: .tmp/mconf
 echo-config: .config.json
 	cat $<
 
-deploy destroy: .config.json
+deploy-cluster destroy-cluster: .config.json
 	$(MAKE) do WHAT=$@
 
 validate:
@@ -50,6 +50,9 @@ validate:
 
 addons:
 	KUBECONFIG="$$(pwd)/phase1/$$(jq -r '.phase1.cloud_provider' .config.json)/.tmp/kubeconfig.json" ./phase3/do deploy
+
+deploy: | deploy-cluster validate addons
+destroy: | destroy-cluster
 
 do:
 	( cd "phase1/$$(jq -r '.phase1.cloud_provider' .config.json)"; ./do $(WHAT) )
