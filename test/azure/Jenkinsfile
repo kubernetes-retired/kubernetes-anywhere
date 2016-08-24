@@ -112,7 +112,7 @@ node {
 				if (destroyCluster=="y") {
 					stage 'Destroy Cluster'
 					withEnv(["FORCE_DESTROY=y"]) {
-						sh("cd ./phase1/azure && ./do destroy")
+						sh("make destroy")
 					}
 				}
 			}
