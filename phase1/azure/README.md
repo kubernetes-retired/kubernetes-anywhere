@@ -16,11 +16,17 @@ Required information:
   * Azure Service Principal Client ID (The Client ID (or Application Identifier URL) of your Service Principal)
   * Azure Service Principal Client Secret (The Client Secret (or Password) of your Service Principal)
 
-If you need help creating an Azure Service Principal, [Hashicorp has some documentation](https://www.packer.io/docs/builders/azure-setup.html).
+#### Create a new Azure Service Principal (optional)
 
-NOTE: Currently, this service principal is used both for driving the deployment in Terraform as well as powering the cloudprovider in the cluster. This means that you
-either need to grant the Service Principal `Contributor` level access to the entire subscription, or you need to make the Resource Group ahead of time and grant
-the Service Principal access to just that specific Resource Group.
+If you don't already have an Azure Service Principal created for this deployment and cluster,
+you can perform the following to create one. You'll want to make sure your Azure CLI is configured for the
+same subscription as you're planning to deploy into.
+
+```shell
+wget https://raw.githubusercontent.com/kubernetes/kubernetes-anywhere/master/phase1/azure/create-azure-service-principal.sh -O ./create-azure-service-principal.sh
+chmod +x ./create-azure-service-principal.sh
+./create-azure-service-principal.sh
+```
 
 ## Deployment
 
@@ -73,10 +79,10 @@ Let's copy your `kubeconfig.json` file somewhere for safe-keeping.
 *(Note, this will overwrite any existing config file at `~/.kube/config`.)*
 You'll need to do this outside of the `kubernetes-anywhere` deployment environment so that it is usable later.
 
-  ```shell
-  mkdir ~/.kube/config
-  cp ./phase1/azure/.tmp/kubeconfig.json ~/.kube/config
-  ```
+```shell
+mkdir ~/.kube/config
+cp ./phase1/azure/.tmp/kubeconfig.json ~/.kube/config
+```
 
 
 #### Deploy Something to the Cluster
@@ -109,3 +115,10 @@ You'll need to do this outside of the `kubernetes-anywhere` deployment environme
   accessible. If you see `<pending>` then you need to wait a few more minutes.
 
 Enjoy your Kubernetes cluster on Azure!
+
+## Notes
+
+* Currently, this service principal is used both for driving the deployment in Terraform as well as powering the cloudprovider in the cluster. This means that you
+either need to grant the Service Principal `Contributor` level access to the entire subscription, or you need to make the Resource Group ahead of time and grant
+the Service Principal access to just that specific Resource Group.
+
