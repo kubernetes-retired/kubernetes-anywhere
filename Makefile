@@ -20,20 +20,15 @@ CONF_TOOL_VERSION = 4.6
 KCONFIG_FILES = $(shell find . -name 'Kconfig')
 
 default:
-	$(MAKE) config
+	$(MAKE) deploy-all
 
-.tmp/conf .tmp/mconf:
-	mkdir -p $(dir $@)
-	curl -sSL --fail -o "$@" "https://storage.googleapis.com/public-mikedanese-k8s/kconfig/$(CONF_TOOL_VERSION)/$(OS)/$(shell basename $@)"
-	chmod +x "$@"
+config:
+	CONFIG_="." kconfig-conf Kconfig
 
-config: .tmp/conf
-	CONFIG_="." .tmp/conf Kconfig
+menuconfig:
+	CONFIG_="." kconfig-mconf Kconfig
 
-menuconfig: .tmp/mconf
-	CONFIG_="." .tmp/mconf Kconfig
-
-.config: .tmp/conf $(KCONFIG_FILES)
+.config: $(KCONFIG_FILES)
 	$(MAKE) config
 
 .config.json: .config
@@ -45,10 +40,10 @@ echo-config: .config.json
 deploy-cluster destroy-cluster: .config.json
 	$(MAKE) do WHAT=$@
 
-validate:
+validate: .config.json
 	KUBECONFIG="$$(pwd)/phase1/$$(jq -r '.phase1.cloud_provider' .config.json)/.tmp/kubeconfig.json" ./util/validate
 
-addons:
+addons: .config.json
 	KUBECONFIG="$$(pwd)/phase1/$$(jq -r '.phase1.cloud_provider' .config.json)/.tmp/kubeconfig.json" ./phase3/do deploy
 
 deploy: | deploy-cluster validate addons
@@ -60,12 +55,11 @@ do:
 docker-build:
 	docker build -t $(IMAGE_NAME):$(IMAGE_VERSION) .
 
-docker-run: docker-build
-	docker run -it --net=host $(IMAGE_NAME):$(IMAGE_VERSION) /bin/bash
-
 docker-dev: docker-build
-	docker run -it --net=host -v `pwd`:/root/kubernetes-anywhere $(IMAGE_NAME):$(IMAGE_VERSION) /bin/bash
+	docker run -it --net=host --volume="`pwd`:/opt/kubernetes-anywhere" $(IMAGE_NAME):$(IMAGE_VERSION) /bin/bash
 
+docker-push: docker-build
+	docker push $(IMAGE_NAME):$(IMAGE_VERSION)
 
 clean:
 	rm -rf .tmp

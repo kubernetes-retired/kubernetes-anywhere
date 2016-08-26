@@ -1,0 +1,7 @@
+.git
+phase1/azure/.tmp/
+phase1/gce/.tmp/
+phase3/.tmp
+.tmp/
+.config
+.config.json

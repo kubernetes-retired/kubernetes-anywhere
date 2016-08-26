@@ -26,4 +26,10 @@ convert_boolean_types() {
 }
 
 ## `jq -n ".foo=true|.bar=false"` will generate `{ "foo": true, "bar": false }`
-jq -n "$(read_input_and_strip_comments | convert_boolean_types | paste -sd "|" -)"
+unflat="$(read_input_and_strip_comments | convert_boolean_types)"
+flat=""
+for line in $unflat; do
+	flat="${flat}|${line}"
+done
+flat=${flat#"|"}
+jq -n "${flat}"
