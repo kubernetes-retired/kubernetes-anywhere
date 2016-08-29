@@ -45,6 +45,14 @@ make deploy
   * phase1.azure.subscription_id = "[azure_subscription_id]"
   ```
 
+  You may skip these fields, and the deployment will offer to fill them in for you:
+
+  ```
+  * phase1.azure.tenant_id
+  * phase1.azure.client_id
+  * phase1.azure.client_secret
+  ```
+
 ## Congratulations!
 
 You have a Kubernetes cluster!
