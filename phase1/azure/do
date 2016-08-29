@@ -3,16 +3,67 @@
 set -o errexit
 set -o pipefail
 set -o nounset
-set -x
 
 cd "${BASH_SOURCE%/*}"
+f="./../../.config.json"
 
 gen() {
   mkdir -p .tmp/
   jsonnet -J ../../ --multi .tmp/ all.jsonnet
 }
 
+check_auth() {
+  cluster_name="$(jq -r '.phase1.cluster_name' $f)"
+  location="$(jq -r '.phase1.azure.location' $f)"
+  subscription_id="$(jq -r '.phase1.azure.subscription_id' $f)"
+  tenant_id="$(jq -r '.phase1.azure.tenant_id' $f)"
+  client_id="$(jq -r '.phase1.azure.client_id' $f)"
+  client_secret="$(jq -r '.phase1.azure.client_secret' $f)"
+
+  if [[ -z "${tenant_id:-}" ]]; then
+    tenant_id="$(curl https://management.azure.com/subscriptions/27b750cd-ed43-42fd-9044-8d75e124ae55?api-version=2016-01-01 -s -D - -o /dev/null | grep WWW-Authenticate | egrep '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}' -o)"
+  fi
+
+  if [[ -z "${client_id:-}" && -z "${client_secret}" ]]; then
+    app_url="http://${cluster_name}"
+    secret="$(cat /proc/sys/kernel/random/uuid)"
+    while true; do
+    echo
+    echo "Azure 'client_id' and 'client_secret' are empty."
+    echo "This will now create a ServicePrincipal named '${cluster_name}', identified by '${app_url}' which will be granted 'Contributor' access to the specific subscription."
+    read -p "Proceed and create new ServicePrincipal? [y/n] " -n 1 -r && echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+      ./create-azure-service-principal.sh \
+        --subscription-id=${subscription_id} \
+        --name="${cluster_name}" \
+        --secret="${secret}" \
+        --app-url="${app_url}" \
+        --output-format=text
+
+	  sed -i "s|.phase1.azure.client_id=\"\"|.phase1.azure.client_id=\"${app_url}\"|" "$f"
+	  sed -i "s|.phase1.azure.client_secret=\"\"|.phase1.azure.client_secret=\"${secret}\"|" "$f"
+	  sed -i "s|.phase1.azure.tenant_id=\"\"|.phase1.azure.tenant_id=\"${client_id}\"|" "$f"
+
+      gened="{\"phase1\":{\"azure\":{\
+          \"client_id\": \"${app_url}\",\
+          \"client_secret\": \"${secret}\",\
+          \"tenant_id\": \"${tenant_id}\"\
+      }}}"
+
+      merged="$(jq ". * ${gened}" ../../.config.json)"
+      echo "${merged}" > ../../.config.json.tmp
+      mv ../../.config.json{.tmp,}
+      break
+    elif [[ $REPLY =~ ^[Nn]$ ]]; then
+      printf 'Credentials must be supplied.' >&2
+      exit -1
+    fi
+    done
+  fi
+}
+
 deploy() {
+  check_auth
   gen
 
   # validate the config
