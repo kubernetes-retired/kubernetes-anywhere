@@ -1,10 +1,10 @@
 #!/bin/bash
 set -eux -o pipefail
 
-apk add --update git build-base wget jq autoconf automake pkgconfig ncurses libtool gperf flex bison ca-certificates
+apk add --update git build-base wget curl jq autoconf automake pkgconfig ncurses libtool gperf flex bison ca-certificates
 
 ## Install kubectl
-export KUBECTL_VERSION=1.3.5
+export KUBECTL_VERSION=1.3.6
 wget https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -O /usr/local/bin/kubectl
 chmod +x /usr/local/bin/kubectl
 
@@ -17,8 +17,8 @@ cp jsonnet /usr/local/bin)
 rm -rf /tmp/jsonnet
 
 ## Install Terraform
-export TERRAFORM_VERSION=0.7.1
-export TERRAFORM_SHA256SUM=133766ed558af04255490f135fed17f497b9ba1e277ff985224e1287726ab2dc
+export TERRAFORM_VERSION=0.7.2
+export TERRAFORM_SHA256SUM=b337c885526a8a653075551ac5363a09925ce9cf141f4e9a0d9f497842c85ad5
 
 mkdir -p /tmp/terraform/
 (cd /tmp/terraform
@@ -34,7 +34,6 @@ npm install -g azure-cli
 
 ## Install kconfig-conf
 export KCONFIG_VERSION=4.7.0.0
-#apt-get update && apt-get install -y autoconf automake pkg-config gperf libtool flex bison libncurses5-dev \
 mkdir -p /tmp/kconfig-frontends
 (cd /tmp/kconfig-frontends
 git clone "https://github.com/colemickens/kconfig-frontends" .
