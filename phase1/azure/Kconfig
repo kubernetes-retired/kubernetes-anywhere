@@ -1,5 +1,25 @@
 menu "Azure configuration"
 
+config phase1.azure.subscription_id
+	string "Azure SubscriptionID"
+	help
+		The Azure Subscription ID
+
+config phase1.azure.tenant_id
+	string "Azure TenantID"
+	help
+		The Azure Tenant ID
+
+config phase1.azure.client_id
+	string "Azure Active Directory ServicePrincipal ClientID"
+	help
+		The ClientID of the Service Account to be used by the cluster components.
+
+config phase1.azure.client_secret
+	string "Azure Active Directory ServicePrincipal ClientSecret"
+	help
+		The ClientSecret of the Service Account to be used by the cluster components.
+
 config phase1.azure.image_publisher
 	string "Base Virtual Machine OS Image"
 	default "canonical"
@@ -52,25 +72,5 @@ config phase1.azure.admin_username
 config phase1.azure.admin_password
 	string "Virtual Machine Admin Password"
 	default "Ch@ng3ThisPassword"
-
-config phase1.azure.tenant_id
-	string "ActiveDirectory ServicePrincipal ClientSecret"
-	help
-		The ClientSecret of the Service Account to be used by the cluster components.
-
-config phase1.azure.subscription_id
-	string "ActiveDirectory ServicePrincipal ClientSecret"
-	help
-		The ClientSecret of the Service Account to be used by the cluster components.
-
-config phase1.azure.client_id
-	string "ActiveDirectory ServicePrincipal ClientID"
-	help
-		The ClientID of the Service Account to be used by the cluster components.
-
-config phase1.azure.client_secret
-	string "ActiveDirectory ServicePrincipal ClientSecret"
-	help
-		The ClientSecret of the Service Account to be used by the cluster components.
 
 endmenu
