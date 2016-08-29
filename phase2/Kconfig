@@ -3,7 +3,7 @@ menu "Phase 2: Node Bootstrapping"
 
 config phase2.installer_container
 	string "installer container"
-	default "docker.io/colemickens/install-k8s:v1"
+	default "docker.io/colemickens/k8s-ignition:latest"
 
 config phase2.docker_registry
 	string "docker registry"
@@ -13,7 +13,7 @@ config phase2.docker_registry
 
 config phase2.kubernetes_version
 	string "kubernetes version"
-	default "v1.2.4"
+	default "v1.4.0-alpha.2"
 	help
 	  The version of Kubernetes to deploy.
 
