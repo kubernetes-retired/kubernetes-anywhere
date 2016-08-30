@@ -103,7 +103,7 @@ cp ./phase1/azure/.tmp/kubeconfig.json ~/.kube/config
 
   2. Expose the `nginx` deployment via a Service (Type=LoadBalancer):
   ```shell
-  kubectl expose deployment nginx --name=nginx --type=LoadBalancer
+  kubectl expose deployment nginx --name=nginx --type=LoadBalancer --port=80
   ```
 
   3. Wait a couple minutes for the Azure Load Balancer to be provisioned, then:
