@@ -15,13 +15,12 @@ gen() {
 deploy() {
   gen
 
-  # validate the config
-  # TODO: auto fix the storage account
+  # TODO: offer to fill in SP creds
+  # TODO: check storage account name
 
   # Workaround: https://github.com/hashicorp/terraform/issues/7153
-  terraform apply -state=./.tmp/terraform.tfstate .tmp || true
-
-  terraform apply -state=./.tmp/terraform.tfstate .tmp
+  terraform apply -state=./.tmp/terraform.tfstate .tmp ||
+    terraform apply -state=./.tmp/terraform.tfstate .tmp
 }
 
 destroy() {
