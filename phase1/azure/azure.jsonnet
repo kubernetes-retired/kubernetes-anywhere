@@ -17,11 +17,11 @@ function(config)
     node_nic: "%(cluster_name)s-node-nic" % cfg,
     node_vm: "%(cluster_name)s-node" % cfg,
   };
-  local kubeconfig(user) =
+  local kubeconfig(user, cluster, context) =
     std.manifestJson(
       tf.pki.kubeconfig_from_certs(
-        user,
-        "root",
+        user, cluster, context,
+        cfg.cluster_name + "-root",
         "https://${azurerm_public_ip.pip.ip_address}",
       ));
   std.mergePatch({
@@ -64,10 +64,10 @@ function(config)
         configure_vm: {
           template: "${file(\"configure-vm.sh\")}",
           vars: {
-            root_ca_public_pem: "${base64encode(tls_self_signed_cert.root.cert_pem)}",
-            apiserver_cert_pem: "${base64encode(tls_locally_signed_cert.master.cert_pem)}",
-            apiserver_key_pem: "${base64encode(tls_private_key.master.private_key_pem)}",
-            node_kubeconfig: kubeconfig("node"),
+            root_ca_public_pem: "${base64encode(tls_self_signed_cert.%s-root.cert_pem)}" % cfg.cluster_name,
+            apiserver_cert_pem: "${base64encode(tls_locally_signed_cert.%s-master.cert_pem)}" % cfg.cluster_name,
+            apiserver_key_pem: "${base64encode(tls_private_key.%s-master.private_key_pem)}" % cfg.cluster_name,
+            node_kubeconfig: kubeconfig(cfg.cluster_name + "-node", "local", "service-account-context"),
             k8s_config: "${base64encode(file(\"../../.config.json\"))}",
             azure_json: "${base64encode(data.template_file.azure_json.rendered)}",
           },
@@ -273,10 +273,10 @@ function(config)
         kubeconfig: {
           provisioner: [{
             "local-exec": {
-              command: "echo '%s' > ./.tmp/kubeconfig.json" % kubeconfig("admin"),
+              command: "echo '%s' > ./.tmp/kubeconfig.json" % kubeconfig(cfg.cluster_name + "-admin", cfg.cluster_name, cfg.cluster_name),
             },
           }],
         },
       },
     },
-  }, tf.pki.cluster_tls([names.master_vm], ["${azurerm_public_ip.pip.ip_address}", master_private_ip]))
+  }, tf.pki.cluster_tls(cfg.cluster_name, [names.master_vm], ["${azurerm_public_ip.pip.ip_address}", master_private_ip]))
