@@ -30,13 +30,13 @@ function(cfg)
       addons_config: (import "phase3/all.jsonnet")(cfg),
     },
   });
-  local kubeconfig(user) =
+  local kubeconfig(user, cluster, context) =
     std.manifestJson(
       tf.pki.kubeconfig_from_certs(
-        user,
-        "root",
+        user, cluster, context,
+        p1.cluster_name + "-root",
         "https://${google_compute_address.%(master_ip)s.address}" % names
-      ));
+    ));
   {
     output: {
       [names.master_ip]: {
@@ -113,10 +113,10 @@ function(cfg)
           metadata: {
             "k8s-role": "master",
             "k8s-config": config_metadata_template % [names.master_ip, "master"],
-            "k8s-ca-public-key": "${tls_self_signed_cert.root.cert_pem}",
-            "k8s-apisever-public-key": "${tls_locally_signed_cert.master.cert_pem}",
-            "k8s-apisever-private-key": "${tls_private_key.master.private_key_pem}",
-            "k8s-master-kubeconfig": kubeconfig("master"),
+            "k8s-ca-public-key": "${tls_self_signed_cert.%s-root.cert_pem}" % p1.cluster_name,
+            "k8s-apisever-public-key": "${tls_locally_signed_cert.%s-master.cert_pem}" % p1.cluster_name,
+            "k8s-apisever-private-key": "${tls_private_key.%s-master.private_key_pem}" % p1.cluster_name,
+            "k8s-master-kubeconfig": kubeconfig(p1.cluster_name + "-master", "local", "service-account-context"),
           },
           disk: [{
             image: gce.os_image,
@@ -135,7 +135,7 @@ function(cfg)
             "k8s-role": "node",
             "k8s-deploy-bucket": names.release_bucket,
             "k8s-config": config_metadata_template % [names.master_ip, "node"],
-            "k8s-node-kubeconfig": kubeconfig("node"),
+            "k8s-node-kubeconfig": kubeconfig(p1.cluster_name + "-node", "local", "service-account-context"),
           },
           disk: [{
             source_image: gce.os_image,
@@ -163,11 +163,11 @@ function(cfg)
         kubeconfig: {
           provisioner: [{
             "local-exec": {
-              command: "echo '%s' > kubeconfig.json" % kubeconfig("admin"),
+              command: "echo '%s' > kubeconfig.json" % kubeconfig(p1.cluster_name + "-admin", p1.cluster_name, p1.cluster_name),
             },
           }],
         },
       },
-    } + tf.pki.cluster_tls_resources([names.master_instance], ["${google_compute_address.%(master_ip)s.address}" % names]),
-    data: tf.pki.cluster_tls_data([names.master_instance], ["${google_compute_address.%(master_ip)s.address}" % names]),
+    } + tf.pki.cluster_tls_resources(p1.cluster_name, [names.master_instance], ["${google_compute_address.%(master_ip)s.address}" % names]),
+    data: tf.pki.cluster_tls_data(p1.cluster_name, [names.master_instance], ["${google_compute_address.%(master_ip)s.address}" % names]),
   }

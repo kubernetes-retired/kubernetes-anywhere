@@ -43,18 +43,18 @@
         "client_auth",
       ],
     },
-    kubeconfig_from_certs(name, signer, apiserver_url): {
+    kubeconfig_from_certs(user, cluster, context, signer, apiserver_url): {
       apiVersion: "v1",
       kind: "Config",
       users: [{
-        name: name,
+        name: user,
         user: {
-          "client-key-data": "${base64encode(tls_private_key.%s.private_key_pem)}" % name,
-          "client-certificate-data": "${base64encode(tls_locally_signed_cert.%s.cert_pem)}" % name,
+          "client-key-data": "${base64encode(tls_private_key.%s.private_key_pem)}" % user,
+          "client-certificate-data": "${base64encode(tls_locally_signed_cert.%s.cert_pem)}" % user,
         },
       }],
       clusters: [{
-        name: "local",
+        name: cluster,
         cluster: {
           "certificate-authority-data": "${base64encode(tls_self_signed_cert.%s.cert_pem)}" % signer,
           server: apiserver_url,
@@ -62,12 +62,12 @@
       }],
       contexts: [{
         context: {
-          cluster: "local",
-          user: name,
+          cluster: cluster,
+          user: user,
         },
-        name: "service-account-context",
+        name: context,
       }],
-      "current-context": "service-account-context",
+      "current-context": context,
     },
 
     // This is a sane default pki resource. This can be used for multi-master
@@ -75,13 +75,13 @@
     // ip addresses will cause all certs to be recreated tainting clusters using the
     // old certificates (i.e. causing those clusters to be recreated by terraform).
 
-    cluster_tls_data(master_instance_names, master_instance_ips):: {
+    cluster_tls_data(cluster_name, master_instance_names, master_instance_ips):: {
       tls_cert_request: {
-        [name]: pki.tls_cert_request(name)
+        [cluster_name + "-" + name]: pki.tls_cert_request(cluster_name + "-" + name)
         for name in ["node", "admin"]
       } {
-        master: pki.tls_cert_request(
-          "master",
+        [cluster_name + "-master"]: pki.tls_cert_request(
+          cluster_name + "-master",
           dns_names=master_instance_names + [
             # master service dns names
             "kubernetes",
@@ -99,23 +99,23 @@
       },
     },
 
-    cluster_tls_resources(master_instance_names, master_instance_ips):: {
+    cluster_tls_resources(cluster_name, master_instance_names, master_instance_ips):: {
       tls_private_key: {
-        [name]: pki.private_key
+        [cluster_name + "-" + name]: pki.private_key
         for name in ["root", "node", "master", "admin"]
       },
       tls_self_signed_cert: {
-        root: pki.tls_self_signed_cert("root"),
+        [cluster_name + "-root"]: pki.tls_self_signed_cert(cluster_name + "-root"),
       },
       tls_locally_signed_cert: {
-        [name]: pki.tls_locally_signed_cert(name, "root")
+        [cluster_name + "-" + name]: pki.tls_locally_signed_cert(cluster_name + "-" + name, cluster_name + "-root")
         for name in ["node", "master", "admin"]
       },
     },
 
-    cluster_tls(master_instance_names, master_instance_ips):: {
-      data: pki.cluster_tls_data(master_instance_names, master_instance_ips),
-      resource: pki.cluster_tls_resources(master_instance_names, master_instance_ips),
+    cluster_tls(cluster_name, master_instance_names, master_instance_ips):: {
+      data: pki.cluster_tls_data(cluster_name, master_instance_names, master_instance_ips),
+      resource: pki.cluster_tls_resources(cluster_name, master_instance_names, master_instance_ips),
     },
   },
 }
