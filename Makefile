@@ -20,7 +20,7 @@ CONF_TOOL_VERSION = 4.6
 KCONFIG_FILES = $(shell find . -name 'Kconfig')
 
 default:
-	$(MAKE) deploy-all
+	$(MAKE) deploy
 
 config:
 	CONFIG_="." kconfig-conf Kconfig
