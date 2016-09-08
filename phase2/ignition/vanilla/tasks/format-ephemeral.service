@@ -1,6 +1,9 @@
 [Unit]
 Description=Format Ephemeral Volume
 Documentation=https://coreos.com/os/docs/latest/mounting-storage.html
+Before=docker.service var-lib-docker.mount
+After=dev-sdb.device
+Requires=dev-sdb.device
 
 [Service]
 Type=oneshot
@@ -12,4 +15,4 @@ ExecStart=/bin/bash -c -x "wipefs -f /dev/sdb1 || true"
 ExecStart=/bin/bash -c -x "mkfs.ext4 -F /dev/sdb"
 
 [Install]
-WantedBy=multi-user.target
+RequiredBy=var-lib-docker.mount

@@ -64,3 +64,8 @@ docker run \
 
 systemctl enable kubelet
 systemctl start kubelet
+
+systemctl enable var-lib-docker.mount
+systemctl enable format-ephemeral.service
+
+reboot
