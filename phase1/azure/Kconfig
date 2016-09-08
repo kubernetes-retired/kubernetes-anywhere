@@ -53,6 +53,16 @@ config phase1.azure.node_vm_size
 	help
 		The size of VirtualMachine to deploy.
 
+config phase1.azure.use_premium_storage
+	bool "Whether or not to use premium storage"
+	help
+		Whether or not to use Premium_LRS as a storage account
+
+config phase1.azure.use_ephemeral_drive
+	bool "Whether or not to use ephemeral drive"
+	help
+		Whether or not to mount the ephmeral drive at /var/lib/docker 
+
 config phase1.azure.master_private_ip
 	string "Private IP address of Master"
 	default "10.240.1.4"
