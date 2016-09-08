@@ -54,6 +54,10 @@ check_auth() {
       merged="$(jq ". * ${gened}" "${configjson}")"
       echo "${merged}" > "${configjson}.tmp"
       mv "${configjson}.tmp" "${configjson}"
+
+      echo "Sleeping for 10 seconds to prevent Terraform failures"
+      sleep 10
+
       break
     elif [[ $REPLY =~ ^[Nn]$ ]]; then
       printf 'Credentials must be supplied.' >&2
