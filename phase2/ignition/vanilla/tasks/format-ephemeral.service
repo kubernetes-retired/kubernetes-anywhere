@@ -4,8 +4,6 @@ Documentation=https://coreos.com/os/docs/latest/mounting-storage.html
 
 [Service]
 Type=oneshot
-RemainAfterExit=yes
-ExecStart=systemctl start var-lib-docker.mount
 ExecStart=/bin/bash -c -x "umount -f /mnt/resource || /bin/true"
 ExecStart=/bin/bash -c -x "umount -A /dev/sdb1 || /bin/true"
 ExecStart=/bin/bash -c -x "umount -A /dev/sdb || /bin/true"

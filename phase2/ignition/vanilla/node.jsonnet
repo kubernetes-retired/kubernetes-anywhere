@@ -9,12 +9,12 @@ function(cfg)
         {
           name: "format-ephemeral.service",
           enable: true,
-          contents: (importstr "tasks/format-ephemeral.service")
+          contents: (importstr "tasks/format-ephemeral.service"),
         },
 	{
           name: "var-lib-docker.mount",
           enable: true,
-          contents: (importstr "tasks/var-lib-docker.mount")
+          contents: (importstr "tasks/var-lib-docker.mount"),
         },
         {
           name: "kubelet.service",
