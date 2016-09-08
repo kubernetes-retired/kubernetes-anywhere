@@ -21,7 +21,7 @@ check_auth() {
   client_secret="$(jq -r '.phase1.azure.client_secret' $f)"
 
   if [[ -z "${tenant_id:-}" ]]; then
-    tenant_id="$(curl https://management.azure.com/subscriptions/27b750cd-ed43-42fd-9044-8d75e124ae55?api-version=2016-01-01 -s -D - -o /dev/null | grep WWW-Authenticate | egrep '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}' -o)"
+    tenant_id="$(curl https://management.azure.com/subscriptions/${subscriptions}?api-version=2016-01-01 -s -D - -o /dev/null | grep WWW-Authenticate | egrep '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}' -o)"
   fi
 
   if [[ -z "${client_id:-}" && -z "${client_secret}" ]]; then
