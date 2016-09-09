@@ -1,8 +1,8 @@
 function(config)
   local tf = import "phase1/tf.jsonnet";
   local cfg = config.phase1;
-  local master_private_ip = cfg.azure.master_private_ip;
-  local storage_type = if cfg.azure.use_premium_storage then "Premium_LRS" else "Standard_LRS";
+  local master_private_ip = cfg.azure.master_private_ip; 
+  local storage_type = if cfg.azure.use_premium_storage == "yes" then "Premium_LRS" else "Standard_LRS";
   local names = {
     resource_group: "%(cluster_name)s" % cfg,
     master_public_ip: "%(cluster_name)s-master-pip" % cfg,

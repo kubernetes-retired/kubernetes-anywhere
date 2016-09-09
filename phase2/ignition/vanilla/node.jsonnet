@@ -6,16 +6,19 @@ function(cfg)
     ignition: { version: "2.0.0" },
     systemd: {
       units: [
-        {
-          name: "format-ephemeral.service",
-          enable: true,
-          contents: (importstr "tasks/format-ephemeral.service"),
-        },
-	{
-          name: "var-lib-docker.mount",
-          enable: true,
-          contents: (importstr "tasks/var-lib-docker.mount"),
-        },
+        if phase1.azure.use_ephemeral_drive == "yes" then
+          [
+            {
+              name: "format-ephemeral.service",
+              enable: true,
+              contents: (importstr "tasks/format-ephemeral.service"),
+            },
+	    {
+              name: "var-lib-docker.mount",
+              enable: true,
+              contents: (importstr "tasks/var-lib-docker.mount"),
+            },
+          ],
         {
           name: "kubelet.service",
           enable: true,
