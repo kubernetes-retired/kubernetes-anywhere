@@ -1,0 +1,41 @@
+#! /bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+cd "${BASH_SOURCE%/*}"
+f="./../../.config.json"
+
+gen() {
+  mkdir -p .tmp/
+  jsonnet -J ../../ --multi .tmp/ all.jsonnet
+}
+
+
+deploy() {
+  gen
+  terraform apply -state=./.tmp/terraform.tfstate .tmp
+}
+
+destroy() {
+  if [[ "${FORCE_DESTROY:-}" == "y" ]]; then
+    terraform destroy -state=./.tmp/terraform.tfstate -force .tmp
+  else
+    terraform destroy -state=./.tmp/terraform.tfstate .tmp
+  fi
+}
+
+case "${1:-}" in
+  "")
+    ;;
+  "deploy-cluster")
+    deploy
+    ;;
+  "destroy-cluster")
+    destroy
+    ;;
+  "gen")
+    gen
+    ;;
+esac

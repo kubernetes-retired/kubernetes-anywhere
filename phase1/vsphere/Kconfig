@@ -1,0 +1,73 @@
+menu "vSphere configuration"
+
+config phase1.vSphere.url
+	string "vCenter url"
+	help
+		The vCenter Url
+
+config phase1.vSphere.port
+	string "vCenter port"
+	default 443
+	help
+		The vCenter port
+
+config phase1.vSphere.username
+	string "vCenter username"
+	help
+		The vCenter Username
+
+config phase1.vSphere.password
+	string "vCenter password"
+	help
+		The vCenter password
+
+config phase1.vSphere.insecure
+	string "Does host use self-signed cert"
+	default true
+	help
+		If the host uses a self-signed cert.
+
+config phase1.vSphere.resourcePool
+	string "Resource pool"
+	default ""
+	help
+		Resource pool or cluster with access to datastore.
+
+config phase1.vSphere.datacenter
+	string "Datacenter"
+	default "datacenter"
+	help
+		The datacenter to be used by vSphere cloud provider plugin.
+
+config phase1.vSphere.datastore
+	string "Datastore"
+	default "datastore"
+	help
+		The datastore where VMs will be created.
+
+config phase1.vSphere.vcpu
+	string "Number of vcpu"
+	default "1"
+	help
+		Number of vcpu required for VM.
+
+
+config phase1.vSphere.memory
+	string "Memory required for VM"
+	default "1024"
+	help
+		Memory required for VM.
+
+config phase1.vSphere.template
+	string "Template Name"
+	default "kubedebian"
+	help
+		Template to clone VMs from.
+
+config phase1.vSphere.flannel_net
+	string "Flannel Network"
+	default "172.1.0.0/16"
+	help
+		 IP range used for flannel overlay network.
+
+endmenu
