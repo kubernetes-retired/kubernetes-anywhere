@@ -39,7 +39,7 @@ function(cfg)
                   name: "ssl-certs-host",
                 },
                 {
-                  readOnly: false,
+                  readOnly: true,
                   mountPath: "/srv/kubernetes/kubeconfig.json",
                   name: "kubeconfig",
                 },
