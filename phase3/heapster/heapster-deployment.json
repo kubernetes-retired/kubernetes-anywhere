@@ -6,7 +6,7 @@
       "spec": {
         "containers": [
           {
-            "image": "gcr.io/google_containers/heapster:v1.2.0-beta.1",
+            "image": "gcr.io/google_containers/heapster:v1.2.0",
             "command": [
               "/heapster",
               "--source=kubernetes.summary_api:''"
@@ -24,7 +24,7 @@
             }
           },
           {
-            "image": "gcr.io/google_containers/addon-resizer:1.3",
+            "image": "gcr.io/google_containers/addon-resizer:1.6",
             "command": [
               "/pod_nanny",
               "--cpu=80m",
@@ -72,7 +72,7 @@
       "metadata": {
         "labels": {
           "k8s-app": "heapster",
-          "version": "v1.2.0-beta.1"
+          "version": "v1.2.0"
         },
         "annotations": {
           "scheduler.alpha.kubernetes.io/critical-pod": "",
@@ -83,7 +83,7 @@
     "selector": {
       "matchLabels": {
         "k8s-app": "heapster",
-        "version": "v1.2.0-beta.1"
+        "version": "v1.2.0"
       }
     }
   },
@@ -91,10 +91,10 @@
   "metadata": {
     "labels": {
       "k8s-app": "heapster",
-      "version": "v1.2.0-beta.1",
+      "version": "v1.2.0",
       "kubernetes.io/cluster-service": "true"
     },
     "namespace": "kube-system",
-    "name": "heapster-v1.2.0-beta.1"
+    "name": "heapster-v1.2.0"
   }
 }
