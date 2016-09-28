@@ -57,7 +57,7 @@ docker-build:
 
 docker-dev: docker-build
 	${info Starting Kuberetes Anywhere deployment shell in a container}
-	docker run -it --env="PS1=[container]:\w> " --net=host --volume="`pwd`:/opt/kubernetes-anywhere" $(IMAGE_NAME):$(IMAGE_VERSION) /bin/bash
+	docker run -it --rm --env="PS1=[container]:\w> " --net=host --volume="`pwd`:/opt/kubernetes-anywhere" $(IMAGE_NAME):$(IMAGE_VERSION) /bin/bash
 
 docker-push: docker-build
 	docker push $(IMAGE_NAME):$(IMAGE_VERSION)
