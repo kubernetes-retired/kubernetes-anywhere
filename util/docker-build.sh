@@ -4,7 +4,7 @@ set -eux -o pipefail
 apk add --update git build-base wget curl jq autoconf automake pkgconfig ncurses libtool gperf flex bison ca-certificates
 
 ## Install kubectl
-export KUBECTL_VERSION=1.3.6
+export KUBECTL_VERSION=1.4.0
 wget https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -O /usr/local/bin/kubectl
 chmod +x /usr/local/bin/kubectl
 
