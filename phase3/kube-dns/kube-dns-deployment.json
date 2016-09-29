@@ -11,7 +11,7 @@
               "successThreshold": 1,
               "initialDelaySeconds": 60,
               "httpGet": {
-                "path": "/healthz",
+                "path": "/healthz-kubedns",
                 "scheme": "HTTP",
                 "port": 8080
               },
@@ -28,7 +28,7 @@
               },
               "timeoutSeconds": 5
             },
-            "image": "gcr.io/google_containers/kubedns-amd64:1.6",
+            "image": "gcr.io/google_containers/kubedns-amd64:1.7",
             "args": [
               "--domain=cluster.local.",
               "--dns-port=10053"
@@ -51,7 +51,6 @@
                 "memory": "70Mi"
               },
               "limits": {
-                "cpu": "100m",
                 "memory": "170Mi"
               }
             }
@@ -61,7 +60,8 @@
             "args": [
               "--cache-size=1000",
               "--no-resolv",
-              "--server=127.0.0.1#10053"
+              "--server=127.0.0.1#10053",
+              "--log-facility=-"
             ],
             "name": "dnsmasq",
             "ports": [
@@ -78,12 +78,26 @@
             ]
           },
           {
-            "image": "gcr.io/google_containers/exechealthz-amd64:1.1",
+            "image": "gcr.io/google_containers/exechealthz-amd64:1.2",
             "args": [
-              "-cmd=nslookup kubernetes.default.svc.cluster.local 127.0.0.1 >/dev/null && nslookup kubernetes.default.svc.cluster.local 127.0.0.1:10053 >/dev/null",
-              "-port=8080",
-              "-quiet"
+              "--cmd=nslookup kubernetes.default.svc.cluster.local 127.0.0.1 >/dev/null",
+              "--url=/healthz-dnsmasq",
+              "--cmd=nslookup kubernetes.default.svc.cluster.local 127.0.0.1:10053 >/dev/null",
+              "--url=/healthz-kubedns",
+              "--port=8080",
+              "--quiet"
             ],
+            "livenessProbe": {
+              "successThreshold": 1,
+              "initialDelaySeconds": 60,
+              "httpGet": {
+                "path": "/healthz-dnsmasq",
+                "scheme": "HTTP",
+                "port": 8080
+              },
+              "timeoutSeconds": 5,
+              "failureThreshold": 5
+            },
             "name": "healthz",
             "resources": {
               "requests": {
@@ -91,7 +105,6 @@
                 "memory": "50Mi"
               },
               "limits": {
-                "cpu": "10m",
                 "memory": "50Mi"
               }
             },
@@ -125,8 +138,7 @@
   "metadata": {
     "labels": {
       "k8s-app": "kube-dns",
-      "version": "v19",
-      "kubernetes.io/cluster-service": "true"
+      "version": "v19"
     },
     "namespace": "kube-system",
     "name": "kube-dns-v19"

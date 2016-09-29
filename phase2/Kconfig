@@ -13,7 +13,7 @@ config phase2.docker_registry
 
 config phase2.kubernetes_version
 	string "kubernetes version"
-	default "v1.4.0-alpha.3"
+	default "v1.4.0"
 	help
 	  The version of Kubernetes to deploy.
 

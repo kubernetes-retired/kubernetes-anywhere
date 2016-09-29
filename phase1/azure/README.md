@@ -62,7 +62,7 @@ Let's copy your `kubeconfig.json` file somewhere for safe-keeping.
 You'll need to do this outside of the `kubernetes-anywhere` deployment environment so that it is usable later.
 
 ```shell
-mkdir -p ~/.kube/config
+mkdir -p ~/.kube
 cp ./phase1/azure/.tmp/kubeconfig.json ~/.kube/config
 ```
 
