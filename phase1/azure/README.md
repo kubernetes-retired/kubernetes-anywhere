@@ -37,7 +37,7 @@ make deploy
 ```
 
 **Notes**:
-* The name chosen for `phase1.cluster_name` needs to be globally unique.
+* The name chosen for `phase1.cluster_name` needs to be globally unique. (See ["Cluster Naming Restrictions"](#cluster-naming-restrictions) below for full details)
 
 * To properly boot a cluster in Azure, you MUST set these values in the wizard:
 
@@ -99,6 +99,14 @@ cp ./phase1/azure/.tmp/kubeconfig.json ~/.kube/config
 Enjoy your Kubernetes cluster on Azure!
 
 ## Notes
+
+### Cluster Naming Restrictions
+The `cluster_name` is used as a prefix for all created resources and is used as the storage account name (dashes are automatically removed). The following restrictions apply to storage account names, and thus must be respected when choosing a `cluster_name`:
+  * Must be unique across Azure
+  * Must contain at least 3 characters
+  * Must contain no more than 24 characters
+  * Must only use alphanumeric characters and underscores (same as domain name requirements)
+  * Must start with a letter
 
 ### Between Deployments
 At times, it can be helpful to run `make clean`. Note that this will remove the Terraform state files, requiring you to manually remove the cluster. Fortunately this is easy in Azure, and just requires you to remove the resource group created by the deployment.
