@@ -6,7 +6,7 @@ set -o pipefail
 set -o nounset
 
 mkdir -p /etc/systemd/system/docker.service.d/
-cat <<EOF > /etc/systemd/system/docker.service.d/clear_mount_propagtion_flags.conf
+cat <<EOF > /etc/systemd/system/docker.service.d/clear_mount_propagation_flags.conf
 [Service]
 MountFlags=shared
 EOF
