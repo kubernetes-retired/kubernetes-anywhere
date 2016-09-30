@@ -8,17 +8,17 @@ config phase1.azure.subscription_id
 config phase1.azure.tenant_id
 	string "Azure TenantID"
 	help
-		The Azure Tenant ID
+		The Azure Tenant ID. (If left blank, will be auto-determined from the Subscription ID)
 
 config phase1.azure.client_id
 	string "Azure Active Directory ServicePrincipal ClientID"
 	help
-		The ClientID of the Service Account to be used by the cluster components.
+		The ClientID of the Service Account to be used by the cluster components. (If left blank, will be created automatically)
 
 config phase1.azure.client_secret
 	string "Azure Active Directory ServicePrincipal ClientSecret"
 	help
-		The ClientSecret of the Service Account to be used by the cluster components.
+		The ClientSecret of the Service Account to be used by the cluster components. (If left blank, will be created automatically)
 
 config phase1.azure.image_publisher
 	string "Base Virtual Machine OS Image"
@@ -35,11 +35,17 @@ config phase1.azure.image_sku
 	default "16.04.0-LTS"
 	help
 		The sku of the base image used for the VirtualMachines.
+
 config phase1.azure.image_version
 	string "Base Virtual Machine OS Image"
 	default "latest"
 	help
 		The version of the base image used for the VirtualMachines.
+
+config phase1.azure.storage_account_name
+	string "Azure Storage Account Name"
+	help
+		The name of the storage account to store VHDs in. (If left blank, a random name will be generated)
 
 config phase1.azure.master_vm_size
 	string "Virtual Machine Size (Master)"

@@ -67,12 +67,31 @@ check_auth() {
   fi
 }
 
+check_storage_account_name() {
+  storage_account_name="$(jq -r '.phase1.azure.storage_account_name' ${configjson})"
+  if [[ ! -z "${storage_account_name}" ]]; then
+    # everything is fine, we assume user knows what they are doing
+    return 0
+  fi
+  set +e;
+  storage_account_name="$(cat /dev/urandom | tr -dc 'a-z' | fold -w 1 | head -n 1)";
+  storage_account_name="${storage_account_name}$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 20 | head -n 1)k8s"
+  set -e;
+
+  sed -i "s|.phase1.azure.storage_account_name=\"\"|.phase1.azure.storage_account_name=\"${storage_account_name}\"|" "${config}"
+
+  gened="{\"phase1\":{\"azure\":{\
+      \"storage_account_name\": \"${storage_account_name}\"\
+  }}}"
+  merged="$(jq ". * ${gened}" "${configjson}")"
+  echo "${merged}" > "${configjson}.tmp"
+  mv "${configjson}.tmp" "${configjson}"
+}
+
 deploy() {
+  check_storage_account_name
   check_auth
   gen
-
-  # TODO: offer to fill in SP creds
-  # TODO: check storage account name
 
   # Workaround: https://github.com/hashicorp/terraform/issues/7153
   terraform apply -state=./.tmp/terraform.tfstate .tmp ||
