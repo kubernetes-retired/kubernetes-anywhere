@@ -45,7 +45,7 @@ config phase1.azure.image_version
 config phase1.azure.storage_account_name
 	string "Azure Storage Account Name"
 	help
-		The name of the storage account to store VHDs in. version of the base image used for the VirtualMachines. (If left blank, a random name will be generated)
+		The name of the storage account to store VHDs in. (If left blank, a random name will be generated)
 
 config phase1.azure.master_vm_size
 	string "Virtual Machine Size (Master)"

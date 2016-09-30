@@ -73,7 +73,10 @@ check_storage_account_name() {
     # everything is fine, we assume user knows what they are doing
     return 0
   fi
-  set +e; storage_account_name="$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 21 | head -n 1)k8s"; set -e
+  set +e;
+  storage_account_name="$(cat /dev/urandom | tr -dc 'a-z' | fold -w 1 | head -n 1)";
+  storage_account_name="${storage_account_name}$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 20 | head -n 1)k8s"
+  set -e;
 
   sed -i "s|.phase1.azure.storage_account_name=\"\"|.phase1.azure.storage_account_name=\"${storage_account_name}\"|" "${config}"
 
