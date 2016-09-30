@@ -55,8 +55,8 @@ check_auth() {
       echo "${merged}" > "${configjson}.tmp"
       mv "${configjson}.tmp" "${configjson}"
 
-      echo "Sleeping for 10 seconds to prevent Terraform failures"
-      sleep 10
+      echo "Sleeping for 30 seconds to prevent Terraform failures"
+      sleep 30
 
       break
     elif [[ $REPLY =~ ^[Nn]$ ]]; then
