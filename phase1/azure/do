@@ -4,8 +4,6 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-set -x
-
 cd "${BASH_SOURCE%/*}"
 config="./../../.config"
 configjson="./../../.config.json"

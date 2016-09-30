@@ -9,11 +9,11 @@ wait_duration=10
 num_nodes="$(( $(cat ./.config.json | jq -r '.phase1.num_nodes') + 1 ))"
 
 while true; do
-  hcount=$(kubectl get nodes 2>/dev/null | grep 'Ready' | wc -l) || true
-  [[ "${hcount}" -ge "${num_nodes}" ]] && exit
-
   total_time=$(( ${total_time} + ${wait_duration} ))
-  echo "Waiting for Cluster: Expected ${num_nodes} healthy nodes; found ${hcount}. (${total_time}s elapsed)"
+  hcount=$(kubectl get nodes 2>/dev/null | grep 'Ready' | wc -l) || true
+  echo "Validation: Expected ${num_nodes} healthy nodes; found ${hcount}. (${total_time}s elapsed)"
+
+  [[ "${hcount}" -ge "${num_nodes}" ]] && echo "Validation: Success!" && exit
 
   sleep ${wait_duration}
 done
