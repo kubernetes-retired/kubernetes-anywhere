@@ -53,6 +53,16 @@ make deploy
   * phase1.azure.client_secret
   ```
 
+* If you see this error output, please wait a minute and re-execute `make deploy`. This is a known issue due to some Azure AD interactions.
+
+  ```
+  Error refreshing state: 1 error(s) occurred:
+
+  * Credentials for acessing the Azure Resource Manager API are likely to be incorrect, or
+    the service principal does not have permission to use the Azure Service Management
+    API.
+  ```
+
 ## Congratulations!
 
 You have a Kubernetes cluster!
