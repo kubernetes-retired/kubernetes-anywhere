@@ -4,6 +4,8 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+set -x
+
 cd "${BASH_SOURCE%/*}"
 config="./../../.config"
 configjson="./../../.config.json"
@@ -20,10 +22,6 @@ check_auth() {
   tenant_id="$(jq -r '.phase1.azure.tenant_id' ${configjson})"
   client_id="$(jq -r '.phase1.azure.client_id' ${configjson})"
   client_secret="$(jq -r '.phase1.azure.client_secret' ${configjson})"
-
-  if [[ -z "${tenant_id:-}" ]]; then
-    tenant_id="$(curl https://management.azure.com/subscriptions/${subscription_id}?api-version=2016-01-01 -s -D - -o /dev/null | grep WWW-Authenticate | egrep '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}' -o)"
-  fi
 
   if [[ -z "${client_id:-}" && -z "${client_secret}" ]]; then
     app_url="http://${cluster_name}"
@@ -43,12 +41,10 @@ check_auth() {
 
       sed -i "s|.phase1.azure.client_id=\"\"|.phase1.azure.client_id=\"${app_url}\"|" "${config}"
       sed -i "s|.phase1.azure.client_secret=\"\"|.phase1.azure.client_secret=\"${secret}\"|" "${config}"
-      sed -i "s|.phase1.azure.tenant_id=\"\"|.phase1.azure.tenant_id=\"${tenant_id}\"|" "${config}"
 
       gened="{\"phase1\":{\"azure\":{\
           \"client_id\": \"${app_url}\",\
-          \"client_secret\": \"${secret}\",\
-          \"tenant_id\": \"${tenant_id}\"\
+          \"client_secret\": \"${secret}\"\
       }}}"
 
       merged="$(jq ". * ${gened}" "${configjson}")"
@@ -65,6 +61,19 @@ check_auth() {
     fi
     done
   fi
+}
+
+check_tenant_id() {
+  subscription_id="$(jq -r '.phase1.azure.subscription_id' ${configjson})"
+  tenant_id="$(curl https://management.azure.com/subscriptions/${subscription_id}?api-version=2016-01-01 -s -D - -o /dev/null | grep WWW-Authenticate | egrep '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}' -o)"
+
+  gened="{\"phase1\":{\"azure\":{\
+      \"tenant_id\": \"${tenant_id}\"\
+  }}}"
+
+  merged="$(jq ". * ${gened}" "${configjson}")"
+  echo "${merged}" > "${configjson}.tmp"
+  mv "${configjson}.tmp" "${configjson}"
 }
 
 check_storage_account_name() {
@@ -90,6 +99,7 @@ check_storage_account_name() {
 
 deploy() {
   check_storage_account_name
+  check_tenant_id
   check_auth
   gen
 

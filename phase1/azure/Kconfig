@@ -5,11 +5,6 @@ config phase1.azure.subscription_id
 	help
 		The Azure Subscription ID
 
-config phase1.azure.tenant_id
-	string "Azure TenantID"
-	help
-		The Azure Tenant ID. (If left blank, will be auto-determined from the Subscription ID)
-
 config phase1.azure.client_id
 	string "Azure Active Directory ServicePrincipal ClientID"
 	help
