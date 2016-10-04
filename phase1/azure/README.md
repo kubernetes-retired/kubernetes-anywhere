@@ -108,6 +108,28 @@ cp ./phase1/azure/.tmp/kubeconfig.json ~/.kube/config
 
 Enjoy your Kubernetes cluster on Azure!
 
+## Troubleshooting
+
+### Validation Fails (Zero nodes are healthy)
+If no nodes are available, there was likely a provisioning failure on the master (either in Azure or in the `ignition` provisioning container).
+The following steps will help in troubleshooting:
+
+1. SSH to the master.
+2. Use the following commands to upload relevant logs:
+  * `sudo journalctl -u kubelet 2>&1 | nc termbin.com 9999`
+  * `sudo cat /var/log/cloud-init-output.log | nc termbin.com 9999`
+3. Attach the logs to [a new Issue](https://github.com/kubernetes/kubernetes-anywhere/issues/new) in this repository.
+
+### Validation Fails (One or more nodes are missing/unhealthy)
+
+1. Use `kubectl get nodes` to identify the missing nodes.
+2. Use Azure Portal or `azure-xplat-cli` to find the node and the node's private IPv4 address.
+3. SSH to the master, then to the missing node
+4. Use the following commands to upload relevant logs:
+  * `sudo journalctl -u kubelet 2>&1 | nc termbin.com 9999`
+  * `sudo cat /var/log/cloud-init-output.log | nc termbin.com 9999`
+5. Attach the logs to [a new Issue](https://github.com/kubernetes/kubernetes-anywhere/issues/new) in this repository.
+
 ## Notes
 
 ### Cluster Naming Restrictions
