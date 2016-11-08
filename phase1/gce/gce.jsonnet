@@ -1,13 +1,15 @@
 function(cfg)
   local tf = import "phase1/tf.jsonnet";
   local p1 = cfg.phase1;
+  local p2 = cfg.phase2;
   local gce = p1.gce;
   local names = {
     instance_template: "%(cluster_name)s-node-instance-template" % p1,
     instance_group: "%(cluster_name)s-node-group" % p1,
     master_instance: "%(cluster_name)s-master" % p1,
     master_ip: "%(cluster_name)s-master-ip" % p1,
-    master_firewall_rule: "%(cluster_name)s-master-https" % p1,
+    master_external_firewall_rule: "%(cluster_name)s-master-https" % p1,
+    master_internal_firewall_rule: "%(cluster_name)s-master-internal" % p1,
     node_firewall_rule: "%(cluster_name)s-node-all" % p1,
     release_bucket: "%s-kube-deploy-%s" % [gce.project, p1.cluster_name],
   };
@@ -22,6 +24,17 @@ function(cfg)
       network: gce.network,
       access_config: {},
     }],
+  };
+  local startup_config = {
+    startup_script:
+      std.escapeStringDollars(importstr "configure-vm.sh") + (
+      if p2.provider == "ignition" then
+        std.escapeStringDollars(importstr "configure-vm-ignition.sh")
+      else if p2.provider == "kubeadm" then
+        std.escapeStringDollars(importstr "configure-vm-kubeadm.sh")
+      else
+        error "Unsupported phase2 provider in config"
+    ),
   };
   local config_metadata_template = std.toString(cfg {
     master_ip: "${google_compute_address.%s.address}",
@@ -38,6 +51,9 @@ function(cfg)
         "https://${google_compute_address.%(master_ip)s.address}" % names
     ));
   {
+    variable: {
+      "kubeadm_token": {},
+    },
     output: {
       [names.master_ip]: {
         value: "${google_compute_address.%(master_ip)s.address}" % names,
@@ -67,14 +83,28 @@ function(cfg)
           }],
           source_ranges: ["0.0.0.0/0"],
         },
-        [names.master_firewall_rule]: {
-          name: names.master_firewall_rule,
+        [names.master_external_firewall_rule]: {
+          name: names.master_external_firewall_rule,
           network: gce.network,
           allow: [{
             protocol: "tcp",
             ports: ["443"],
           }],
           source_ranges: ["0.0.0.0/0"],
+          target_tags: ["%(cluster_name)s-master" % p1],
+        },
+        [names.master_internal_firewall_rule]: {
+          name: names.master_internal_firewall_rule,
+          network: gce.network,
+          allow: [{
+            protocol: "tcp",
+            ports: ["9898"],
+          }],
+          source_ranges: [
+            "10.0.0.0/8",
+            "172.16.0.0/12",
+            "192.168.0.0/16",
+          ],
           target_tags: ["%(cluster_name)s-master" % p1],
         },
         [names.node_firewall_rule]: {
@@ -109,7 +139,7 @@ function(cfg)
               nat_ip: "${google_compute_address.%(master_ip)s.address}" % names,
             },
           }],
-          metadata_startup_script: std.escapeStringDollars(importstr "configure-vm.sh"),
+          metadata_startup_script: startup_config.startup_script,
           metadata: {
             "k8s-role": "master",
             "k8s-config": config_metadata_template % [names.master_ip, "master"],
@@ -117,6 +147,7 @@ function(cfg)
             "k8s-apisever-public-key": "${tls_locally_signed_cert.%s-master.cert_pem}" % p1.cluster_name,
             "k8s-apisever-private-key": "${tls_private_key.%s-master.private_key_pem}" % p1.cluster_name,
             "k8s-master-kubeconfig": kubeconfig(p1.cluster_name + "-master", "local", "service-account-context"),
+            "k8s-kubeadm-token": "${var.kubeadm_token}",
           },
           disk: [{
             image: gce.os_image,
@@ -131,11 +162,13 @@ function(cfg)
           name: names.instance_template,
           tags: ["%(cluster_name)s-node" % p1],
           metadata: {
-            "startup-script": std.escapeStringDollars(importstr "configure-vm.sh"),
+            "startup-script": startup_config.startup_script,
             "k8s-role": "node",
             "k8s-deploy-bucket": names.release_bucket,
             "k8s-config": config_metadata_template % [names.master_ip, "node"],
             "k8s-node-kubeconfig": kubeconfig(p1.cluster_name + "-node", "local", "service-account-context"),
+            "k8s-master-ip": "${google_compute_instance.%(master_instance)s.network_interface.0.address}" % names,
+            "k8s-kubeadm-token": "${var.kubeadm_token}",
           },
           disk: [{
             source_image: gce.os_image,
