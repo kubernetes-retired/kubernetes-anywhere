@@ -24,7 +24,11 @@ deploy() {
 }
 
 destroy() {
-  terraform destroy -var-file .tmp/terraform.tfvars .tmp
+  FLAGS=""
+  if [[ "${FORCE_DESTROY:-}" == "y" ]]; then
+    FLAGS="-force"
+  fi
+  terraform destroy -var-file .tmp/terraform.tfvars $FLAGS .tmp
 }
 
 case "${1:-}" in
