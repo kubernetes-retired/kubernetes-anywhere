@@ -163,7 +163,7 @@ function(cfg)
         kubeconfig: {
           provisioner: [{
             "local-exec": {
-              command: "echo '%s' > kubeconfig.json" % kubeconfig(p1.cluster_name + "-admin", p1.cluster_name, p1.cluster_name),
+              command: "echo '%s' > .tmp/kubeconfig.json" % kubeconfig(p1.cluster_name + "-admin", p1.cluster_name, p1.cluster_name),
             },
           }],
         },
