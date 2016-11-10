@@ -40,6 +40,16 @@ echo-config: .config.json
 deploy-cluster destroy-cluster: .config.json
 	$(MAKE) do WHAT=$@
 
+# For maximum usefulness, use this target with "make -s" to silence any trace output, e.g.:
+#   $ export KUBECONFIG=$(make -s kubeconfig-path)
+kubeconfig-path: .config.json
+	@$(eval KUBECONFIG_PATH := $(shell pwd)/phase1/$(shell jq -r '.phase1.cloud_provider' .config.json)/.tmp/kubeconfig.json)
+	@if [ ! -e "$(KUBECONFIG_PATH)" ]; then \
+		echo "Cannot find kubeconfig file. Have you started a cluster with \"make deploy\" yet?" > /dev/stderr; \
+		exit 1; \
+	fi
+	@echo $(KUBECONFIG_PATH)
+
 validate: .config.json
 	KUBECONFIG="$$(pwd)/phase1/$$(jq -r '.phase1.cloud_provider' .config.json)/.tmp/kubeconfig.json" ./util/validate
 
