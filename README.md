@@ -24,7 +24,7 @@ If you want to understand, read further about the design and implementation then
 
 ### Deployment Design:
 
-The input of the deployment is a cluster configuration object, specified as JSON object. We use Kconfig to describe the structure of this object and add configuration parameters. You may notice that scattered around this repository, their are Kconfig files that define configuration parameters. Running `make config .config.json` executes the configuration wizard and produces a file in the root of the repository, `.config.json` which stores this config object.
+The input of the deployment is a cluster configuration object, specified as JSON object. We use Kconfig to describe the structure of this object and add configuration parameters. You may notice that scattered around this repository, there are Kconfig files that define configuration parameters. Running `make config .config.json` executes the configuration wizard and produces a file in the root of the repository, `.config.json` which stores this config object.
 
 The deployment consists of three phases (not including generating the config object), provisioning, bootstrap and addon deployment:
 
@@ -34,7 +34,7 @@ The deployment consists of three phases (not including generating the config obj
 
 #### Phase 1: Resource Provisioning
 
-Provisioning consists of creating the physical or virtual resources that the cluster will run on (ips, instances, persistent disks). Provisioning will be implemented per cloud provider. There will be an implementation of GCE/AWS/Azure provisiong that utilizes [Terraform](https://www.terraform.io/). This phase takes the cluster configuration object as input.
+Provisioning consists of creating the physical or virtual resources that the cluster will run on (ips, instances, persistent disks). Provisioning will be implemented per cloud provider. There will be an implementation of GCE/AWS/Azure provisioning that utilizes [Terraform](https://www.terraform.io/). This phase takes the cluster configuration object as input.
 
 #### Phase 2: Node Bootstrap
 
@@ -52,7 +52,7 @@ Phase 1 should be sufficiently decoupled from phase 2 such that phase 2 could be
 
 At the end of these two phases:
   * The master will be running a kubelet in a Docker container and (apiserver, controller-manager, scheduler, etcd and addon-manager) in static pods.
-  * The nodes will be running a kubelet in a Docker container that is registered securely to the apiserver using tls client key auth.
+  * The nodes will be running a kubelet in a Docker container that is registered securely to the apiserver using TLS client key auth.
 
 Deployment of fluentd, kube-proxy will happen with DaemonSets after this process through the addon manager. Deployment of heapster, kube-dns, all other addons will happen after this process through the addon manager.
 
