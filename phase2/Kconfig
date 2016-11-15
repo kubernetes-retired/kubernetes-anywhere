@@ -17,4 +17,12 @@ config phase2.kubernetes_version
 	help
 	  The version of Kubernetes to deploy.
 
+config phase2.provider
+	string "bootstrap provider"
+	default "ignition"
+	help
+	  The bootstrap provider to use.
+
+	  Valid options are (ignition, kubeadm).
+
 endmenu

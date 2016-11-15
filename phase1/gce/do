@@ -7,18 +7,24 @@ set -x
 
 cd "${BASH_SOURCE%/*}"
 
+generate_token() {
+  perl -e 'printf "%06X.%08X%08X\n", rand(0xffffff), rand(0xffffffff), rand(0xffffffff);'
+}
+
 gen() {
+  TOKEN=$(generate_token)
   mkdir -p .tmp/
   jsonnet -J ../../ --multi .tmp/ all.jsonnet
+  echo "kubeadm_token = \"$TOKEN\"" > .tmp/terraform.tfvars
 }
 
 deploy() {
   gen
-  terraform apply .tmp
+  terraform apply -var-file .tmp/terraform.tfvars .tmp
 }
 
 destroy() {
-  terraform destroy .tmp
+  terraform destroy -var-file .tmp/terraform.tfvars .tmp
 }
 
 case "${1:-}" in
