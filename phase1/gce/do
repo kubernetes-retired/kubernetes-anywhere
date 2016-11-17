@@ -21,6 +21,40 @@ gen() {
 deploy() {
   gen
   terraform apply -var-file .tmp/terraform.tfvars .tmp
+
+  if [[ "${WAIT_FOR_KUBECONFIG:-}" == "y" ]]; then
+    fetch_kubeconfig
+  fi
+}
+
+# For most implementations, the kubeconfig outputted by terraform is sufficient
+# to connect to the cluster. However, if using kubeadm, then "kubeadm init"
+# creates its own certificates on the master and ignores what was created by
+# terraform. In order to access the cluster remotely, we need to fetch the
+# proper kubeconfig from the master.
+fetch_kubeconfig() {
+  PHASE2=$(jq -r '.phase2.provider' ../../.config.json)
+  PROJECT=$(jq -r '.phase1.gce.project' ../../.config.json)
+  ZONE=$(jq -r '.phase1.gce.zone' ../../.config.json)
+  MASTER=$(jq -r '.phase1.cluster_name' ../../.config.json)-master
+
+  if [[ "$PHASE2" != kubeadm ]]; then
+    return
+  fi
+
+  for tries in {1..60}; do
+    echo Trying to fetch kubeconfig from master... $tries/10
+
+    if gcloud compute ssh --project "$PROJECT" --zone "$ZONE" "$MASTER" --command "sudo cat /etc/kubernetes/admin.conf" > .tmp/kubeconfig.json; then
+      echo Successfully fetched kubeconfig.
+      return
+    else
+      sleep 5
+    fi
+  done
+
+  echo Exhausted attempts to fetch kubeconfig. >&2
+  exit 1
 }
 
 destroy() {
