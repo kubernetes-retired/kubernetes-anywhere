@@ -13,7 +13,7 @@ apt-get install -y kubelet kubeadm kubectl kubernetes-cni
 
 case "${ROLE}" in
   "master")
-    kubeadm init --token "${TOKEN}"
+    kubeadm init --token "${TOKEN}" --api-port 443
     ;;
   "node")
     MASTER=$(get_metadata "k8s-master-ip")
