@@ -7,13 +7,29 @@
 
 ## Prerequisites
   * `docker-engine` for executing the `kubernetes-anywhere` deployment which can be downloaded [here](https://docs.docker.com/engine/installation/)
-  * `make` for entering the deployment environment
-  *  OVA which can be found [here](https://storage.googleapis.com/kubernetes-anywhere-for-vsphere-cna-storage/KubernetesAnywhereTemplatePhotonOS.ova) 
+  * `make` for entering the deployment environment 
 
 ## Deployment
 
 **Notes**:
-The deployment is tested with kubernetes v1.4.0 and 1.4.4.
+The deployment is tested with kubernetes v1.4.0 and v1.4.4.
+
+### Upload Template to vSphere:
+You **must** upload template to vCenter before deploying kubernetes. 
+
+#### Upload using vSphere Client.
+1. Login to vSphere Client.
+2. Right-Click on ESX host on which you want to deploy template.
+3. Select Deploy OVF template.
+4. Copy and paste URL for [OVA](https://storage.googleapis.com/kubernetes-anywhere-for-vsphere-cna-storage/KubernetesAnywhereTemplatePhotonOS.ova)
+5. Follow next steps according to instructions mentioned in wizard.
+
+You can also upload ova using [govc](https://github.com/vmware/govmomi/tree/master/govc). 
+
+```shell
+git clone https://github.com/kubernetes/kubernetes-anywhere
+cd kubernetes-anywhere
+```
 
 ### Clone the `kubernetes-anywhere` tool:
 
