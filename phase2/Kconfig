@@ -25,4 +25,16 @@ config phase2.provider
 
 	  Valid options are (ignition, kubeadm).
 
+if phase2.provider = kubeadm
+
+config phase2.kubeadm.version
+	string "kubeadm version"
+	default "stable"
+	help
+	  The version of kubeadm to use.
+
+	  Valid options are "stable" or a Google Cloud Storage link to a build.
+
+endif
+
 endmenu
