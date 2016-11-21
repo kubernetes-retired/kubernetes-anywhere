@@ -13,7 +13,7 @@ apt-get install -y kubelet kubeadm kubectl kubernetes-cni
 
 case "${ROLE}" in
   "master")
-    kubeadm init --token "${TOKEN}" --api-port 443 --skip-preflight-checks
+    kubeadm init --token "${TOKEN}" --api-port 443 --skip-preflight-checks --api-advertise-addresses "$(get_metadata "k8s-advertise-addresses")"
     ;;
   "node")
     MASTER=$(get_metadata "k8s-master-ip")

@@ -148,6 +148,7 @@ function(cfg)
             "k8s-apisever-private-key": "${tls_private_key.%s-master.private_key_pem}" % p1.cluster_name,
             "k8s-master-kubeconfig": kubeconfig(p1.cluster_name + "-master", "local", "service-account-context"),
             "k8s-kubeadm-token": "${var.kubeadm_token}",
+            "k8s-advertise-addresses": "${google_compute_address.%(master_ip)s.address}" % names,
           },
           disk: [{
             image: gce.os_image,
