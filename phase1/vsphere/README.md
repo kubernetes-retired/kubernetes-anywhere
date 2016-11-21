@@ -20,7 +20,7 @@ You **must** upload template to vCenter before deploying kubernetes.
 #### Upload using vSphere Client.
 1. Login to vSphere Client.
 2. Right-Click on ESX host on which you want to deploy template.
-3. Select Deploy OVF template.
+3. Select ```Deploy OVF template```.
 4. Copy and paste URL for [OVA](https://storage.googleapis.com/kubernetes-anywhere-for-vsphere-cna-storage/KubernetesAnywhereTemplatePhotonOS.ova).
 5. Follow next steps according to instructions mentioned in wizard.
 
@@ -81,5 +81,16 @@ $ make destroy
 to tear down your cluster.
 
 ## Issues
-  - make destroy is flaky.
-  - kubelet doesn't restart when node restarts.
+  1. ```make destroy``` is flaky.
+
+     Terraform fails to destroy VM's and remove the state for existing cluster. 
+     * Workaround:
+       In vSphere Client,
+        1. Stop all VM's that are setup by kubernetes-anywhere.
+        2. Right-Click on VM and select ```Delete from Disk```.
+        3. Run ```make clean```.
+
+  2. kubelet doesn't restart when node restarts.
+     
+      * Workaround:
+        Run ```systemctl start kubelet``` on that node.
