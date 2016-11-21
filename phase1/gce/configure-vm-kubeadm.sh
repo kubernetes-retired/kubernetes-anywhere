@@ -13,11 +13,11 @@ apt-get install -y kubelet kubeadm kubectl kubernetes-cni
 
 case "${ROLE}" in
   "master")
-    kubeadm init --token "${TOKEN}" --api-port 443
+    kubeadm init --token "${TOKEN}" --api-port 443 --skip-preflight-checks
     ;;
   "node")
     MASTER=$(get_metadata "k8s-master-ip")
-    kubeadm join --token "${TOKEN}" "${MASTER}"
+    kubeadm join --token "${TOKEN}" "${MASTER}" --skip-preflight-checks
     ;;
   *)
     echo invalid phase2 provider.
