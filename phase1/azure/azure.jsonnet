@@ -1,7 +1,8 @@
 function(config)
   local tf = import "phase1/tf.jsonnet";
   local cfg = config.phase1;
-  local master_private_ip = cfg.azure.master_private_ip;
+  local master_private_ip = cfg.azure.master_private_ip; 
+  local storage_type = if cfg.azure.use_premium_storage == "yes" then "Premium_LRS" else "Standard_LRS";
   local names = {
     resource_group: "%(cluster_name)s" % cfg,
     master_public_ip: "%(cluster_name)s-master-pip" % cfg,
@@ -86,7 +87,7 @@ function(config)
           resource_group_name: "${azurerm_resource_group.rg.name}",
           name: names.storage_account,
           location: "${azurerm_resource_group.rg.location}",
-          account_type: "Standard_LRS",
+          account_type: storage_type,
         },
       },
       azurerm_storage_container: {
@@ -280,3 +281,4 @@ function(config)
       },
     },
   }, tf.pki.cluster_tls(cfg.cluster_name, [names.master_vm], ["${azurerm_public_ip.pip.ip_address}", master_private_ip]))
+

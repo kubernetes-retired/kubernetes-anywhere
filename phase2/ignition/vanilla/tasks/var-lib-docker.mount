@@ -1,0 +1,14 @@
+[Unit]
+Description=Mount /var/lib/docker on SSD Ephemeral
+Documentation=https://coreos.com/os/docs/latest/mounting-storage.html
+Before=docker.service
+After=format-ephemeral.service
+Requires=format-ephemeral.service
+
+[Mount]
+What=/dev/sdb
+Where=/var/lib/docker
+Type=ext4
+
+[Install]
+RequiredBy=docker.service
