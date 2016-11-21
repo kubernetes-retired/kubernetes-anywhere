@@ -60,7 +60,7 @@ config phase1.vSphere.memory
 
 config phase1.vSphere.template
 	string "Template Name"
-	default "kubedebian"
+	default "KubernetesAnywhereTemplatePhotonOS"
 	help
 		Template to clone VMs from.
 
