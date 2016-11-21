@@ -11,7 +11,7 @@
 
 ## Deployment
 
-**Notes**:
+**Note**:
 The deployment is tested with kubernetes v1.4.0 and v1.4.4.
 
 ### Upload Template to vSphere:
