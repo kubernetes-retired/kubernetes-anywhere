@@ -63,6 +63,9 @@ and fill complete the config wizard to deploy a kubernetes-anywhere cluster.
 
 You have a Kubernetes cluster!
 
+**Notes**
+If you want to launch another cluster while keeping existing one then clone the kubernetes-anywhere and follow the steps above.
+
 #### Get Cluster Info:
 
 First set KUBECONFIG to access cluster using kubectl:
