@@ -27,12 +27,6 @@ config phase1.vSphere.insecure
 	help
 		If the host uses a self-signed cert.
 
-config phase1.vSphere.resourcePool
-	string "Resource pool"
-	default ""
-	help
-		Resource pool or cluster with access to datastore.
-
 config phase1.vSphere.datacenter
 	string "Datacenter"
 	default "datacenter"
