@@ -4,6 +4,7 @@
   - [Deployment](#deployment)
   - [Destroy](#destroy)
   - [Issues](#issues)
+  - [Troubleshooting](#troubleshooting)
 
 ## Prerequisites
   * `docker-engine` for executing the `kubernetes-anywhere` deployment which can be downloaded [here](https://docs.docker.com/engine/installation/).
@@ -94,3 +95,33 @@ to tear down your cluster.
      
       * Workaround:
         Run ```systemctl start kubelet``` on that node.
+
+## Troubleshooting
+
+### Validation Fails (Zero nodes are healthy)
+If no nodes are available, there was likely a provisioning failure on the master (either in vSphere or in the `ignition` provisioning container).
+The following steps will help in troubleshooting:
+
+1. SSH to the master.
+2. Use the following command to upload relevant logs:
+  * `journalctl -u kubelet`
+3. Attach the logs to [a new Issue](https://github.com/kubernetes/kubernetes-anywhere/issues/new) in this repository.
+
+### Validation Fails (One or more nodes are missing/unhealthy)
+
+1. Use `kubectl get nodes` to identify the missing nodes.
+2. Use vSphere Client or `govc` to find the node and the node's IP address.
+3. SSH to the master, then to the missing node
+4. Use the following command to upload relevant logs:
+   * `journalctl -u kubelet`
+5. Attach the logs to [a new Issue](https://github.com/kubernetes/kubernetes-anywhere/issues/new) in this repository.
+
+### Validation Fails (Dashboard or other kubernetes services are not working)
+This was be mostly likely flannel failure.
+
+1. Use `kubectl describe pod dashboard-pod-name` to identify the node on which dashboard pod is scheduled.
+2. Use vSphere Client or `govc` to find the node and the node's IP address.
+3. SSH to the node.
+4. Use the following command on node to upload relevant logs:
+   * `journalctl -u flannelc`
+5. Attach the logs to [a new Issue](https://github.com/kubernetes/kubernetes-anywhere/issues/new) in this repository.
