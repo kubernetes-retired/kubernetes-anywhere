@@ -2,8 +2,8 @@ function(config)
   local tf = import "phase1/tf.jsonnet";
   local cfg = config.phase1;
   local vms = std.makeArray(cfg.num_nodes + 1,function(node) node+1); 
-  local master_dependency_list = ["vsphere_virtual_machine.kubedebian%d" % vm for vm in vms];
-  local node_name_to_ip = [("${vsphere_virtual_machine.kubedebian%d.network_interface.0.ipv4_address} %s"  % [vm, (if vm == 1 then "master" else "node%d" % (vm-1) )])  for vm in vms];
+  local master_dependency_list = ["vsphere_virtual_machine.kubevm%d" % vm for vm in vms];
+  local node_name_to_ip = [("${vsphere_virtual_machine.kubevm%d.network_interface.0.ipv4_address} %s"  % [vm, (if vm == 1 then "master" else "node%d" % (vm-1) )])  for vm in vms];
   local vm_username = "root";
   local vm_password = "kubernetes";
 
@@ -12,11 +12,11 @@ function(config)
       tf.pki.kubeconfig_from_certs(
         user, cluster, context,
         cfg.cluster_name + "-root",
-        "https://${vsphere_virtual_machine.kubedebian1.network_interface.0.ipv4_address}",
+        "https://${vsphere_virtual_machine.kubevm1.network_interface.0.ipv4_address}",
       ));
 
   local config_metadata_template = std.toString(config {
-      master_ip: "${vsphere_virtual_machine.kubedebian1.network_interface.0.ipv4_address}",
+      master_ip: "${vsphere_virtual_machine.kubevm1.network_interface.0.ipv4_address}",
       role: "%s",
       phase3 +: {
         addons_config: (import "phase3/all.jsonnet")(config),
@@ -45,7 +45,7 @@ function(config)
             apiserver_key_pem: "${base64encode(tls_private_key.%s-master.private_key_pem)}" % cfg.cluster_name,
             master_kubeconfig: kubeconfig(cfg.cluster_name + "-master", "local", "service-account-context"),
             node_kubeconfig: kubeconfig(cfg.cluster_name + "-node", "local", "service-account-context"),
-            master_ip: "${vsphere_virtual_machine.kubedebian1.network_interface.0.ipv4_address}",
+            master_ip: "${vsphere_virtual_machine.kubevm1.network_interface.0.ipv4_address}",
             nodes_dns_mappings: std.join("\n", node_name_to_ip),
             flannel_net: cfg.vSphere.flannel_net,
             installer_container: config.phase2.installer_container,
@@ -61,7 +61,7 @@ function(config)
             apiserver_key_pem: "${base64encode(tls_private_key.%s-master.private_key_pem)}" % cfg.cluster_name,
             master_kubeconfig: kubeconfig(cfg.cluster_name + "-master", "local", "service-account-context"),
             node_kubeconfig: kubeconfig(cfg.cluster_name + "-node", "local", "service-account-context"),
-            master_ip: "${vsphere_virtual_machine.kubedebian1.network_interface.0.ipv4_address}",
+            master_ip: "${vsphere_virtual_machine.kubevm1.network_interface.0.ipv4_address}",
             nodes_dns_mappings: std.join("\n", node_name_to_ip),
             flannel_net: cfg.vSphere.flannel_net,
             installer_container: config.phase2.installer_container,
@@ -94,7 +94,7 @@ function(config)
         },
       },
       vsphere_virtual_machine: {
-        ["kubedebian" + vm]: {
+        ["kubevm" + vm]: {
             name: (if vm == 1 then "master" else ("node%d" % (vm-1))),
             vcpu: cfg.vSphere.vcpu,
             memory: cfg.vSphere.memory,
@@ -119,7 +119,7 @@ function(config)
             connection: {
               user: vm_username,
               password: vm_password,
-              host: "${vsphere_virtual_machine.kubedebian1.network_interface.0.ipv4_address}"
+              host: "${vsphere_virtual_machine.kubevm1.network_interface.0.ipv4_address}"
             },
             provisioner: [{
                 "remote-exec": {
@@ -136,11 +136,11 @@ function(config)
            }],
         },} + {
         ["node" + vm]: {
-            depends_on: ["vsphere_virtual_machine.kubedebian1","vsphere_virtual_machine.kubedebian%d" % vm],
+            depends_on: ["vsphere_virtual_machine.kubevm1","vsphere_virtual_machine.kubevm%d" % vm],
             connection: {
               user: vm_username,
               password: vm_password,
-              host: "${vsphere_virtual_machine.kubedebian%d.network_interface.0.ipv4_address}" % vm
+              host: "${vsphere_virtual_machine.kubevm%d.network_interface.0.ipv4_address}" % vm
             },
             provisioner: [{
                 "remote-exec": {
@@ -153,4 +153,4 @@ function(config)
            }],
         } for vm in vms if vm > 1 },
     },    
-  }, tf.pki.cluster_tls(cfg.cluster_name, ["%(cluster_name)s-master" % cfg], ["${vsphere_virtual_machine.kubedebian1.network_interface.0.ipv4_address}"]))
+  }, tf.pki.cluster_tls(cfg.cluster_name, ["%(cluster_name)s-master" % cfg], ["${vsphere_virtual_machine.kubevm1.network_interface.0.ipv4_address}"]))
