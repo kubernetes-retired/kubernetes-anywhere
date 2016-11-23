@@ -27,6 +27,9 @@ You **must** upload template to vCenter before deploying kubernetes.
 
 You can also upload ova using [govc](https://github.com/vmware/govmomi/tree/master/govc). 
 
+**Note**:
+This OVA is based on Photon OS(v1.0) with virtual hardware v11. 
+
 ### Clone the `kubernetes-anywhere` tool:
 
 ```shell
