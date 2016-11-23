@@ -110,6 +110,7 @@ function(config)
               template: cfg.vSphere.template, 
               bootable: true,
               type: "thin",
+              datastore: cfg.vSphere.datastore,
             },
         } for vm in vms
       },
