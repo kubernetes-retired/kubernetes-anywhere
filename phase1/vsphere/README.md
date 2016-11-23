@@ -60,6 +60,7 @@ and fill complete the config wizard to deploy a kubernetes-anywhere cluster.
 
 * To change configuration, run: ``` make config .config```
 
+* The deployment is configured to use DHCP. 
 
 ### Congratulations!
 
