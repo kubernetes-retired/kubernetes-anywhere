@@ -58,6 +58,9 @@ and fill complete the config wizard to deploy a kubernetes-anywhere cluster.
   * phase2.installer_container = "docker.io/ashivani/k8s-ignition:v3"
   ```
 
+* To change configuration, run: ``` make config .config```
+
+
 ### Congratulations!
 
 You have a Kubernetes cluster!
