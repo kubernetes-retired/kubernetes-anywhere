@@ -77,6 +77,7 @@ clean:
 	rm -rf phase3/.tmp
 	rm -rf phase1/gce/.tmp
 	rm -rf phase1/azure/.tmp
+	rm -rf phase1/vsphere/.tmp
 
 fmt:
 	for f in $$(find . -name '*.jsonnet'); do jsonnet fmt -i -n 2 $${f}; done;

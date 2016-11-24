@@ -37,6 +37,8 @@ function(cfg)
             ],
             if cfg.phase1.cloud_provider == "azure" then
               ["--cloud-config=/etc/kubernetes/azure.json"],
+            if cfg.phase1.cloud_provider == "vsphere" then
+              ["--cloud-config=/etc/kubernetes/vsphere.conf"],
           ]),
           livenessProbe: {
             httpGet: {
