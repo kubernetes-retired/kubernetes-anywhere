@@ -1,6 +1,8 @@
 [Unit]
 Description=Kubernetes Kubelet Server
 Documentation=https://github.com/kubernetes/kubernetes
+After=docker.service
+Requires=docker.service
 
 [Service]
 ExecStartPre=/bin/mkdir -p /var/lib/kubelet
