@@ -1,8 +1,8 @@
 [Unit]
 Description=Kubernetes Kubelet Server
 Documentation=https://github.com/kubernetes/kubernetes
-After=docker.service
-Requires=docker.service
+Requires=docker.service network-online.target
+After=docker.service network-online.target
 
 [Service]
 ExecStartPre=/bin/mkdir -p /var/lib/kubelet
@@ -23,6 +23,8 @@ ExecStart=/usr/bin/docker run \
         %(docker_registry)s/hyperkube-amd64:%(kubernetes_version)s \
         /hyperkube kubelet %(kubelet_args)s
 Restart=always
+StartLimitInterval=0
+RestartSec=10
 KillMode=process
 
 [Install]
