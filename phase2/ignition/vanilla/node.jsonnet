@@ -24,12 +24,15 @@ function(cfg)
               "--cluster-domain=cluster.local",
               "--v=2",
             ],
+            if cfg.role == "node" && phase1.cloud_provider != "vsphere" then
+              [
+                "--network-plugin=kubenet",
+                "--reconcile-cidr",                
+              ],            
             if cfg.role == "node" then
               [
                 "--api-servers=https://" + cfg.master_ip,
                 "--hairpin-mode=promiscuous-bridge",
-                "--network-plugin=kubenet",
-                "--reconcile-cidr",
               ]
             else
               [
@@ -40,8 +43,10 @@ function(cfg)
               [
                 "--cloud-config=/etc/kubernetes/azure.json",
               ],
-            if cfg.phase1.cloud_provider == "vsphere" then
-              ["--cloud-config=/etc/kubernetes/vsphere.conf"],             
+            if phase1.cloud_provider == "vsphere" then
+              [
+                "--cloud-config=/etc/kubernetes/vsphere.conf"
+              ],             
           ])),
         },
       }],
