@@ -55,7 +55,7 @@ and fill complete the config wizard to deploy a kubernetes-anywhere cluster.
 * To properly boot a cluster in vSphere, you MUST set these values in the wizard:
 
   ```
-  * phase2.installer_container = "docker.io/ashivani/k8s-ignition:v3"
+  * phase2.installer_container = "docker.io/ashivani/k8s-ignition:v4"
   ```
 
 * To change configuration, run: ``` make config .config```
@@ -89,6 +89,7 @@ $ make destroy
 to tear down your cluster.
 
 ## Issues
+  
   1. ```make destroy``` is flaky.
 
      Terraform fails to destroy VM's and remove the state for existing cluster. 
@@ -97,11 +98,6 @@ to tear down your cluster.
         1. Stop all VM's that are setup by kubernetes-anywhere.
         2. Right-Click on VM and select ```Delete from Disk```.
         3. Run ```make clean```.
-
-  2. kubelet doesn't restart when node restarts.
-     
-      * Workaround:
-        Run ```systemctl start kubelet``` on that node.
 
 ## Troubleshooting
 
