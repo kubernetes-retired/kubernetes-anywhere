@@ -100,7 +100,8 @@ function(config)
             memory: cfg.vSphere.memory,
             enable_disk_uuid: true,
             datacenter: cfg.vSphere.datacenter,
-            skip_customization: true,
+            resource_pool: cfg.vSphere.resourcepool,
+	    skip_customization: true,
             folder: "${vsphere_folder.cluster_folder.path}",
             network_interface: {
               label: "VM Network",
