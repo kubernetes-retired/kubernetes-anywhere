@@ -4,6 +4,11 @@
 
 This will deploy a Kubernetes cluster into Azure.
 
+**Note**: The _recommended_ way of deploying Kubernetes into Azure, is via the
+[Azure Container Service](https://docs.microsoft.com/en-us/azure/container-service/container-service-kubernetes-walkthrough),
+or with the open-source, customizable core of ACS,
+[ACS-Engine](https://github.com/Azure/acs-engine).
+
 ## Preparation
 
 Required software:
