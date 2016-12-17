@@ -39,6 +39,12 @@ config phase1.vSphere.datastore
 	help
 		The datastore where VMs will be created.
 
+config phase1.vSphere.resourcepool
+        string "Resourcepool"
+        default "/datacenter/host/<host-ip> (or) <vc-cluster-name>/Resources"
+        help
+                The resourcepool where VMs will be created.
+
 config phase1.vSphere.vcpu
 	string "Number of vcpu"
 	default "1"
