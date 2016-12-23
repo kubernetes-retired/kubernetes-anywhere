@@ -5,7 +5,7 @@ set -o pipefail
 set -o nounset
 set -o xtrace
 
-export IGNITION_CFG_URL="oem:///ignite.json"
+export IGNITION_CONFIG_FILE="/usr/share/oem/ignite.json"
 
 mkdir -p /usr/share/oem
 jsonnet \
@@ -14,4 +14,4 @@ jsonnet \
   --jpath /opt/kubernetes-anywhere \
   /opt/kubernetes-anywhere/ignite.jsonnet
 
-ignition -oem vanilla -stage files --root /mnt/root
+ignition -oem file -stage files --root /mnt/root
