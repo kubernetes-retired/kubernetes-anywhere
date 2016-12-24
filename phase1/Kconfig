@@ -17,12 +17,10 @@ config phase1.cluster_name
 	  and for naming any other cloud provider resources.
 
 menuconfig phase1.cloud_provider
-	string "cloud provider"
+	string "cloud provider: gce, azure or vsphere"
 	default "gce"
 	help
 	  The cloud provider you would like to deploy to.
-
-	  Valid options are (gce, azure, vSphere).
 
 if phase1.cloud_provider = "gce"
 	source "phase1/gce/Kconfig"

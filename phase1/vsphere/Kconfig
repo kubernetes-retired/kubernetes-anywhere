@@ -1,7 +1,7 @@
 menu "vSphere configuration"
 
 config phase1.vSphere.url
-	string "vCenter url"
+	string "vCenter URL Ex: 10.192.10.30 or myvcenter.io (without https://)"
 	help
 		The vCenter Url
 
@@ -31,36 +31,36 @@ config phase1.vSphere.datacenter
 	string "Datacenter"
 	default "datacenter"
 	help
-		The datacenter to be used by vSphere cloud provider plugin.
+		The datacenter to be used by vSphere cloud provider plugin. Use vCenter UI or ```govc datacenter.info```
 
 config phase1.vSphere.datastore
 	string "Datastore"
 	default "datastore"
 	help
-		The datastore where VMs will be created.
+		The datastore where VMs will be created. This will also be used for provisioning volumes for storage classes.
 
 config phase1.vSphere.resourcepool
-        string "Resourcepool"
-        default "/datacenter/host/<host-ip> (or) <vc-cluster-name>/Resources"
+        string "Specify a valid Cluster, Host or Resource Pool in which to deploy Kubernetes VMs."
+        default ""
         help
-                The resourcepool where VMs will be created.
+		Specify a valid Cluster, Host or Resource Pool in which to deploy Kubernetes VMs.
 
 config phase1.vSphere.vcpu
-	string "Number of vcpu"
+	string "Number of vCPUs for each VM"
 	default "1"
 	help
 		Number of vcpu required for VM.
 
 
 config phase1.vSphere.memory
-	string "Memory required for VM"
-	default "1024"
+	string "Memory for VM"
+	default "2048"
 	help
-		Memory required for VM.
+		Memory required for each VM.
 
 config phase1.vSphere.template
-	string "Template Name"
-	default "KubernetesAnywhereTemplatePhotonOS"
+	string "Name of the template VM imported from OVA"
+	default "KubernetesAnywhereTemplatePhotonOS.ova"
 	help
 		Template to clone VMs from.
 
