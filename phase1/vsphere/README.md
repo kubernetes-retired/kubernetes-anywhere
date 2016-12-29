@@ -3,7 +3,7 @@
   - [Prerequisites](#prerequisites)
   - [Deployment](#deployment)
   - [Destroy](#destroy)
-  - [Issues](#issues)
+  - [Known issues](#known-issues)
   - [Troubleshooting](#troubleshooting)
 
 ## Prerequisites
