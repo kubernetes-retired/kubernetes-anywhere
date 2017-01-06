@@ -8,7 +8,7 @@ set -x
 cd "${BASH_SOURCE%/*}"
 
 generate_token() {
-  perl -e 'printf "%06X.%08X%08X\n", rand(0xffffff), rand(0xffffffff), rand(0xffffffff);'
+  perl -e 'printf "%06X:%08X%08X\n", rand(0xffffff), rand(0xffffffff), rand(0xffffffff);'
 }
 
 gen() {

@@ -150,7 +150,8 @@ function(cfg)
             "k8s-advertise-addresses": "${google_compute_address.%(master_ip)s.address}" % names,
           } + if p2.provider == "kubeadm" then {
             "k8s-kubeadm-token": "${var.kubeadm_token}",
-            "k8s-kubeadm-version": "%(version)s" % p2.kubeadm
+            "k8s-kubeadm-version": "%(version)s" % p2.kubeadm,
+            "k8s-kubernetes-version": "%(kubernetes_version)s" % p2
           } else { },
           disk: [{
             image: gce.os_image,
@@ -173,7 +174,8 @@ function(cfg)
             "k8s-master-ip": "${google_compute_instance.%(master_instance)s.network_interface.0.address}" % names,
           } + if p2.provider == "kubeadm" then {
             "k8s-kubeadm-token": "${var.kubeadm_token}",
-            "k8s-kubeadm-version": "%(version)s" % p2.kubeadm
+            "k8s-kubeadm-version": "%(version)s" % p2.kubeadm,
+            "k8s-kubernetes-version": "%(kubernetes_version)s" % p2
           } else { },
           disk: [{
             source_image: gce.os_image,
