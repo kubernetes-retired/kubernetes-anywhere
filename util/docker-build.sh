@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eux -o pipefail
 
-apk add --update git build-base wget curl jq autoconf automake pkgconfig ncurses libtool gperf flex bison ca-certificates
+apk add --update git build-base wget curl jq autoconf automake pkgconfig ncurses-dev libtool gperf flex bison ca-certificates
 
 ## Install kubectl
 export KUBECTL_VERSION=1.4.0
@@ -39,7 +39,7 @@ mkdir -p /tmp/kconfig-frontends
 git clone "https://github.com/colemickens/kconfig-frontends" .
 git checkout "v${KCONFIG_VERSION}"
 autoreconf -fi
-./configure nconf_EXTRA_LIBS=-lgpm --disable-shared --enable-static --disable-gconf --disable-qconf
+./configure nconf_EXTRA_LIBS=-lgpm --disable-shared --enable-static --disable-gconf --disable-qconf --disable-nconf
 make
 make install)
 rm -rf /tmp/kconfig-frontends
