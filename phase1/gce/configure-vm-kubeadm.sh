@@ -2,6 +2,7 @@
 
 TOKEN=$(get_metadata "k8s-kubeadm-token")
 KUBEADM_VERSION=$(get_metadata "k8s-kubeadm-version")
+KUBERNETES_VERSION=$(get_metadata "k8s-kubernetes-version")
 
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
@@ -26,11 +27,12 @@ fi
 
 case "${ROLE}" in
   "master")
-    kubeadm init --token "${TOKEN}" --api-port 443 --skip-preflight-checks --api-advertise-addresses "$(get_metadata "k8s-advertise-addresses")"
+    kubeadm init --discovery "token://${TOKEN}@" --api-port 443 --skip-preflight-checks --api-advertise-addresses "$(get_metadata "k8s-advertise-addresses")" --use-kubernetes-version $KUBERNETES_VERSION
     ;;
   "node")
     MASTER=$(get_metadata "k8s-master-ip")
-    kubeadm join --token "${TOKEN}" "${MASTER}" --skip-preflight-checks
+    echo kubeadm join --discovery "token://${TOKEN}@${MASTER}:9898" --skip-preflight-checks
+    kubeadm join --discovery "token://${TOKEN}@${MASTER}:9898" --skip-preflight-checks
     ;;
   *)
     echo invalid phase2 provider.
