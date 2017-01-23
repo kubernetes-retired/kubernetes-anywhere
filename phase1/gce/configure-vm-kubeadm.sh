@@ -31,7 +31,6 @@ case "${ROLE}" in
     ;;
   "node")
     MASTER=$(get_metadata "k8s-master-ip")
-    echo kubeadm join --discovery "token://${TOKEN}@${MASTER}:9898" --skip-preflight-checks
     kubeadm join --discovery "token://${TOKEN}@${MASTER}:9898" --skip-preflight-checks
     ;;
   *)
