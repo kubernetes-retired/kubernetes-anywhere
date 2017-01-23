@@ -129,7 +129,7 @@ kubernetes in GCE on a Linux distro that has the apt package manager.
     build_and_push() {
       local component="$1"
       bazel run "//build:${component}"
-      docker tag "gcr.io/google-containers/build:${component}" "${KUBE_REPO_PREFIX}/${component}-amd64:${KUBE_VERSION}"
+      docker tag "gcr.io/google_containers/${component}:${component}" "${KUBE_REPO_PREFIX}/${component}-amd64:${KUBE_VERSION}"
       docker push "${KUBE_REPO_PREFIX}/${component}-amd64:${KUBE_VERSION}"
     }
 
@@ -140,7 +140,18 @@ kubernetes in GCE on a Linux distro that has the apt package manager.
     done
     ```
 
-7. Upload a custom builds of the listed components to GCR.
+7. Upload custom builds of the Kubernetes components that are distributed as
+   Debian packages (kubeadm, kubectl, kubelet, kubernetes-cni), used for
+   bootstrapping the cluster.
+
+
+    ```sh
+    cd kubernetes
+    GCS_BUCKET_NAME="<gcs-bucket-name>"
+    bazel run //:ci-artifacts -- gs://${GCS_BUCKET_NAME}
+    ```
+
+8. Upload custom builds of the listed components to GCR.
 
     ```sh
     cd kubernetes
@@ -148,14 +159,14 @@ kubernetes in GCE on a Linux distro that has the apt package manager.
     bash upload.sh kube-apiserver kube-controller-manager kube-proxy kube-scheduler
     ```
 
-8. Run these commands to create a cluster.
+9. Run these commands to create a cluster.
 
     ```sh
     make docker-dev
     make deploy-cluster
     ```
 
-9. When you are done you can destroy the cluster.
+10. When you are done you can destroy the cluster.
 
     ```sh
     make destroy-cluster
@@ -183,8 +194,46 @@ describe a process for accomplishing that.
    will be downloaded from GCR.
 
     ```sh
-    sudo docker rmi -f gcr.io/google_containers/kube-apiserver-amd64:v1.5.1
-    sudo docker rm -f `sudo docker ps --filter name=kube-apiserver -q`
-    sudo docker ps --filter name=kube-apiserver
+    POD=kube-controller-manager
+    docker rmi -f $(docker images | grep $POD | awk '{print $1 ":" $2;}')
+    docker rm -f $(docker ps --filter name=$POD -q)
+    docker ps --filter name=$POD
+    kubectl logs ${POD}-k-a-master --namespace=kube-system
     ```
 
+    Sometimes it is convenient to define a function on the master to put these
+    steps together:
+
+    ```sh
+    function reload() {
+        POD=$1
+        docker rmi -f $(docker images | grep $POD | awk '{print $1 ":" $2;}')
+        docker rm -f $(docker ps --filter name=$POD -q)
+        for retry in {1..20} ; do
+            if docker ps | grep -v '"/pause"' | grep "$POD" ; then
+                return
+            fi
+            sleep 1
+        done
+        printf "\nThe '$POD' failed to reload.\n\n"
+        return 1
+    }
+    ```
+
+    Which can be used:
+
+    ```sh
+    reload controller-manager
+    ```
+
+3. If you are doing development on a component that is distributed as a Debian
+   package (kubeadm, kubectl, kubelet, kubernetes-cni), the process is slightly
+   different. For example, to test changes to the kubelet:
+
+    ```sh
+    GCS_BUCKET_NAME="<gcs-bucket-name>"
+    mkdir -p tmp-packages
+    gsutil cp gs://${GCS_BUCKET_NAME}/build/debs/kubelet.deb tmp-packages
+    sudo dpkg -i tmp-packages/kubelet.deb
+    systemctl restart kubelet
+    ```
