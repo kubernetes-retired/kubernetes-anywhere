@@ -38,6 +38,14 @@ You can also upload ova using [govc](https://github.com/vmware/govmomi/tree/mast
 
 This OVA is based on Photon OS(v1.0) with virtual hardware v11. 
 
+**NOTE: DO NOT POWER ON THE IMPORTED VM.**
+
+If you do power it on, future clones of this VM will land up [getting the same IP as the imported VM] (https://github.com/vmware/photon/wiki/Frequently-Asked-Questions#q-why-do-all-of-my-cloned-photon-os-instances-have-the-same-ip-address-when-using-dhcp). To work around this run the following command before powering the VM off and using it to clone the kubernetes nodes.
+```
+echo -n > /etc/machine-id
+```
+
+
 ### Clone `kubernetes-anywhere`:
 
 ```shell
