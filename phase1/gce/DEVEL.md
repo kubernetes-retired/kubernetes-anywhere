@@ -100,6 +100,18 @@ kubernetes in GCE on a Linux distro that has the apt package manager.
     docker pull gcr.io/google-containers/kube-discovery-amd64:1.0
     docker tag gcr.io/google-containers/kube-discovery-amd64:1.0 gcr.io/${GCP_PROJECT_ID}/kube-discovery-amd64:1.0
     docker push gcr.io/${GCP_PROJECT_ID}/kube-discovery-amd64:1.0
+
+    docker pull gcr.io/google_containers/k8s-dns-sidecar-amd64:1.11.0
+    docker tag gcr.io/google_containers/k8s-dns-sidecar-amd64:1.11.0 gcr.io/${GCP_PROJECT_ID}/k8s-dns-sidecar-amd64:1.11.0
+    docker push gcr.io/${GCP_PROJECT_ID}/k8s-dns-sidecar-amd64:1.11.0
+
+    docker pull gcr.io/google-containers/k8s-dns-dnsmasq-amd64:1.11.0
+    docker tag gcr.io/google-containers/k8s-dns-dnsmasq-amd64:1.11.0 gcr.io/${GCP_PROJECT_ID}/k8s-dns-dnsmasq-amd64:1.11.0
+    docker push gcr.io/${GCP_PROJECT_ID}/k8s-dns-dnsmasq-amd64:1.11.0
+
+    docker pull gcr.io/google-containers/k8s-dns-kube-dns-amd64:1.11.0
+    docker tag gcr.io/google-containers/k8s-dns-kube-dns-amd64:1.11.0 gcr.io/${GCP_PROJECT_ID}/k8s-dns-kube-dns-amd64:1.11.0
+    docker push gcr.io/${GCP_PROJECT_ID}/k8s-dns-kube-dns-amd64:1.11.0
     ```
 
 6. Create a shell script like this in your kubernetes directory, called
@@ -166,7 +178,15 @@ kubernetes in GCE on a Linux distro that has the apt package manager.
     make deploy-cluster
     ```
 
-10. When you are done you can destroy the cluster.
+10. Install a network overlay. This is a software defined network that
+    Kubernetes will use for configuring how to route traffic between pods as IP
+    addresses are assigned to pods on different nodes across the cluster.
+
+    ```sh
+    kubectl apply -f https://git.io/weave-kube
+    ```
+
+11. When you are done you can destroy the cluster.
 
     ```sh
     make destroy-cluster
