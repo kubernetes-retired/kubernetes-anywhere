@@ -7,4 +7,4 @@ RUN /opt/docker-build.sh
 
 WORKDIR /opt/kubernetes-anywhere
 ADD . /opt/kubernetes-anywhere/
-CMD make
+CMD '/opt/kubernetes-anywhere/entrypoint.sh'
