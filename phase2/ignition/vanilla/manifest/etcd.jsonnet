@@ -11,7 +11,7 @@ function(cfg)
       containers: [
         {
           name: "etcd-container",
-          image: "gcr.io/google_containers/etcd:2.2.1",
+          image: "gcr.io/google_containers/etcd:3.0.4",
           resources: {
             requests: {
               cpu: "200m",
@@ -23,8 +23,8 @@ function(cfg)
             |||
               /usr/local/bin/etcd \
                 --listen-peer-urls http://127.0.0.1:2380 \
-                --addr 127.0.0.1:2379 \
-                --bind-addr 127.0.0.1:2379 \
+                -advertise-client-urls http://127.0.0.1:2379 \
+                -listen-client-urls http://127.0.0.1:2379 \
                 --data-dir /var/etcd/data
             |||,
           ],

@@ -19,7 +19,7 @@ function(cfg)
               "--enable-server",
               "--enable-debugging-handlers",
               "--kubeconfig=/srv/kubernetes/kubeconfig.json",
-              "--config=/etc/kubernetes/manifests",
+              "--pod-manifest-path=/etc/kubernetes/manifests",
               "--cluster-dns=10.0.0.10",
               "--cluster-domain=cluster.local",
               "--v=2",
