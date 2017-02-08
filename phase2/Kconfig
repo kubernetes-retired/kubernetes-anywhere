@@ -3,7 +3,7 @@ menu "Phase 2: Node Bootstrapping"
 
 config phase2.installer_container
 	string "installer container"
-	default "docker.io/colemickens/k8s-ignition:latest"
+	default "docker.io/cnastorage/k8s-ignition:v1"
 
 config phase2.docker_registry
 	string "docker registry"

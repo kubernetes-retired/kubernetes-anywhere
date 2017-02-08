@@ -49,8 +49,3 @@ systemctl daemon-reload
 systemctl enable kubelet
 systemctl start kubelet
 
-if [ "${role}" == "master" ]; then
-    # Download kubectl
-    curl -o /bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${kubernetes_version}/bin/linux/amd64/kubectl
-    chmod 777 /bin/kubectl
-fi
