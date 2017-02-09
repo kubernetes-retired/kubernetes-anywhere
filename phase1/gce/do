@@ -12,10 +12,13 @@ generate_token() {
 }
 
 gen() {
-  TOKEN=$(generate_token)
-  mkdir -p .tmp/
-  jsonnet -J ../../ --multi .tmp/ all.jsonnet
-  echo "kubeadm_token = \"$TOKEN\"" > .tmp/terraform.tfvars
+  if [ ! -f .tmp/terraform.tvars ]; then
+    # Use env var or generate token
+    TOKEN=${KUBEADM_TOKEN:-$(generate_token)}
+    mkdir -p .tmp/
+    jsonnet -J ../../ --multi .tmp/ all.jsonnet
+    echo "kubeadm_token = \"$TOKEN\"" > .tmp/terraform.tfvars
+  fi
 }
 
 deploy() {
@@ -58,6 +61,7 @@ fetch_kubeconfig() {
 }
 
 destroy() {
+  gen
   FLAGS=""
   if [[ "${FORCE_DESTROY:-}" == "y" ]]; then
     FLAGS="-force"

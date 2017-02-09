@@ -4,7 +4,10 @@ Since many files are produced when clusters are created, we need
 to retain them so we can use them across container instances.
 """
 import os
+import sys
 import re
+
+import argparse
 
 from google.cloud import storage
 
@@ -13,11 +16,35 @@ CLUSTER_NAME = 'CLUSTER_NAME'
 
 
 def main():
-    """Main method and control"""
-    cs = CloudStorage()
-    cs.files_up()
-    cs.files_down()
-    # cs.delete_from_bucket()
+    """Parse command line and run the appropriate method"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--upload', action='store_true', help='Upload cluster config files to GCS bucket')
+    parser.add_argument('--download', action='store_true', help='Download cluster config files from GCS bucket')
+    parser.add_argument('--clean', action='store_true', help='Remove cluster config files from GSC bucket')
+
+    if len(sys.argv) != 2:
+        parser.print_help()
+        sys.exit(1)
+
+    try:
+        options = parser.parse_args()
+    except:
+        parser.print_help()
+        sys.exit(0)
+
+    if options.upload:
+        CloudStorage().files_up()
+
+    elif options.download:
+        CloudStorage().files_down()
+
+    elif options.clean:
+        CloudStorage().delete_files_from_bucket()
+
+    else:
+        # should never get here...
+        parser.print_help()
+        sys.exit(1)
 
 
 class CloudStorage(object):
@@ -36,23 +63,21 @@ class CloudStorage(object):
         if not credentials:
             account_json = '{}/account.json'.format(self.cwd)
             if os.path.isfile(account_json):
-                os.putenv(GOOGLE_APPLICATION_CREDENTIALS, account_json)
-                print 'Loading creds from {}'.format(account_json)
+                os.environ[GOOGLE_APPLICATION_CREDENTIALS] = account_json
+                self._print('Loading creds from {}'.format(account_json))
             else:
-                print 'ERROR: Missing Environment Variable {} and default file {} not found'.format(
+                msg = 'Missing Environment Variable {} and default file {} not found'.format(
                     GOOGLE_APPLICATION_CREDENTIALS, account_json)
-                exit(1)
+                self._print_err(msg)
 
         self.storage_client = storage.Client()
         if not self.storage_client:
-            print 'ERROR: Could not get google cloud storage client'
-            exit(1)
+            self._print_err('Could not get google cloud storage client')
 
         # verify that the ENV for cluster_name is set. We use that for folder.
         cluster_name = os.environ.get(CLUSTER_NAME)
         if not cluster_name:
-            print 'ERROR: Missing env var {}'.format(CLUSTER_NAME)
-            exit(1)
+            self._print_err('Missing env var {}'.format(CLUSTER_NAME))
         self.cluster_name = self._cleanse_name(cluster_name)
 
         self.bucket = self._get_bucket()
@@ -63,14 +88,13 @@ class CloudStorage(object):
 
         project = self._cleanse_name(self.storage_client.project)
         bucket_name = '{}-applariat-cluster-data'.format(project)
-        print bucket_name
 
         bucket = self.storage_client.lookup_bucket(bucket_name)
         if not bucket:
             bucket = self.storage_client.create_bucket(bucket_name)
-            print('Bucket {} created.'.format(bucket.name))
+            self._print('Bucket {} created.'.format(bucket.name))
         else:
-            print('Bucket {} found.'.format(bucket.name))
+            self._print('Bucket {} found.'.format(bucket.name))
 
         return bucket
 
@@ -81,12 +105,21 @@ class CloudStorage(object):
         blob = self.bucket.blob(destination_name)
         blob.upload_from_filename(source_file_name)
 
-        print('Uploading {} -> {}/{}'.format(source_file_name, self.bucket.name, destination_name))
+        self._print('Uploading {} -> {}/{}'.format(source_file_name, self.bucket.name, destination_name))
 
     @staticmethod
     def _cleanse_name(name):
         """Allow only num/char/-/_ in names. Periods will be removed due to DNS issue"""
         return re.sub(r'^[a-zA-Z0-9-_]$', '', name)
+
+    @staticmethod
+    def _print_err(msg):
+        print 'ERROR: {}'.format(msg)
+        exit(1)
+
+    @staticmethod
+    def _print(msg):
+        print 'STORAGE: {}'.format(msg)
 
     def files_up(self):
         """Upload all required files"""
@@ -108,19 +141,22 @@ class CloudStorage(object):
     def files_down(self):
         """Downloads all files to local system. Puts them where they belong"""
 
+        if not os.path.exists(self.tmp):
+            os.makedirs(self.tmp)
+
         blobs = self.bucket.list_blobs(prefix=self.cluster_name)
         for blob in blobs:
             # Need to replace cluster_name folder with cwd
             destination_file_name = blob.name.replace(self.cluster_name, self.root, 1)
             blob.download_to_filename(destination_file_name)
-            print('Downloaded {}'.format(destination_file_name))
+            self._print('Downloaded {}'.format(destination_file_name))
 
-    def delete_from_bucket(self):
+    def delete_files_from_bucket(self):
         """Remove the folder that contains all cluster information"""
 
         blobs = self.bucket.list_blobs(prefix=self.cluster_name)
         for blob in blobs:
-            print('Deleting {}/{}'.format(self.bucket.name, blob.name))
+            self._print('Deleting {}/{}'.format(self.bucket.name, blob.name))
             self.bucket.delete_blob(blob.name)
 
 
