@@ -2,7 +2,11 @@
 set -eux -o pipefail
 
 apk add --update git build-base wget curl jq autoconf automake pkgconfig \
-	ncurses-dev libtool gperf flex bison ca-certificates python
+	ncurses-dev libtool gperf flex bison ca-certificates python py-pip
+
+## Install cloud storage
+pip install --upgrade google-cloud-storage
+#pip install --upgrade azure-storage
 
 ## Install kubectl
 export KUBECTL_VERSION=1.4.0
