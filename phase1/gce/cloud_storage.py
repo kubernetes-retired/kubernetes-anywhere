@@ -13,14 +13,15 @@ from google.cloud import storage
 
 GOOGLE_APPLICATION_CREDENTIALS = 'GOOGLE_APPLICATION_CREDENTIALS'
 CLUSTER_NAME = 'CLUSTER_NAME'
+CLOUD_STORAGE = 'CLOUD_STORAGE'
 
 
 def main():
     """Parse command line and run the appropriate method"""
     parser = argparse.ArgumentParser()
-    parser.add_argument('--upload', action='store_true', help='Upload cluster config files to GCS bucket')
-    parser.add_argument('--download', action='store_true', help='Download cluster config files from GCS bucket')
-    parser.add_argument('--clean', action='store_true', help='Remove cluster config files from GSC bucket')
+    parser.add_argument('--upload', action='store_true', help='Upload cluster config files to cloud storage')
+    parser.add_argument('--download', action='store_true', help='Download cluster config files from cloud')
+    parser.add_argument('--clean', action='store_true', help='Remove cluster config files from cloud')
 
     if len(sys.argv) != 2:
         parser.print_help()
@@ -32,14 +33,15 @@ def main():
         parser.print_help()
         sys.exit(0)
 
+    cs = CloudStorage.factory()
     if options.upload:
-        CloudStorage().files_up()
+        cs.upload()
 
     elif options.download:
-        CloudStorage().files_down()
+        cs.download()
 
     elif options.clean:
-        CloudStorage().delete_files_from_bucket()
+        cs.clean()
 
     else:
         # should never get here...
@@ -48,17 +50,76 @@ def main():
 
 
 class CloudStorage(object):
+    """Factory class for CloudStorage"""
+
+    def factory():
+        """GCS or K8 types"""
+
+        # If this is set, use a bucket, otherwise use k8 secret
+        storage_type = os.environ.get(CLOUD_STORAGE)
+        if storage_type:
+            return GCSCloudStorage()
+
+        return K8CloudStorage()
+
+    factory = staticmethod(factory)
+
+    @staticmethod
+    def _print_err(msg):
+        print 'ERROR: {}'.format(msg)
+        exit(1)
+
+    @staticmethod
+    def _print(msg):
+        print 'STORAGE: {}'.format(msg)
+
+
+class K8CloudStorage(CloudStorage):
+    """Store zip of config files in kubernetes"""
+
+    def __init__(self):
+        if not os.path.isfile('phase1/gce/.tmp/kubeconfig.json'):
+            self._print_err('Missing phase1/gce/.tmp/kubeconfig.json file')
+
+        self.kubectl = 'kubectl --kubeconfig=phase1/gce/.tmp/kubeconfig.json --namespace=kube-system'
+
+    def _run(self, cmd):
+        result = os.system(cmd)
+        if result:
+            self._print_err('Command failed: {}'.format(cmd))
+            print 'ERROR: '
+
+    def upload(self):
+        """Zip files, then upload to k8-anywhere-configs secret"""
+        cmd = """zip configs.zip .config* phase1/gce/terraform.tfstate* phase1/gce/.tmp/* && \
+            {} create secret generic k8-anywhere-configs --from-file=zip=configs.zip && \
+            rm configs.zip""".format(self.kubectl)
+        self._run(cmd)
+
+    def download(self):
+        """Fetch and unpack the k8-anywhere-configs secret"""
+        cmd = """{} get secret k8-anywhere-configs -o json | \
+            jq -r '.data.zip' | \
+            base64 -d > configs.zip && \
+            unzip -o configs.zip && \
+            rm configs.zip""".format(self.kubectl)
+        self._run(cmd)
+
+    def clean(self):
+        """This method doesn't do anything. The cluster where the configs live is gone..."""
+        self._print('Nothing to clean...')
+
+
+class GCSCloudStorage(CloudStorage):
     """Use this class to send files up or get files from google cloud storage"""
 
     def __init__(self):
-
         self.cwd = os.path.dirname(os.path.realpath(__file__))
         self.tmp = '{}/.tmp'.format(self.cwd)
         self.root = self.cwd.replace('/phase1/gce', '')
 
         # We make sure the GOOGLE_APPLICATION_CREDENTIALS env var is set.
         # If it is not, we set it to self.cwd/account.json
-
         credentials = os.environ.get(GOOGLE_APPLICATION_CREDENTIALS)
         if not credentials:
             account_json = '{}/account.json'.format(self.cwd)
@@ -87,7 +148,7 @@ class CloudStorage(object):
         A '.' cannot be used in the name or it will require proper DNS."""
 
         project = self._cleanse_name(self.storage_client.project)
-        bucket_name = '{}-applariat-cluster-data'.format(project)
+        bucket_name = '{}-k8-anywhere-cluster-data'.format(project)
 
         bucket = self.storage_client.lookup_bucket(bucket_name)
         if not bucket:
@@ -112,16 +173,7 @@ class CloudStorage(object):
         """Allow only num/char/-/_ in names. Periods will be removed due to DNS issue"""
         return re.sub(r'^[a-zA-Z0-9-_]$', '', name)
 
-    @staticmethod
-    def _print_err(msg):
-        print 'ERROR: {}'.format(msg)
-        exit(1)
-
-    @staticmethod
-    def _print(msg):
-        print 'STORAGE: {}'.format(msg)
-
-    def files_up(self):
+    def upload(self):
         """Upload all required files"""
 
         # root files
@@ -138,7 +190,7 @@ class CloudStorage(object):
                 f = '{}/{}'.format('phase1/gce/.tmp', tmp_file)
                 self._upload_blob(f)
 
-    def files_down(self):
+    def download(self):
         """Downloads all files to local system. Puts them where they belong"""
 
         if not os.path.exists(self.tmp):
@@ -151,7 +203,7 @@ class CloudStorage(object):
             blob.download_to_filename(destination_file_name)
             self._print('Downloaded {}'.format(destination_file_name))
 
-    def delete_files_from_bucket(self):
+    def clean(self):
         """Remove the folder that contains all cluster information"""
 
         blobs = self.bucket.list_blobs(prefix=self.cluster_name)
