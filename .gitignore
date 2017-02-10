@@ -5,3 +5,5 @@
 **/kubeconfig.json
 *.pyc
 .idea
+crush
+**/terraform.tfstate*
