@@ -8,3 +8,7 @@ phase3/.tmp
 .config.json
 .idea
 *.pyc
+crush
+**/terraform.tfstate*
+**/kubeconfig.json
+**/.tmp

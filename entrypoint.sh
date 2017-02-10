@@ -3,50 +3,46 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-# use a flag to switch between job and interactive modes.
-# use a flag to switch between deploy/destroy
-# Use IS_JOB=t and DELETE_CLUSTER
-#
-#If IS_JOB
-#	if DELETE_CLUSTER
-#		Download files from cloud storage
-#		call make destroy
-#		if ok, blow files away from cloud storage
-#	else
-#		Skip the interactive quiz. Generate .config file from ENV vars
-#		call make deploy
-#		save files needed for destroy in cloud storage.
-#		echo vars to stdout needed by job
-
-
+# Flag to kick off automated deploy
 IS_JOB=${IS_JOB:-}
-DELETE_CLUSTER=${DELETE_CLUSTER:-}
 if [ -n "$IS_JOB" ];
 then
+	# automated mode
 
 	CLOUD_PROVIDER=${CLOUD_PROVIDER?Error \$CLOUD_PROVIDER is not defined.}
 
+	if [ -d "/crush" ];
+	then
+		# Since some needed files are in directories and docker can't mount individaul files, we
+		# will copy anything found in /crush to /opt/kubernetes-anywhere
+		# This only matters in docker. Kubernetes can mount files in directories.
+		# This is also useful if you wish to overwrite certain files without having to create a new image
+		cp -vR /crush/* /opt/kubernetes-anywhere/
+	fi
+
+	DELETE_CLUSTER=${DELETE_CLUSTER:-}
 	if [ -n "$DELETE_CLUSTER" ];
 	then
-		./phase1/${CLOUD_PROVIDER}/cloud_storage.py --download
+		# Destroy cluster. We fetch the configs first.
+		./util/config-store.sh --download
 
 		FORCE_DESTROY=y make destroy
-
-		./phase1/${CLOUD_PROVIDER}/cloud_storage.py --clean
+		# The configs are destroyed with the cluster so no config cleanup is needed
 
 	else
+		# Deploy cluster. We build configs from env first.
 		./util/env_to_config.py
 
 		make deploy
 
+		# Echo the contents of the kubeconfig.json file to STDOUT. This can be parsed by the job.
 		echo KUBECONFIG_JSON=`cat phase1/${CLOUD_PROVIDER}/.tmp/kubeconfig.json | jq -c '.'| base64 | tr -d '\n'`
 
-		./phase1/${CLOUD_PROVIDER}/cloud_storage.py --upload
-
+		# Store the configs in the cluster
+		./util/config-store.sh --upload
 	fi
 
 else
-
+	# interactive mode
 	exec make $@
-
 fi
