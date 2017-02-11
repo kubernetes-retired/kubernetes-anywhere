@@ -9,7 +9,7 @@ This automated version of Kubernetes Anywhere will allow you to run deploy/destr
 ### 
 
 ### Config File Creation
-The Kubernetes Anywhere project utilizes Kconfig to ask the user questions. This process creates a .config file. That file is used to create .config.json and so on... In order to automate this process ENV vars are used instead. As the Kconfig file tree is traversed the environment is examined for a matching variable. If found, it assigns the value and validates it. The variables in Kconfig have a phase1/2/3 prefix so we strip that off, swap all . with _ and then turn it to upper case. 
+The Kubernetes Anywhere project utilizes Kconfig to ask the user questions. This process creates a .config file. That file is used to create .config.json and so on... As the Kconfig file tree is traversed the environment is examined for a matching variable. If found, it assigns the value and validates it. The variables in Kconfig have a phase1/2/3 prefix so we strip that off, swap all . with _ and then turn it to upper case. 
 If we see the following:
 ```
 menuconfig phase1.cloud_provider
@@ -66,19 +66,14 @@ vSphere required ENV vars:
 
 Optional ENV vars:
 
-  * CLOUD_STORAGE
-    - can be set to any value. 
-    - If set, see Storing the Configs below for more info.
-  * DELETE_CLUSTER
+  * DELETE_CLUSTER | DESTROY_CLUSTER
     - can be set to any value. 
     - If set, the container will run in destroy mode.
   * KUBEADM_TOKEN
     - If set, the value will be used instead of one being generated.
 
 ### Storing the Configs
-The container will exit when it completes. There are config and state files on-board that we will need later to destroy the cluster. These files can be stored in kubernetes or in a cloud bucket. To store configs in a cloud bucket, set the CLOUD_STORAGE env var to any value. If it's set, a bucket will be used. If the bucket doesn't exist one will be created for you. The format will be <project_name_here>-k8-anywhere-cluster-data. A folder will be made inside the bucket named ${CLUSTER_NAME} and all the configs will be placed there. This allows multiple cluster configs to be stored in the same bucket.
-
-If CLOUD_STORAGE is not set, a zip file of the configs is stored in kubernetes as a secret in the kube-system namespace.
+The container will exit when it completes. There are config and state files on-board that we will need later to destroy the cluster. A tar.gz file of the configs is stored in kubernetes as a secret in the kube-system namespace.
 
 ### Credentials in the Image
 
@@ -90,7 +85,7 @@ Example:
 # will be copied to...
 /opt/kubernetes-anywhere/phase1/gce/.tmp/kubecontrol.json
 ```
-You can overwrite any file you wish like this. 
+You can overwrite any file you wish using /crush. 
 
 
 ### Deploy
@@ -140,7 +135,7 @@ Save the file!
 
 Here is an example GCE destroy using docker. 
 ```
-# file structure of /crush, contains GCE account file
+# file structure of /crush, contains the kubecontrol.json
 #  crush
 #  └─ phase1
 #     └─ gce
@@ -149,6 +144,7 @@ Here is an example GCE destroy using docker.
 ```
 Fully automated example:
 ```
+# destroy doesn't need any other info, it pulls all configs from the cluster
 docker run -it --rm --volume=`pwd`/crush:/crush \
         -e CLOUD_PROVIDER=gce \
         -e IS_JOB=y \
@@ -168,3 +164,6 @@ docker run -it --rm --volume=`pwd`/crush:/crush \
 ./entrypoint.sh
 ```
 
+
+### TODO
+Create example yaml files for kubernetes job
