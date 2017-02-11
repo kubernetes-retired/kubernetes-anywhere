@@ -20,8 +20,10 @@ then
 		cp -vR /crush/* /opt/kubernetes-anywhere/
 	fi
 
+	# check for both. It's easy to mess these up.
 	DELETE_CLUSTER=${DELETE_CLUSTER:-}
-	if [ -n "$DELETE_CLUSTER" ];
+	DESTROY_CLUSTER=${DESTROY_CLUSTER:-}
+	if [ -n "$DESTROY_CLUSTER" ] || [ -n "$DELETE_CLUSTER" ];
 	then
 		# Destroy cluster. We fetch the configs first.
 		./util/config-store.sh --download

@@ -1,8 +1,6 @@
 #! /bin/bash
 
-
 # tar.gz the config files. Store them as a kubernetes secret in namespace kube-system
-
 
 set -o errexit
 set -o pipefail
@@ -40,9 +38,10 @@ download() {
 
 	tar -zxvf configs.tar.gz
 
-	rm configs.tar.gz./
+	rm configs.tar.gz
 }
 
+# This isn't used yet. Could be useful for testing or perhaps if someday terraform state is updated
 clean() {
 	echo 'removing configs from cluster'
 	${KCTL} delete secret k8-anywhere-configs
