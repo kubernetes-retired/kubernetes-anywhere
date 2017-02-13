@@ -1,7 +1,6 @@
 .git
 phase1/azure/.tmp/
 phase1/gce/.tmp/
-phase1/gce/account.json
 phase3/.tmp
 .tmp/
 .config

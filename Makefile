@@ -65,13 +65,14 @@ do:
 docker-build:
 	docker build -t $(IMAGE_NAME):$(IMAGE_VERSION) .
 
-docker-bash: docker-build
-	${info Starting Kuberetes Anywhere deployment shell in a container}
-	docker run -it --rm --env="PS1=[container]:\w> " --net=host $(IMAGE_NAME):$(IMAGE_VERSION) /bin/bash
-
 docker-dev: docker-build
 	${info Starting Kuberetes Anywhere deployment shell in a container}
-	docker run -it --rm --env="PS1=[container]:\w> " --net=host pwd $(IMAGE_NAME):$(IMAGE_VERSION) /bin/bash
+	docker run -it --rm \
+		--env="PS1=[container]:\w> " \
+		--net=host \
+		--volume="`pwd`:/opt/kubernetes-anywhere" \
+		--entrypoint=/bin/bash \
+		$(IMAGE_NAME):$(IMAGE_VERSION)
 
 docker-push: docker-build
 	docker push $(IMAGE_NAME):$(IMAGE_VERSION)

@@ -12,7 +12,7 @@ generate_token() {
 }
 
 gen() {
-  if [ ! -f .tmp/terraform.tvars ]; then
+  if [ ! -f .tmp/terraform.tfvars ]; then
     # Use env var or generate token
     TOKEN=${KUBEADM_TOKEN:-$(generate_token)}
     mkdir -p .tmp/
@@ -61,7 +61,6 @@ fetch_kubeconfig() {
 }
 
 destroy() {
-  gen
   FLAGS=""
   if [[ "${FORCE_DESTROY:-}" == "y" ]]; then
     FLAGS="-force"
