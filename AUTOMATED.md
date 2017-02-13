@@ -1,6 +1,7 @@
 # Kubernetes Anywhere as a Job
 
 *Run kubernetes-anywhere with env vars*
+*This has only been tested on GCE*
 
 ### Goals and Motivation
 
