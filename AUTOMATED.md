@@ -4,9 +4,7 @@
 
 ### Goals and Motivation
 
-This automated version of Kubernetes Anywhere will allow you to run deploy/destroy from a script or a job. The config file will be generated the same way using Kconfig but instead of interactive it will utilize environment variables.
-
-### 
+This automated version of Kubernetes Anywhere will allow you to run deploy/destroy from a script or a job. 
 
 ### Config File Creation
 The Kubernetes Anywhere project utilizes Kconfig to ask the user questions. This process creates a .config file. That file is used to create .config.json and so on... As the Kconfig file tree is traversed the environment is examined for a matching variable. If found, it assigns the value and validates it. The variables in Kconfig have a phase1/2/3 prefix so we strip that off, swap all . with _ and then turn it to upper case. 
@@ -112,14 +110,17 @@ docker run -it --rm --volume=`pwd`/crush:/crush \
 
 Testing mode:
 ```
-docker run -it --rm --volume=`pwd`/crush:/crush \
-        --entrypoint=/bin/bash \
-        -e GCE_PROJECT=<your-google-project-here> \
-        -e CLUSTER_NAME=chris-cluster3 \
-        -e CLOUD_PROVIDER=gce \
-        -e IS_JOB=y \
-        kubernetes-anywhere:v0.0.1
+make docker-dev
 
+export GCE_PROJECT=<your-google-project-here>
+export CLUSTER_NAME=chris-cluster3 \
+export CLOUD_PROVIDER=gce \
+export IS_JOB=y \
+
+# verify env vars
+./util/env_to_config.py
+
+# run it
 ./entrypoint.sh
 ```
 
@@ -144,7 +145,6 @@ Here is an example GCE destroy using docker.
 ```
 Fully automated example:
 ```
-# destroy doesn't need any other info, it pulls all configs from the cluster
 docker run -it --rm --volume=`pwd`/crush:/crush \
         -e CLOUD_PROVIDER=gce \
         -e IS_JOB=y \
@@ -154,12 +154,11 @@ docker run -it --rm --volume=`pwd`/crush:/crush \
 
 Testing mode:
 ```
-docker run -it --rm --volume=`pwd`/crush:/crush \
-        --entrypoint=/bin/bash \
-        -e CLOUD_PROVIDER=gce \
-        -e IS_JOB=y \
-        -e DESTROY_CLUSTER=y \
-        kubernetes-anywhere:v0.0.1
+make docker-dev
+
+export CLOUD_PROVIDER=gce
+export IS_JOB=y
+export DESTROY_CLUSTER=y
 
 ./entrypoint.sh
 ```
