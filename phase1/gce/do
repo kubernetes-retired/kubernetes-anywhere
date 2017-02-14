@@ -43,7 +43,7 @@ fetch_kubeconfig() {
   fi
 
   for tries in {1..60}; do
-    echo Trying to fetch kubeconfig from master... $tries/10
+    echo Trying to fetch kubeconfig from master... $tries/60
 
     if gcloud compute ssh --project "$PROJECT" --zone "$ZONE" "$MASTER" --command "sudo cat /etc/kubernetes/admin.conf" > .tmp/kubeconfig.json; then
       echo Successfully fetched kubeconfig.
