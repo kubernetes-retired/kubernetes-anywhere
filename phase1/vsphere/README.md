@@ -134,6 +134,11 @@ cloud provider: gce, azure or vsphere (phase1.cloud_provider) [gce] (NEW) vspher
   Memory for each VM (phase1.vSphere.memory) [2048] (NEW) 8192 
 ```
 
+* Network for each VM. Master and all nodes will have the Network configured below.
+```
+  Network for each VM (phase1.vSphere.network) [VM Network] (NEW)
+```
+
 * Name of the template VM to use to create clone VMs for master and all nodes. The name here should be the same as the name that is reported by vCenter.
 ```
   Name of the VM created after import of OVA (phase1.vSphere.template) [KubernetesAnywhereTemplatePhotonOS.ova] (NEW) KubernetesAnywhereTemplate
@@ -297,3 +302,4 @@ This was be mostly likely flannel failure.
 4. Use the following command on node to upload relevant logs:
    * `journalctl -u flannelc`
 5. Attach the logs to [a new Issue](https://github.com/kubernetes/kubernetes-anywhere/issues/new) in this repository.
+

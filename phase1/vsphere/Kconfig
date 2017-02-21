@@ -58,6 +58,12 @@ config phase1.vSphere.memory
 	help
 		Memory required for each VM.
 
+config phase1.vSphere.network
+	string "Network for VM"
+	default "VM Network"
+	help
+		Network to use for each VM.
+
 config phase1.vSphere.template
 	string "Name of the template VM imported from OVA"
 	default "KubernetesAnywhereTemplatePhotonOS.ova"

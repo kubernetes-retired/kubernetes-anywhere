@@ -104,7 +104,7 @@ function(config)
 	    skip_customization: true,
             folder: "${vsphere_folder.cluster_folder.path}",
             network_interface: {
-              label: "VM Network",
+              label: cfg.vSphere.network,
             },
 
             disk: {
@@ -156,3 +156,4 @@ function(config)
         } for vm in vms if vm > 1 },
     },    
   }, tf.pki.cluster_tls(cfg.cluster_name, ["%(cluster_name)s-master" % cfg], ["${vsphere_virtual_machine.kubevm1.network_interface.0.ipv4_address}"]))
+
