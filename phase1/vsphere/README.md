@@ -15,11 +15,11 @@
 
 **Note**:
 
-The recommended version is v1.4.8
+The recommended version is v1.5.3
 
-The deployment is tested with kubernetes v1.4.0, v1.4.4, v1.4.7 and v1.4.8
+The deployment is tested with kubernetes v1.4.0, v1.4.4, v1.4.7, v1.4.8 and v1.5.3
 
-vSphere Cloud Provider is tested on v1.4.7 and v1.4.8
+vSphere Cloud Provider is tested on v1.4.7, v1.4.8 and v1.5.3
 
 ### Upload VM image to be used to vSphere:
 
@@ -165,7 +165,7 @@ docker registry (phase2.docker_registry) [gcr.io/google-containers] (NEW)
 
 * Set the release of Kubernetes to be used. The release should be the exact string used to tag a release.
 ```
-kubernetes version (phase2.kubernetes_version) [v1.4.8] (NEW) v1.4.8
+kubernetes version (phase2.kubernetes_version) [v1.5.3] (NEW) v1.5.3
 ```
 
 * Set bootstrap provider to ignition
@@ -222,8 +222,10 @@ kubectl cluster-info
 To access the dashboard after successful instllation of kubernetes cluster. There are 2 options.
 
 * Run ```kubectl proxy``` outside the container spawned by ```make docker-dev```
+
+Note: Make sure to download the kubectl version that matches with deployed kubernetes cluster 
 ```
-curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.4.8/bin/linux/amd64/kubectl
+curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.5.3/bin/linux/amd64/kubectl
 chmod u+x kubectl
 export KUBECONFIG=phase1/vsphere/.tmp/kubeconfig.json
 ./kubectl proxy
@@ -267,6 +269,7 @@ If make destroy fails due to a [known issue](https://github.com/kubernetes/kuber
 1. ```make destroy``` is [flaky.](https://github.com/kubernetes/kubernetes-anywhere/issues/285)
 2. [Photon OS template needs to be in the same cluster as kubernetes VMs.] (https://github.com/kubernetes/kubernetes-anywhere/issues/300)
 3. [Only a single kubernetes cluster can exist in a resource pool.] (https://github.com/kubernetes/kubernetes-anywhere/issues/296)
+4. [Can not execute command in a container using kubectl exec](https://github.com/kubernetes/kubernetes-anywhere/issues/337)
 
 ## Troubleshooting
 ### Logging into the VMs
