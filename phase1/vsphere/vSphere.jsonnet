@@ -126,6 +126,7 @@ function(config)
             provisioner: [{
                 "remote-exec": {
                   inline: [
+                    "hostnamectl set-hostname %s" % "master",
                     "mkdir -p /etc/kubernetes/; echo '%s' > /etc/kubernetes/k8s_config.json " % (config_metadata_template % "master"),                    
                     "echo '%s' > /etc/configure-vm.sh; bash /etc/configure-vm.sh" % "${data.template_file.configure_master.rendered}",
                     "echo '%s' >  /etc/kubernetes/vsphere.conf" % "${data.template_file.cloudprovider.rendered}",            
@@ -147,6 +148,7 @@ function(config)
             provisioner: [{
                 "remote-exec": {
                   inline: [
+                    "hostnamectl set-hostname %s" % ("node" + (vm-1)),
                     "mkdir -p /etc/kubernetes/; echo '%s' > /etc/kubernetes/k8s_config.json " % (config_metadata_template % "node"),                    
                     "echo '%s' > /etc/configure-vm.sh; bash /etc/configure-vm.sh" % "${data.template_file.configure_node.rendered}",
                     "echo '%s' >  /etc/kubernetes/vsphere.conf" % "${data.template_file.cloudprovider.rendered}",            
