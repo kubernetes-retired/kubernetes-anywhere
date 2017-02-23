@@ -25,11 +25,11 @@ convert_boolean_types() {
   sed -e 's/\(=\)[yY]$/\1true/' -e 's/\(=\)[nN]$/\1false/'
 }
 
+convert_newline_to_pipe() {
+  sed  ':a;N;$!ba;s/\n/|/g'
+}
+
 ## `jq -n ".foo=true|.bar=false"` will generate `{ "foo": true, "bar": false }`
-unflat="$(read_input_and_strip_comments | convert_boolean_types)"
-flat=""
-for line in $unflat; do
-	flat="${flat}|${line}"
-done
+flat="$(read_input_and_strip_comments | convert_boolean_types | convert_newline_to_pipe)"
 flat=${flat#"|"}
 jq -n "${flat}"
