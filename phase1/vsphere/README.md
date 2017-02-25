@@ -230,8 +230,9 @@ chmod u+x kubectl
 export KUBECONFIG=phase1/vsphere/.tmp/kubeconfig.json
 ./kubectl proxy
 Starting to serve on 127.0.0.1:8001
-# Open the https://127.0.0.1:8001/ui in a browser
 ``` 
+
+Open the http://127.0.0.1:8001/ui in a browser
 
 * Access the dashboard from the node it is running on via NodePort mapping
 ```
