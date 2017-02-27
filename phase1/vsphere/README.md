@@ -155,7 +155,7 @@ cloud provider: gce, azure or vsphere (phase1.cloud_provider) [gce] (NEW) vspher
 *
 * Phase 2: Node Bootstrapping
 *
-installer container (phase2.installer_container) [docker.io/colemickens/k8s-ignition:latest] (NEW) docker.io/ashivani/k8s-ignition:v4
+installer container (phase2.installer_container) [docker.io/cnastorage/k8s-ignition:v1] (NEW) docker.io/cnastorage/k8s-ignition:v1
 ```
 
 * Registry to be used by Kubernetes
@@ -189,11 +189,7 @@ Run the addon manager? (phase3.run_addons) [Y/n/?] (NEW)
 
 * Set the resource pool to be same as the one selected during import of OVA above.
 
-* To properly boot a cluster in vSphere, you MUST set these values in the wizard:
-
-  ```
-  * phase2.installer_container = "docker.io/ashivani/k8s-ignition:v4"
-  ```
+* You can build your own ```phase2.installer_container``` using Dockerfile [here](https://github.com/kubernetes/kubernetes-anywhere/blob/master/phase2/ignition/Dockerfile).
 
 * To change configuration, run: ``` make config .config```. Run ```make clean``` before ```make deploy```
 

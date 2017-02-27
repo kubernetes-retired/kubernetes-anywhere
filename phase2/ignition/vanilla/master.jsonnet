@@ -1,6 +1,8 @@
 function(cfg)
   (import "node.jsonnet")(cfg) {
-    local util = import "util.jsonnet",
+    local util = import "util.jsonnet",   
+    local phase2 = cfg.phase2,
+    local kubectl = "https://storage.googleapis.com/kubernetes-release/release/" + phase2.kubernetes_version + "/bin/linux/amd64/kubectl",
     storage: {
       filesystems: [{
         name: "root",
@@ -35,8 +37,8 @@ function(cfg)
           filesystem: "root",
           path: "/usr/local/bin/kubectl",
           contents: {
-            source: "https://storage.googleapis.com/kubernetes-release/release/v1.3.4/bin/linux/amd64/kubectl",
-          },
+            source: kubectl,
+	  },
           mode: 511,
         },
       ],
