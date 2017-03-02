@@ -30,13 +30,13 @@ Upload the template OS OVA to vCenter before deploying kubernetes. All kubernete
 1. Login to vSphere Client.
 2. Right-Click on ESX host on which you want to deploy template.
 3. Select ```Deploy OVF template```.
-4. Copy and paste URL for [OVA](https://storage.googleapis.com/kubernetes-anywhere-for-vsphere-cna-storage/KubernetesAnywhereTemplatePhotonOS.ova).
+4. Copy and paste URL for [OVA](https://storage.googleapis.com/kubernetes-anywhere-for-vsphere-cna-storage/KubernetesAnywhereTemplatePhotonOS.ova) (*Updated on March 1 2017*).
 5. **Check the name of the VM created**, this will be used to deploy kubernetes later. (Should default to KubernetesAnywhereTemplatePhotonOS.ova)
 6. Follow next steps according to instructions mentioned in wizard. Select the resource pool in which the kubernetes cluster is to be created. **The Resource Pool selected** will need to be entered in the wizard when deploying kubernetes during ```make deploy``` or ```make config```
 
 You can also upload ova using [govc](https://github.com/vmware/govmomi/tree/master/govc). 
 
-This OVA is based on Photon OS(v1.0) with virtual hardware v11. 
+This OVA is based on Photon OS(v1.0) with virtual hardware v11.
 
 **NOTE: DO NOT POWER ON THE IMPORTED VM.**
 
