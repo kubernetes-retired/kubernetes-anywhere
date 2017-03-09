@@ -1,6 +1,6 @@
 
 SHELL=/bin/bash
-.SHELLFLAGS="-O" "extglob" "-o" "errexit" "-o" "pipefail" "-o" "nounset" "-c"
+.SHELLFLAGS=-O extglob -o errexit -o pipefail -o nounset -c
 
 .PHONY: config echo-config
 
