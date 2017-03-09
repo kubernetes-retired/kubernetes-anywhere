@@ -16,19 +16,26 @@ gen() {
 deploy() {
   gen
   terraform apply -state=./.tmp/terraform.tfstate .tmp
-  rm /usr/local/bin/kubectl
   COMMAND="grep '.phase2.kubernetes_version' ../../.config | cut -d '=' -f2 | tr -d '\"'"
   KUBERNETES_VERSION=$(eval $COMMAND)
   # If the kubectl binary doesn't exist download it.
   if [ ! -f /usr/local/bin/kubectl_$KUBERNETES_VERSION ]; then
     echo "Kubectl binary with version - $KUBERNETES_VERSION doesn't exist. So downloading it."
-    wget https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubectl -O /usr/local/bin/kubectl_$KUBERNETES_VERSION
-    chmod +x /usr/local/bin/kubectl_$KUBERNETES_VERSION
+    if wget --spider https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubectl 2>/dev/null; then
+      rm -rf /usr/local/bin/kubectl
+      wget https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubectl -O /usr/local/bin/kubectl_$KUBERNETES_VERSION
+      if [ -f /usr/local/bin/kubectl_$KUBERNETES_VERSION ]; then
+        chmod +x /usr/local/bin/kubectl_$KUBERNETES_VERSION
+        # Create a symbolic link to the kubectl version binary.
+        ln -s /usr/local/bin/kubectl_$KUBERNETES_VERSION /usr/local/bin/kubectl
+      fi
+    else
+      echo "Kubectl binary is not available at https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubectl"
+    fi
   else
     echo "Kubectl binary with version - $KUBERNETES_VERSION already exists."
+    ln -sf /usr/local/bin/kubectl_$KUBERNETES_VERSION /usr/local/bin/kubectl
   fi
-  # Create a symbolic link to the kubectl version binary.
-  ln -s /usr/local/bin/kubectl_$KUBERNETES_VERSION /usr/local/bin/kubectl
 }
 
 destroy() {
