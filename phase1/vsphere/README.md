@@ -69,6 +69,8 @@ and fill complete the config wizard to deploy a kubernetes-anywhere cluster.
 
 ### Sample config
 
+**You can get help for any config option by entering '?'.** 
+
 * Select the number of nodes. Master + Number of nodes will be deployed.
 ```
 number of nodes (phase1.num_nodes) [4] (NEW) 8
@@ -106,7 +108,7 @@ cloud provider: gce, azure or vsphere (phase1.cloud_provider) [gce] (NEW) vspher
 
 * Set the type of certificate used by vCenter. Set to true for self signed certificates
 ```
-  Does host use self-signed cert (phase1.vSphere.insecure) [true] (NEW) 
+  Does host use self-signed cert (phase1.vSphere.insecure) [Y/n/?] (NEW) 
 ```
 
 * Set the datacenter in vCenter to use. Specify the same datacenter to which the OVA was imported to.

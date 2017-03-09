@@ -6,7 +6,7 @@ config phase1.vSphere.url
 		The vCenter Url
 
 config phase1.vSphere.port
-	string "vCenter port"
+	int "vCenter port"
 	default 443
 	help
 		The vCenter port
@@ -22,8 +22,8 @@ config phase1.vSphere.password
 		The vCenter password
 
 config phase1.vSphere.insecure
-	string "Does host use self-signed cert"
-	default true
+	bool "Does host use self-signed cert"
+	default y
 	help
 		If the host uses a self-signed cert.
 
@@ -46,15 +46,15 @@ config phase1.vSphere.resourcepool
 		Specify a valid Cluster, Host or Resource Pool in which to deploy Kubernetes VMs.
 
 config phase1.vSphere.vcpu
-	string "Number of vCPUs for each VM"
-	default "1"
+	int "Number of vCPUs for each VM"
+	default 1
 	help
 		Number of vcpu required for VM.
 
 
 config phase1.vSphere.memory
-	string "Memory for VM"
-	default "2048"
+	int "Memory for VM"
+	default 2048
 	help
 		Memory required for each VM.
 
