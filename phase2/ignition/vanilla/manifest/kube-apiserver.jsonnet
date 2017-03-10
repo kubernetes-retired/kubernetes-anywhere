@@ -64,6 +64,11 @@ function(cfg)
               containerPort: 8080,
               hostPort: 8080,
             },
+            {
+              name: "rkt",
+              containerPort: 15441,
+              hostPort: 15441,
+            },
           ],
           volumeMounts: [
             {
