@@ -27,11 +27,11 @@ fi
 
 case "${ROLE}" in
   "master")
-    kubeadm init --discovery "token://${TOKEN}@" --api-port 443 --skip-preflight-checks --api-advertise-addresses "$(get_metadata "k8s-advertise-addresses")" --use-kubernetes-version $KUBERNETES_VERSION
+    kubeadm init --token "${TOKEN}" --apiserver-bind-port 443 --skip-preflight-checks --apiserver-advertise-address "$(get_metadata "k8s-advertise-addresses")" --kubernetes-version $KUBERNETES_VERSION
     ;;
   "node")
     MASTER=$(get_metadata "k8s-master-ip")
-    kubeadm join --discovery "token://${TOKEN}@${MASTER}:9898" --skip-preflight-checks
+    kubeadm join --token "${TOKEN}" "${MASTER}:443" --skip-preflight-checks
     ;;
   *)
     echo invalid phase2 provider.
