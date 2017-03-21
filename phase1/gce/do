@@ -45,7 +45,13 @@ fetch_kubeconfig() {
   for tries in {1..60}; do
     echo Trying to fetch kubeconfig from master... $tries/60
 
-    if gcloud compute ssh --project "$PROJECT" --zone "$ZONE" "$MASTER" --command "sudo cat /etc/kubernetes/admin.conf" > .tmp/kubeconfig.json; then
+    # We can't use copy-files here because only root can read the file
+    # (intentionally). However, if the very first invocation of this command
+    # succeeds, then stdout is tainted by ssh initialization output, so we echo
+    # a marker to indicate the start of the file, and delete all lines up to and
+    # including it.
+    if gcloud compute ssh --project "$PROJECT" --zone "$ZONE" "$MASTER" --command "echo STARTFILE; sudo cat /etc/kubernetes/admin.conf" > .tmp/kubeconfig.raw; then
+      sed '1,/^STARTFILE$/d' .tmp/kubeconfig.raw > .tmp/kubeconfig.json
       echo Successfully fetched kubeconfig.
       return
     else
