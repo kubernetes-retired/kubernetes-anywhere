@@ -1,7 +1,11 @@
 #!/bin/bash
 set -eux -o pipefail
 
-apk add --update git build-base wget curl jq autoconf automake pkgconfig ncurses-dev libtool gperf flex bison ca-certificates
+apk add --update git build-base wget curl jq autoconf automake pkgconfig \
+	ncurses-dev libtool gperf flex bison ca-certificates python py-pip
+
+# Intstall kconfiglib
+pip install https://github.com/ulfalizer/Kconfiglib/tarball/master
 
 ## Install kubectl
 export KUBECTL_VERSION=1.4.0

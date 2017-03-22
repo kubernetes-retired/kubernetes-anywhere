@@ -3,3 +3,7 @@
 .config.old
 .config.json
 **/kubeconfig.json
+*.pyc
+.idea
+crush
+**/terraform.tfstate*

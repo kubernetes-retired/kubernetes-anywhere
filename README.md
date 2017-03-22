@@ -18,7 +18,12 @@ If you want to deploy a cluster to kick the tires of Kubernetes, checkout one of
   * [Get started on Google Compute Engine](phase1/gce/README.md)
   * [Get started on Azure](phase1/azure/README.md)
   * [Get started on vSphere](phase1/vsphere/README.md)
-  
+
+If you want to deploy a cluster from a job or script, checkout the automation guide
+
+  * [Get started with automation](AUTOMATED.md)
+
+
 ### Diving Deeper
 
 If you want to understand, read further about the design and implementation then dive into the code.
