@@ -40,7 +40,7 @@ This OVA is based on Photon OS(v1.0) with virtual hardware v11.
 
 **NOTE: DO NOT POWER ON THE IMPORTED VM.**
 
-If you do power it on, future clones of this VM will land up [getting the same IP as the imported VM] (https://github.com/vmware/photon/wiki/Frequently-Asked-Questions#q-why-do-all-of-my-cloned-photon-os-instances-have-the-same-ip-address-when-using-dhcp). To work around this run the following command before powering the VM off and using it to clone the kubernetes nodes.
+If you do power it on, future clones of this VM will land up [getting the same IP as the imported VM](https://github.com/vmware/photon/wiki/Frequently-Asked-Questions#q-why-do-all-of-my-cloned-photon-os-instances-have-the-same-ip-address-when-using-dhcp). To work around this run the following command before powering the VM off and using it to clone the kubernetes nodes.
 ```
 echo -n > /etc/machine-id
 ```
@@ -266,8 +266,8 @@ If make destroy fails due to a [known issue](https://github.com/kubernetes/kuber
 ## Known Issues
   
 1. ```make destroy``` is [flaky.](https://github.com/kubernetes/kubernetes-anywhere/issues/285)
-2. [Photon OS template needs to be in the same cluster as kubernetes VMs.] (https://github.com/kubernetes/kubernetes-anywhere/issues/300)
-3. [Only a single kubernetes cluster can exist in a resource pool.] (https://github.com/kubernetes/kubernetes-anywhere/issues/296)
+2. [Photon OS template needs to be in the same cluster as kubernetes VMs.](https://github.com/kubernetes/kubernetes-anywhere/issues/300)
+3. [Only a single kubernetes cluster can exist in a resource pool.](https://github.com/kubernetes/kubernetes-anywhere/issues/296)
 4. [Can not execute command in a container using kubectl exec](https://github.com/kubernetes/kubernetes-anywhere/issues/337)
 
 ## Troubleshooting
