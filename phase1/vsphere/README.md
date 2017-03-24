@@ -10,6 +10,36 @@
   * `docker-engine` for executing the `kubernetes-anywhere` deployment which can be downloaded [here](https://docs.docker.com/engine/installation/).
   * `make` for entering the deployment environment.
   * Kubernetes Anywhere is tested on vSphere deployments with vCenter, single node vSphere without vCenter is not supported.
+    * vCenter user with following minimal set of privileges.
+```
+Datastore > Allocate space
+Datastore > Low level file Operations
+Folder > Create Folder
+Folder > Delete Folder
+Network > Assign network
+Resource > Assign virtual machine to resource pool
+Virtual machine > Configuration > Add new disk
+Virtual Machine > Configuration > Add existing disk
+Virtual Machine > Configuration > Add or remove device
+Virtual Machine > Configuration > Change CPU count
+Virtual Machine > Configuration > Change resource
+Virtual Machine > Configuration > Memory
+Virtual Machine > Configuration > Modify device settings
+Virtual Machine > Configuration > Remove disk
+Virtual Machine > Configuration > Rename
+Virtual Machine > Configuration > Settings
+Virtual machine > Configuration > Advanced
+Virtual Machine > Interaction > Power off
+Virtual Machine > Interaction > Power on
+Virtual Machine > Inventory > Create from existing
+Virtual Machine > Inventory > Create new
+Virtual Machine > Inventory > Remove
+Virtual Machine > Provisioning > Clone virtual machine
+Virtual Machine > Provisioning > Customize
+Virtual Machine > Provisioning > Read customization specifications
+vApp > Import
+```
+**Note: vSphere Cloud Provider doesn't need these many privileges. These privileges are required for deployment of Kubernetes Cluster using Kubernetes-Anywhere. Please refer [vSphere Cloud Provider Guide](https://kubernetes.io/docs/getting-started-guides/vsphere/) for minimal set of privileges required for vSphere Cloud Provider.**
 
 ## Deployment
 
@@ -268,7 +298,6 @@ If make destroy fails due to a [known issue](https://github.com/kubernetes/kuber
 1. ```make destroy``` is [flaky.](https://github.com/kubernetes/kubernetes-anywhere/issues/285)
 2. [Photon OS template needs to be in the same cluster as kubernetes VMs.](https://github.com/kubernetes/kubernetes-anywhere/issues/300)
 3. [Only a single kubernetes cluster can exist in a resource pool.](https://github.com/kubernetes/kubernetes-anywhere/issues/296)
-4. [Can not execute command in a container using kubectl exec](https://github.com/kubernetes/kubernetes-anywhere/issues/337)
 
 ## Troubleshooting
 ### Logging into the VMs
