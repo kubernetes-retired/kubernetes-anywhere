@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eux -o pipefail
 
-apk add --update git build-base wget curl jq autoconf automake pkgconfig ncurses-dev libtool gperf flex bison ca-certificates
+apk add --update git build-base wget curl jq autoconf automake pkgconfig ncurses-dev libtool gperf flex bison ca-certificates python
 
 ## Install kubectl
 export KUBECTL_VERSION=1.4.0
@@ -43,3 +43,14 @@ autoreconf -fi
 make
 make install)
 rm -rf /tmp/kconfig-frontends
+
+## Install gcloud, the CLI for GCE
+export GOOGLE_SDK_VERSION=148.0.1
+mkdir -p /tmp/google-sdk
+(cd /tmp/google-sdk
+wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GOOGLE_SDK_VERSION}-linux-x86_64.tar.gz
+tar xvf google-cloud-sdk-${GOOGLE_SDK_VERSION}-linux-x86_64.tar.gz -C /
+/google-cloud-sdk/install.sh -q --path-update true
+source ~/.bashrc
+)
+rm -rf /tmp/google-sdk
