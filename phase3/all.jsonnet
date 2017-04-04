@@ -1,5 +1,5 @@
 function(cfg)
-  local if_enabled(addon, manifest) = if cfg.phase3[addon] then manifest else {};
+  local if_enabled(addon, manifest) = if std.objectHas(cfg.phase3, addon) && cfg.phase3[addon] then manifest else {};
   local join(arr) = std.foldl(function(a, b) a + b, arr, {});
   if_enabled("run_addons",
              join([
