@@ -11,7 +11,7 @@ function(cfg)
       containers: [
         {
           name: "etcd-container",
-          image: "gcr.io/google_containers/etcd:3.0.4",
+          image: "gcr.io/google_containers/etcd:2.2.1",
           resources: {
             requests: {
               cpu: "200m",

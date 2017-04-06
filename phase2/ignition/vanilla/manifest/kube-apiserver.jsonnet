@@ -35,7 +35,7 @@ function(cfg)
               "--tls-cert-file=/srv/kubernetes/apiserver.pem",
               "--tls-private-key-file=/srv/kubernetes/apiserver-key.pem",
               "--secure-port=443",
-              "--storage-backend=etcd3", 
+              "--storage-backend=etcd2", 
               "--allow-privileged",
               "--v=4",
             ],
