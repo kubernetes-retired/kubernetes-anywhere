@@ -86,7 +86,7 @@ function(config)
           resource_group_name: "${azurerm_resource_group.rg.name}",
           name: names.storage_account,
           location: "${azurerm_resource_group.rg.location}",
-          account_type: "Standard_LRS",
+          account_type: "Premium_LRS",
         },
       },
       azurerm_storage_container: {
