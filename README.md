@@ -18,7 +18,7 @@ If you want to deploy a cluster to kick the tires of Kubernetes, checkout one of
   * [Get started on Google Compute Engine](phase1/gce/README.md)
   * [Get started on Azure](phase1/azure/README.md)
   * [Get started on vSphere](phase1/vsphere/README.md)
-  
+
 ### Diving Deeper
 
 If you want to understand, read further about the design and implementation then dive into the code.
@@ -45,7 +45,7 @@ The input to bootstrap phase is the cluster configuration object along with a sm
 
 #### Phase 3: Deploying Cluster Addons
 
-Addon deployment consists of deploying onto the Kubernetes cluster all the applications that make Kubernetes run. Examples of these apps are kube-dns, heapster monitoring, kube-proxy, a SDN node agent if they deployment calls for one. These applications are managed with kubctl apply and can be deployed and managed with a single command.
+Addon deployment consists of deploying onto the Kubernetes cluster all the applications that make Kubernetes run. Examples of these apps are kube-dns, heapster monitoring, kube-proxy, a SDN node agent if they deployment calls for one. These applications are managed with kubectl apply and can be deployed and managed with a single command.
 
 #### Tying it all together
 
