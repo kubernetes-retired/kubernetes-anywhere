@@ -8,4 +8,5 @@ function(cfg)
                if_enabled("heapster", (import "heapster/heapster.jsonnet")(cfg)),
                if_enabled("kube_dns", (import "kube-dns/kube-dns.jsonnet")(cfg)),
                if_enabled("weave_net", (import "weave-net/weave-net.jsonnet")(cfg)),
+               if_enabled("flannel", (import "flannel/flannel.jsonnet")(cfg)),
              ]))
