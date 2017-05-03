@@ -38,6 +38,12 @@ config phase3.weave_net
 	default n
 	help
 	  Should we deploy weave-net? You likely only want this if using kubeadm for phase2.
+
+config phase3.flannel
+	bool "Run flannel?"
+	default n
+	help
+	  Should we deploy flannel? You likely only want this if using kubeadm for phase2.
 endif
 
 endmenu
