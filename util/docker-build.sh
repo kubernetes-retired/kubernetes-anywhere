@@ -17,8 +17,7 @@ cp jsonnet /usr/local/bin)
 rm -rf /tmp/jsonnet
 
 ## Install Terraform
-export TERRAFORM_VERSION=0.7.2
-export TERRAFORM_SHA256SUM=b337c885526a8a653075551ac5363a09925ce9cf141f4e9a0d9f497842c85ad5
+export TERRAFORM_VERSION=0.9.4
 
 mkdir -p /tmp/terraform/
 (cd /tmp/terraform

@@ -32,7 +32,7 @@
       ],
     },
     tls_locally_signed_cert(name, signer): {
-      cert_request_pem: "${data.tls_cert_request.%s.cert_request_pem}" % name,
+      cert_request_pem: "${tls_cert_request.%s.cert_request_pem}" % name,
       ca_key_algorithm: "${tls_private_key.%s.algorithm}" % signer,
       ca_private_key_pem: "${tls_private_key.%s.private_key_pem}" % signer,
       ca_cert_pem: "${tls_self_signed_cert.%s.cert_pem}" % signer,
@@ -75,7 +75,18 @@
     // ip addresses will cause all certs to be recreated tainting clusters using the
     // old certificates (i.e. causing those clusters to be recreated by terraform).
 
-    cluster_tls_data(cluster_name, master_instance_names, master_instance_ips):: {
+    cluster_tls_resources(cluster_name, master_instance_names, master_instance_ips):: {
+      tls_private_key: {
+        [cluster_name + "-" + name]: pki.private_key
+        for name in ["root", "node", "master", "admin"]
+      },
+      tls_self_signed_cert: {
+        [cluster_name + "-root"]: pki.tls_self_signed_cert(cluster_name + "-root"),
+      },
+      tls_locally_signed_cert: {
+        [cluster_name + "-" + name]: pki.tls_locally_signed_cert(cluster_name + "-" + name, cluster_name + "-root")
+        for name in ["node", "master", "admin"]
+      },
       tls_cert_request: {
         [cluster_name + "-" + name]: pki.tls_cert_request(cluster_name + "-" + name)
         for name in ["node", "admin"]
@@ -99,22 +110,7 @@
       },
     },
 
-    cluster_tls_resources(cluster_name, master_instance_names, master_instance_ips):: {
-      tls_private_key: {
-        [cluster_name + "-" + name]: pki.private_key
-        for name in ["root", "node", "master", "admin"]
-      },
-      tls_self_signed_cert: {
-        [cluster_name + "-root"]: pki.tls_self_signed_cert(cluster_name + "-root"),
-      },
-      tls_locally_signed_cert: {
-        [cluster_name + "-" + name]: pki.tls_locally_signed_cert(cluster_name + "-" + name, cluster_name + "-root")
-        for name in ["node", "master", "admin"]
-      },
-    },
-
     cluster_tls(cluster_name, master_instance_names, master_instance_ips):: {
-      data: pki.cluster_tls_data(cluster_name, master_instance_names, master_instance_ips),
       resource: pki.cluster_tls_resources(cluster_name, master_instance_names, master_instance_ips),
     },
   },
