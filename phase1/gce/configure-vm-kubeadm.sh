@@ -27,7 +27,7 @@ fi
 
 case "${ROLE}" in
   "master")
-    kubeadm init --token "${TOKEN}" --apiserver-bind-port 443 --skip-preflight-checks --apiserver-advertise-address "$(get_metadata "k8s-advertise-addresses")" --kubernetes-version $KUBERNETES_VERSION
+    kubeadm init --token "${TOKEN}" --pod-network-cidr 10.244.0.0/16 --apiserver-bind-port 443 --skip-preflight-checks --apiserver-advertise-address "$(get_metadata "k8s-advertise-addresses")" --kubernetes-version $KUBERNETES_VERSION
     ;;
   "node")
     MASTER=$(get_metadata "k8s-master-ip")
