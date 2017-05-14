@@ -9,7 +9,7 @@ config phase1.num_nodes
 	  The number of nodes you would like to provision.
 
 config phase1.cluster_name
-	string "cluster name"
+	string "kubernetes cluster name"
 	default "kubernetes"
 	help
 	  An identifier to use for this cluster.
