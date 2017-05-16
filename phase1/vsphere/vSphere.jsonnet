@@ -102,8 +102,14 @@ function(config)
             memory: cfg.vSphere.memory,
             enable_disk_uuid: true,
             datacenter: cfg.vSphere.datacenter,
-            resource_pool: cfg.vSphere.resourcepool,
-	    skip_customization: true,
+            skip_customization: true,
+            resource_pool: (
+              if cfg.vSphere.useresourcepool == "no" then
+                if cfg.vSphere.placement == "host" then cfg.vSphere.host
+                else cfg.vSphere.cluster
+              else
+                if cfg.vSphere.placement == "host" then std.join("/", ["/", cfg.vSphere.datacenter, "host", cfg.vSphere.host, "Resources", cfg.vSphere.resourcepool])
+                else std.join("/", ["/", cfg.vSphere.datacenter, "host", cfg.vSphere.cluster, "Resources", cfg.vSphere.resourcepool])),
             folder: "${vsphere_folder.cluster_folder.path}",
             network_interface: {
               label: cfg.vSphere.network,
