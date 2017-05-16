@@ -14,6 +14,9 @@ get_metadata() {
 
 ROLE=$(get_metadata "k8s-role")
 
+apt-get update
+apt-get install -y apt-transport-https
+
 cat <<EOF > /etc/apt/sources.list.d/k8s.list
 deb [arch=amd64] https://apt.dockerproject.org/repo ubuntu-xenial main
 EOF
