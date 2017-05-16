@@ -29,7 +29,11 @@ fi
 
 case "${ROLE}" in
   "master")
-    kubeadm init --token "${TOKEN}" --apiserver-bind-port 443 --skip-preflight-checks --apiserver-advertise-address "$(get_metadata "k8s-advertise-addresses")" --kubernetes-version $KUBERNETES_VERSION
+    OPTS=''
+    if [[ -n "$KUBERNETES_VERSION" ]]; then
+      OPTS="--kubernetes-version $KUBERNETES_VERSION"
+    fi
+    kubeadm init --token "${TOKEN}" --apiserver-bind-port 443 --skip-preflight-checks --apiserver-advertise-address "$(get_metadata "k8s-advertise-addresses")" $OPTS
     ;;
   "node")
     MASTER=$(get_metadata "k8s-master-ip")
