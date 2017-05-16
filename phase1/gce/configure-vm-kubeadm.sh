@@ -19,6 +19,8 @@ elif [[ "${KUBEADM_VERSION}" == "gs://"* ]]; then
   gsutil rsync "${KUBEADM_VERSION}" $TMPDIR
   dpkg -i $TMPDIR/{kubelet,kubeadm,kubectl,kubernetes-cni}.deb || echo Ignoring expected dpkg failure
   apt-get install -f -y
+  systemctl enable kubelet
+  systemctl start kubelet
   rm -rf $TMPDIR
 else
   echo "Don't know how to handle version: $KUBEADM_VERSION"
