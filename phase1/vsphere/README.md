@@ -79,7 +79,7 @@ echo -n > /etc/machine-id
 ### Download `kubernetes-anywhere`:
 
 ```shell
-curl -sL https://github.com/kubernetes/kubernetes-anywhere/archive/v0.1.0.zip | tar xz
+curl -sL https://github.com/kubernetes/kubernetes-anywhere/archive/v0.1.0.tar.gz | tar xz
 cd kubernetes-anywhere-0.1.0
 ```
 
