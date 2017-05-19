@@ -1,0 +1,16 @@
+{
+  "kind": "ConfigMap",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "kube-flannel-cfg",
+    "namespace": "kube-system",
+    "labels": {
+      "tier": "node",
+      "app": "flannel"
+    }
+  },
+  "data": {
+    "cni-conf.json": "{\n  \"name\": \"cbr0\",\n  \"type\": \"flannel\",\n  \"delegate\": {\n    \"isDefaultGateway\": true\n  }\n}\n",
+    "net-conf.json": "{\n  \"Network\": \"10.244.0.0/16\",\n  \"Backend\": {\n    \"Type\": \"vxlan\"\n  }\n}"
+  }
+}
