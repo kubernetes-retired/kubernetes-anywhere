@@ -48,7 +48,7 @@ export GOOGLE_SDK_VERSION=148.0.1
 mkdir -p /tmp/google-sdk
 (cd /tmp/google-sdk
 wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GOOGLE_SDK_VERSION}-linux-x86_64.tar.gz
-tar xvf google-cloud-sdk-${GOOGLE_SDK_VERSION}-linux-x86_64.tar.gz -C /
+tar xf google-cloud-sdk-${GOOGLE_SDK_VERSION}-linux-x86_64.tar.gz -C /
 /google-cloud-sdk/install.sh -q --path-update true
 source ~/.bashrc
 )
