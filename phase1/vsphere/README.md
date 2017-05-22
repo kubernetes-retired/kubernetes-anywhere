@@ -76,11 +76,11 @@ echo -n > /etc/machine-id
 ```
 
 
-### Clone `kubernetes-anywhere`:
+### Download `kubernetes-anywhere`:
 
 ```shell
-git clone https://github.com/kubernetes/kubernetes-anywhere
-cd kubernetes-anywhere
+curl -sL https://github.com/kubernetes/kubernetes-anywhere/archive/v0.1.0.tar.gz | tar xz
+cd kubernetes-anywhere-0.1.0
 ```
 
 ### Enter the `kubernetes-anywhere` deployment environment:
@@ -205,16 +205,17 @@ kubernetes version (phase2.kubernetes_version) [v1.5.3] (NEW) v1.5.3
 bootstrap provider (phase2.provider) [ignition] (NEW) ignition
 ```
 
-* Select the addons. Defaults to yes.
+* Select the addons. Defaults to yes. **Make sure to choose 'N' for weave-net addon.** 
 ```
 *
 * Phase 3: Deploying Addons. 
 *
-Run the addon manager? (phase3.run_addons) [Y/n/?] (NEW) 
-  Run kube-proxy? (phase3.kube_proxy) [Y/n/?] (NEW) 
-  Run the dashboard? (phase3.dashboard) [Y/n/?] (NEW) 
-  Run heapster? (phase3.heapster) [Y/n/?] (NEW) 
-  Run kube-dns? (phase3.kube_dns) [Y/n/?] (NEW) 
+Run the addon manager? (phase3.run_addons) [Y/n/?] (NEW)
+  Run kube-proxy? (phase3.kube_proxy) [Y/n/?] (NEW)
+  Run the dashboard? (phase3.dashboard) [Y/n/?] (NEW)
+  Run heapster? (phase3.heapster) [Y/n/?] (NEW)
+  Run kube-dns? (phase3.kube_dns) [Y/n/?] (NEW)
+  Run weave-net? (phase3.weave_net) [N/y/?] (NEW) N
 ```
 
 **Notes**:

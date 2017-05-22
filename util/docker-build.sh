@@ -17,8 +17,7 @@ cp jsonnet /usr/local/bin)
 rm -rf /tmp/jsonnet
 
 ## Install Terraform
-export TERRAFORM_VERSION=0.7.2
-export TERRAFORM_SHA256SUM=b337c885526a8a653075551ac5363a09925ce9cf141f4e9a0d9f497842c85ad5
+export TERRAFORM_VERSION=0.9.4
 
 mkdir -p /tmp/terraform/
 (cd /tmp/terraform
@@ -49,7 +48,7 @@ export GOOGLE_SDK_VERSION=148.0.1
 mkdir -p /tmp/google-sdk
 (cd /tmp/google-sdk
 wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GOOGLE_SDK_VERSION}-linux-x86_64.tar.gz
-tar xvf google-cloud-sdk-${GOOGLE_SDK_VERSION}-linux-x86_64.tar.gz -C /
+tar xf google-cloud-sdk-${GOOGLE_SDK_VERSION}-linux-x86_64.tar.gz -C /
 /google-cloud-sdk/install.sh -q --path-update true
 source ~/.bashrc
 )

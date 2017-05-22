@@ -209,5 +209,4 @@ function(cfg)
         },
       },
     } + tf.pki.cluster_tls_resources(p1.cluster_name, [names.master_instance], ["${google_compute_address.%(master_ip)s.address}" % names]),
-    data: tf.pki.cluster_tls_data(p1.cluster_name, [names.master_instance], ["${google_compute_address.%(master_ip)s.address}" % names]),
   }

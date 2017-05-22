@@ -19,6 +19,8 @@ elif [[ "${KUBEADM_VERSION}" == "gs://"* ]]; then
   gsutil rsync "${KUBEADM_VERSION}" $TMPDIR
   dpkg -i $TMPDIR/{kubelet,kubeadm,kubectl,kubernetes-cni}.deb || echo Ignoring expected dpkg failure
   apt-get install -f -y
+  systemctl enable kubelet
+  systemctl start kubelet
   rm -rf $TMPDIR
 else
   echo "Don't know how to handle version: $KUBEADM_VERSION"
@@ -27,7 +29,11 @@ fi
 
 case "${ROLE}" in
   "master")
-    kubeadm init --token "${TOKEN}" --pod-network-cidr 10.244.0.0/16 --apiserver-bind-port 443 --skip-preflight-checks --apiserver-advertise-address "$(get_metadata "k8s-advertise-addresses")" --kubernetes-version $KUBERNETES_VERSION
+    OPTS=''
+    if [[ -n "$KUBERNETES_VERSION" ]]; then
+      OPTS="--kubernetes-version $KUBERNETES_VERSION"
+    fi
+    kubeadm init --token "${TOKEN}" --apiserver-bind-port 443 --skip-preflight-checks --apiserver-advertise-address "$(get_metadata "k8s-advertise-addresses")" $OPTS
     ;;
   "node")
     MASTER=$(get_metadata "k8s-master-ip")
