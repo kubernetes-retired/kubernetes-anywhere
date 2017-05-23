@@ -42,7 +42,7 @@ endif
 
 config phase3.cni
 	string "CNI plugin to use"
-	default weave
+	default ""
 	help
 	  CNI plugin to use. You likely only want this if using kubeadm for phase2.
 

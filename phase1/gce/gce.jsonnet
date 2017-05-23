@@ -149,7 +149,7 @@ function(cfg)
             "k8s-apisever-private-key": "${tls_private_key.%s-master.private_key_pem}" % p1.cluster_name,
             "k8s-master-kubeconfig": kubeconfig(p1.cluster_name + "-master", "local", "service-account-context"),
             "k8s-advertise-addresses": "${google_compute_address.%(master_ip)s.address}" % names,
-            "k8s-cni-plugin": if std.objectHas(p3, "cni") then p3.cni else "undefined",
+            "k8s-cni-plugin": if std.objectHas(p3, "cni") then p3.cni else "",
           } + if p2.provider == "kubeadm" then {
             "k8s-kubeadm-token": "${var.kubeadm_token}",
             "k8s-kubeadm-version": "%(version)s" % p2.kubeadm,
