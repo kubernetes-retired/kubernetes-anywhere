@@ -2,6 +2,7 @@ function(cfg)
   local tf = import "phase1/tf.jsonnet";
   local p1 = cfg.phase1;
   local p2 = cfg.phase2;
+  local p3 = cfg.phase3;
   local gce = p1.gce;
   local names = {
     instance_template: "%(cluster_name)s-node-instance-template" % p1,
@@ -148,6 +149,7 @@ function(cfg)
             "k8s-apisever-private-key": "${tls_private_key.%s-master.private_key_pem}" % p1.cluster_name,
             "k8s-master-kubeconfig": kubeconfig(p1.cluster_name + "-master", "local", "service-account-context"),
             "k8s-advertise-addresses": "${google_compute_address.%(master_ip)s.address}" % names,
+            "k8s-cni-plugin": p3.cni,
           } + if p2.provider == "kubeadm" then {
             "k8s-kubeadm-token": "${var.kubeadm_token}",
             "k8s-kubeadm-version": "%(version)s" % p2.kubeadm,
