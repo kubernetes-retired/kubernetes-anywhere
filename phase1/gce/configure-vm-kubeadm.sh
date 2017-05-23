@@ -1,6 +1,7 @@
 # This is not meant to run on its own, but extends phase1/gce/configure-vm.sh
 
 TOKEN=$(get_metadata "k8s-kubeadm-token")
+CNI=$(get_metadata "k8s-cni-plugin")
 KUBEADM_VERSION=$(get_metadata "k8s-kubeadm-version")
 KUBERNETES_VERSION=$(get_metadata "k8s-kubernetes-version")
 
@@ -32,6 +33,9 @@ case "${ROLE}" in
     OPTS=''
     if [[ -n "$KUBERNETES_VERSION" ]]; then
       OPTS="--kubernetes-version $KUBERNETES_VERSION"
+    fi
+    if [[ "${CNI}" == "flannel" ]]; then
+      OPTS="${OPTS} --pod-network-cidr 10.244.0.0/16"
     fi
     kubeadm init --token "${TOKEN}" --apiserver-bind-port 443 --skip-preflight-checks --apiserver-advertise-address "$(get_metadata "k8s-advertise-addresses")" $OPTS
     ;;
