@@ -145,7 +145,7 @@ function(cfg)
           metadata: {
             "k8s-role": "master",
             "k8s-advertise-addresses": "${google_compute_address.%(master_ip)s.address}" % names,
-            "k8s-cni-plugin": p3.cni,
+            "k8s-cni-plugin": if std.objectHas(p3, "cni") then p3.cni else "undefined",
           } + if p2.provider == "kubeadm" then {
             "k8s-kubeadm-token": "${var.kubeadm_token}",
             "k8s-kubeadm-version": "%(version)s" % p2.kubeadm,

@@ -33,6 +33,13 @@ config phase3.kube_dns
 	help
 	  Should we deploy kube-dns?
 
+config phase3.weave_net
+	bool "Run weave-net?"
+	default n
+	help
+	  Should we deploy weave-net? You likely only want this if using kubeadm for phase2.
+endif
+
 config phase3.cni
 	string "CNI plugin to use"
 	default weave
