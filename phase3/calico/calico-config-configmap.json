@@ -1,0 +1,13 @@
+{
+    "kind": "ConfigMap", 
+    "data": {
+        "etcd_endpoints": "http://10.96.232.136:6666", 
+        "calico_backend": "bird", 
+        "cni_network_config": "{\n    \"name\": \"k8s-pod-network\",\n    \"cniVersion\": \"0.1.0\",\n    \"type\": \"calico\",\n    \"etcd_endpoints\": \"__ETCD_ENDPOINTS__\",\n    \"log_level\": \"info\",\n    \"ipam\": {\n        \"type\": \"calico-ipam\"\n    },\n    \"policy\": {\n        \"type\": \"k8s\",\n         \"k8s_api_root\": \"https://__KUBERNETES_SERVICE_HOST__:__KUBERNETES_SERVICE_PORT__\",\n         \"k8s_auth_token\": \"__SERVICEACCOUNT_TOKEN__\"\n    },\n    \"kubernetes\": {\n        \"kubeconfig\": \"/etc/cni/net.d/__KUBECONFIG_FILENAME__\"\n    }\n}"
+    }, 
+    "apiVersion": "v1", 
+    "metadata": {
+        "namespace": "kube-system", 
+        "name": "calico-config"
+    }
+}

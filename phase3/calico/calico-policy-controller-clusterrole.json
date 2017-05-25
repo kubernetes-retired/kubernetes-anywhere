@@ -1,0 +1,25 @@
+{
+    "rules": [
+        {
+            "apiGroups": [
+                "", 
+                "extensions"
+            ], 
+            "verbs": [
+                "watch", 
+                "list"
+            ], 
+            "resources": [
+                "pods", 
+                "namespaces", 
+                "networkpolicies"
+            ]
+        }
+    ], 
+    "kind": "ClusterRole", 
+    "apiVersion": "rbac.authorization.k8s.io/v1beta1", 
+    "metadata": {
+        "namespace": "kube-system", 
+        "name": "calico-policy-controller"
+    }
+}

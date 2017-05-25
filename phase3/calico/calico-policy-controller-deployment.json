@@ -1,0 +1,68 @@
+{
+    "kind": "Deployment", 
+    "spec": {
+        "replicas": 1, 
+        "template": {
+            "spec": {
+                "tolerations": [
+                    {
+                        "effect": "NoSchedule", 
+                        "key": "node-role.kubernetes.io/master"
+                    }, 
+                    {
+                        "operator": "Exists", 
+                        "key": "CriticalAddonsOnly"
+                    }
+                ], 
+                "hostNetwork": true, 
+                "serviceAccountName": "calico-policy-controller", 
+                "containers": [
+                    {
+                        "image": "quay.io/calico/kube-policy-controller:v0.6.0", 
+                        "name": "calico-policy-controller", 
+                        "env": [
+                            {
+                                "valueFrom": {
+                                    "configMapKeyRef": {
+                                        "name": "calico-config", 
+                                        "key": "etcd_endpoints"
+                                    }
+                                }, 
+                                "name": "ETCD_ENDPOINTS"
+                            }, 
+                            {
+                                "name": "K8S_API", 
+                                "value": "https://kubernetes.default:443"
+                            }, 
+                            {
+                                "name": "CONFIGURE_ETC_HOSTS", 
+                                "value": "true"
+                            }
+                        ]
+                    }
+                ]
+            }, 
+            "metadata": {
+                "labels": {
+                    "k8s-app": "calico-policy-controller"
+                }, 
+                "namespace": "kube-system", 
+                "name": "calico-policy-controller", 
+                "annotations": {
+                    "scheduler.alpha.kubernetes.io/critical-pod": ""
+                }
+            }
+        }, 
+        "strategy": {
+            "type": "Recreate"
+        }
+    }, 
+    "apiVersion": "extensions/v1beta1", 
+    "metadata": {
+        "labels": {
+            "k8s-app": "calico-policy"
+        }, 
+        "namespace": "kube-system", 
+        "name": "calico-policy-controller"
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "kind": "Service", 
+    "spec": {
+        "clusterIP": "10.96.232.136", 
+        "ports": [
+            {
+                "port": 6666
+            }
+        ], 
+        "selector": {
+            "k8s-app": "calico-etcd"
+        }
+    }, 
+    "apiVersion": "v1", 
+    "metadata": {
+        "labels": {
+            "k8s-app": "calico-etcd"
+        }, 
+        "namespace": "kube-system", 
+        "name": "calico-etcd"
+    }
+}

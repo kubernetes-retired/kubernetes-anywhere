@@ -11,5 +11,6 @@ function(cfg)
                if_enabled("weave_net", (import "weave-net/weave-net.jsonnet")(cfg)),
                if_cni_plugin("weave", (import "weave-net/weave-net.jsonnet")(cfg)),
                if_cni_plugin("flannel", (import "flannel/flannel.jsonnet")(cfg)),
+               if_cni_plugin("calico", (import "calico/calico.jsonnet")(cfg)),
                if_enabled("gce_storage_class", (import "gce-storage-class/storage-class.jsonnet")(cfg)),
              ]))
