@@ -3,7 +3,7 @@ menu "Phase 1: Cluster Resource Provisioning"
 
 config phase1.num_nodes
 	int "number of nodes"
-	default 4
+	default 3
 	range 1 1000
 	help
 	  The number of nodes you would like to provision.
