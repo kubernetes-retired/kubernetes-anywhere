@@ -45,14 +45,15 @@ $ make deploy
 and fill complete the config wizard to deploy a kubernetes-anywhere cluster. Eventually, you will see a set of nodes when you run:
 
 ```console
-$ kubectl --kubeconfig phase1/gce/kubeconfig.json get nodes
+$ export KUBECONFIG=$(make -s kubeconfig-path)
+$ kubectl get nodes
 ```
 
 It may take a couple minutes for the Kubernetes API to start responding to requests. Once all the nodes in your cluster is ready, you can deploy cluster addons by running:
 
 ```console
 $ ./phase3/do gen
-$ kubectl --kubeconfig phase1/gce/kubeconfig.json apply -f ./phase3/.tmp/
+$ kubectl apply -f ./phase3/.tmp/
 ```
 
 After you've had a great experience with Kubernetes, run:
