@@ -1,7 +1,7 @@
 {
     "kind": "Service", 
     "spec": {
-        "clusterIP": "10.96.232.136", 
+        "clusterIP": "10.0.232.136", 
         "ports": [
             {
                 "port": 6666
