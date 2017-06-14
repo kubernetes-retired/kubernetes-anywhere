@@ -17,6 +17,12 @@ while true; do
 
   [[ "${hcount}" -ge "${num_nodes}" ]] && echo "Validation: Success!" && exit
 
+  # Time out after 20 minutes
+  if [[ "${total_time}" -ge 1200 ]]; then
+    echo "Timeout exceeded."
+    exit 1
+  fi
+
   sleep ${wait_duration}
 done
 
