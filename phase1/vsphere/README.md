@@ -9,7 +9,7 @@
 ## Prerequisites
   * `docker-engine` for executing the `kubernetes-anywhere` deployment which can be downloaded [here](https://docs.docker.com/engine/installation/).
   * `make` for entering the deployment environment.
-  * Kubernetes Anywhere is tested on vSphere deployments with vCenter, single node vSphere without vCenter is not supported.
+  * Kubernetes Anywhere is tested on vSphere deployments with vCenter, single node ESXi host without vCenter is not supported.
     * vCenter user with following minimal set of privileges.
 ```
 Datastore > Allocate space
