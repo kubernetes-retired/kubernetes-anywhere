@@ -23,8 +23,8 @@ function(cfg)
             |||
               /usr/local/bin/etcd \
                 --listen-peer-urls http://127.0.0.1:2380 \
-                -advertise-client-urls http://127.0.0.1:2379 \
-                -listen-client-urls http://127.0.0.1:2379 \
+                --advertise-client-urls http://127.0.0.1:2379 \
+                --listen-client-urls http://127.0.0.1:2379 \
                 --data-dir /var/etcd/data
             |||,
           ],
