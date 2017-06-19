@@ -47,8 +47,8 @@
 **Note**:
 
 * The recommended version is v1.6.5
-* The deployment is tested with kubernetes v1.4.0, v1.4.4, v1.4.7, v1.4.8 and v1.5.3
-* vSphere Cloud Provider is tested on v1.6.5, v1.5.3, v1.4.7 and v1.4.8
+* The deployment is tested with kubernetes 1.6.5, 1.5.7
+* vSphere Cloud Provider is tested on v1.6.5, v1.5.7
 
 ### Upload VM image to be used to vSphere:
 
@@ -254,7 +254,7 @@ You have a Kubernetes cluster!
 
 Lets take a look at where node VM's are located on the vCenter.
 
-Node VMs are planced in the ```dev-resource-pool``` under the VM Folder ```kubernetes```.  ```kubernetes``` is the name of the cluster we specified in the configuration wizard.
+Node VMs are placed in the ```dev-resource-pool``` under the VM Folder ```kubernetes```.  ```kubernetes``` is the name of the cluster we specified in the configuration wizard.
 
 ![alt text](https://user-images.githubusercontent.com/22985595/27245212-0ff39f50-529f-11e7-9e44-9a7ae9c7c9fe.jpg)
 ![alt text](https://user-images.githubusercontent.com/22985595/27245211-0ff08d42-529f-11e7-9ab4-8cfe64cffc78.jpg)
