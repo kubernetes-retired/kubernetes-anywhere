@@ -86,9 +86,9 @@ docker pull cnastorage/kubernetes-anywhere
 docker run -it --rm --env="PS1=[container]:\w> " --net=host cnastorage/kubernetes-anywhere:latest /bin/bash
 ```
 
-#### Start the deployment wizard:
+### Start the deployment wizard:
 
-### Sample config
+#### Sample config
 
 Lets take a look at vSphere environment before starting deployment wizard.
 
