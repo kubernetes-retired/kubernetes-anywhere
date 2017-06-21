@@ -3,7 +3,7 @@ menu "Phase 2: Node Bootstrapping"
 
 config phase2.installer_container
 	string "installer container"
-	default "docker.io/cnastorage/k8s-ignition:v1"
+	default "docker.io/cnastorage/k8s-ignition:v2"
 
 config phase2.docker_registry
 	string "docker registry"
@@ -13,7 +13,7 @@ config phase2.docker_registry
 
 config phase2.kubernetes_version
 	string "kubernetes version"
-	default "v1.5.3"
+	default "v1.6.5"
 	help
 	  The version of Kubernetes to deploy.
 
