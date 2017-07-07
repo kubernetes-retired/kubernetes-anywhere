@@ -63,11 +63,22 @@ do:
 	( cd "phase1/$$(jq -r '.phase1.cloud_provider' .config.json)"; ./do $(WHAT) )
 
 docker-build:
-	docker build -t $(IMAGE_NAME):$(IMAGE_VERSION) .
+	docker build \
+		--build-arg="http_proxy=$(http_proxy)" \
+		--build-arg="https_proxy=$(https_proxy)" \
+		--build-arg="no_proxy=$(no_proxy)" \
+		--rm -t $(IMAGE_NAME):$(IMAGE_VERSION) .
 
-docker-dev: docker-build
+docker-dev: docker-build 
 	${info Starting Kuberetes Anywhere deployment shell in a container}
-	docker run -it --rm --env="PS1=[container]:\w> " --net=host --volume="`pwd`:/opt/kubernetes-anywhere" $(IMAGE_NAME):$(IMAGE_VERSION) /bin/bash
+	docker run -it --rm \
+		--env="PS1=[container]:\w> " \
+		--env="http_proxy=$(http_proxy)" \
+		--env="https_proxy=$(https_proxy)" \
+		--env="no_proxy=$(no_proxy)" \
+		--net=host \
+		--volume="`pwd`:/opt/kubernetes-anywhere" \
+		$(IMAGE_NAME):$(IMAGE_VERSION) /bin/bash
 
 docker-push: docker-build
 	docker push $(IMAGE_NAME):$(IMAGE_VERSION)
