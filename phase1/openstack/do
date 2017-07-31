@@ -1,0 +1,103 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+set -x
+
+cd "${BASH_SOURCE%/*}"
+
+CONFIG_FILE="${CONFIG_JSON_FILE:-../../.config.json}"
+CLUSTER_NAME=$(jq -r '.phase1.cluster_name' ${CONFIG_FILE})
+KUBE_CONTEXT_NAME=$(jq -r '.phase2.kube_context_name' ${CONFIG_FILE})
+TMP_DIR=${CLUSTER_NAME}/.tmp
+
+generate_token() {
+  perl -e 'printf "%06x.%08x%08x\n", rand(0xffffff), rand(0xffffffff), rand(0xffffffff);'
+}
+
+gen() {
+  TOKEN=$(generate_token)
+  mkdir -p ${TMP_DIR}
+  jsonnet -J ../../ --multi ${TMP_DIR} --tla-code-file cfg=${CONFIG_FILE} all.jsonnet
+  echo "kubeadm_token = \"$TOKEN\"" > ${CLUSTER_NAME}/terraform.tfvars
+}
+
+deploy() {
+  gen
+  terraform apply -var-file=${CLUSTER_NAME}/terraform.tfvars -state=${CLUSTER_NAME}/terraform.tfstate ${TMP_DIR}
+
+  PHASE2=$(jq -r '.phase2.provider' ${CONFIG_FILE})
+  if [[ "${PHASE2}" == "kubeadm" ]]; then
+    fetch_kubeconfig
+  fi
+}
+
+# For most implementations, the kubeconfig outputted by terraform is sufficient
+# to connect to the cluster. However, if using kubeadm, then "kubeadm init"
+# creates its own certificates on the master and ignores what was created by
+# terraform. In order to access the cluster remotely, we need to fetch the
+# proper kubeconfig from the master.
+fetch_kubeconfig() {
+  SSH_KEY_FILE=$(jq -r '.phase1.openstack.ssh_key_file' ${CONFIG_FILE})
+  MASTER=$(terraform output -json -state=${CLUSTER_NAME}/terraform.tfstate |jq -r ".[\"${CLUSTER_NAME}_master_ip\"].value")
+  SSHUSER=$(jq -r '.phase1.ssh_user' ${CONFIG_FILE})
+
+  if [[ -n "${SSHUSER}" ]];then
+    SSHUSER="${SSHUSER}@"
+  fi
+
+  for tries in {1..60}; do
+    echo Trying to fetch kubeconfig from master... $tries/60
+
+    # We can't use copy-files here because only root can read the file
+    # (intentionally). However, if the very first invocation of this command
+    # succeeds, then stdout is tainted by ssh initialization output, so we echo
+    # a marker to indicate the start of the file, and delete all lines up to and
+    # including it.
+    if ssh -i ${SSH_KEY_FILE} "$SSHUSER$MASTER" -o "StrictHostKeyChecking=no" -o "PasswordAuthentication=no" "echo STARTFILE; sudo cat /etc/kubernetes/admin.conf" > ${TMP_DIR}/kubeconfig.raw; then
+      sed '/^STARTFILE$/,$!d;/^STARTFILE$/d' ${TMP_DIR}/kubeconfig.raw > ${CLUSTER_NAME}/kubeconfig.json
+      echo Successfully fetched kubeconfig.
+
+      # Replace internal ip by the floating ip of master
+      sed -i "s|server: https://.*:|server: https://${MASTER}:|" ${CLUSTER_NAME}/kubeconfig.json
+
+      if [[ -n "${KUBE_CONTEXT_NAME}" ]]; then
+        # kubeconfig.json fetched from master node has the user, cluster and context all hardcoded with
+        # 'kubernetes' keyword. So replace 'kubernetes' with the cluster_name.
+        # TODO: use `kubectl config rename-(context,cluster,user)` sub-commands whenever they are available
+        sed -i "s/kubernetes/${CLUSTER_NAME}/g" ${CLUSTER_NAME}/kubeconfig.json
+        sed -i "s/${CLUSTER_NAME}-admin@${CLUSTER_NAME}/${KUBE_CONTEXT_NAME}/" ${CLUSTER_NAME}/kubeconfig.json
+      fi
+
+      return
+    else
+      sleep 5
+    fi
+  done
+
+  echo Exhausted attempts to fetch kubeconfig. >&2
+  exit 1
+}
+
+destroy() {
+  FLAGS=""
+  if [[ "${FORCE_DESTROY:-}" == "y" ]]; then
+    FLAGS="-force"
+  fi
+  terraform destroy -var-file=${CLUSTER_NAME}/terraform.tfvars -state=${CLUSTER_NAME}/terraform.tfstate $FLAGS ${TMP_DIR}
+}
+
+case "${1:-}" in
+  "")
+    ;;
+  "deploy-cluster")
+    deploy
+    ;;
+  "destroy-cluster")
+    destroy
+    ;;
+  "gen")
+    gen
+    ;;
+esac
