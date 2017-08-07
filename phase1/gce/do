@@ -54,7 +54,7 @@ fetch_kubeconfig() {
     # a marker to indicate the start of the file, and delete all lines up to and
     # including it.
     if gcloud compute ssh --project "$PROJECT" --zone "$ZONE" "$MASTER" --command "echo STARTFILE; sudo cat /etc/kubernetes/admin.conf" > ${TMP_DIR}/kubeconfig.raw; then
-      sed '0,/^STARTFILE$/d' ${TMP_DIR}/kubeconfig.raw > ${CLUSTER_NAME}/kubeconfig.json
+      sed '/^STARTFILE$/,$!d;/^STARTFILE$/d' ${TMP_DIR}/kubeconfig.raw > ${CLUSTER_NAME}/kubeconfig.json
       echo Successfully fetched kubeconfig.
       return
     else
