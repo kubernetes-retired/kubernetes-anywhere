@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eux -o pipefail
 
-apk add --update git build-base wget curl jq autoconf automake pkgconfig ncurses-dev libtool gperf flex bison ca-certificates python
+apk add --update git build-base wget curl jq autoconf automake pkgconfig ncurses-dev libtool gperf flex bison ca-certificates python openssh-client
 
 ## Install kubectl
 export KUBECTL_VERSION=1.6.0-beta.4
