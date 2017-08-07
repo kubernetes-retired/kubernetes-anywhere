@@ -143,17 +143,18 @@ function(cfg)
           metadata_startup_script: startup_config.startup_script,
           metadata: {
             "k8s-role": "master",
-            "k8s-config": config_metadata_template % [names.master_ip, "master"],
-            "k8s-ca-public-key": "${tls_self_signed_cert.%s-root.cert_pem}" % p1.cluster_name,
-            "k8s-apisever-public-key": "${tls_locally_signed_cert.%s-master.cert_pem}" % p1.cluster_name,
-            "k8s-apisever-private-key": "${tls_private_key.%s-master.private_key_pem}" % p1.cluster_name,
-            "k8s-master-kubeconfig": kubeconfig(p1.cluster_name + "-master", "local", "service-account-context"),
             "k8s-advertise-addresses": "${google_compute_address.%(master_ip)s.address}" % names,
           } + if p2.provider == "kubeadm" then {
             "k8s-kubeadm-token": "${var.kubeadm_token}",
             "k8s-kubeadm-version": "%(version)s" % p2.kubeadm,
             "k8s-kubernetes-version": "%(kubernetes_version)s" % p2
-          } else { },
+          } else {
+            "k8s-config": config_metadata_template % [names.master_ip, "master"],
+            "k8s-ca-public-key": "${tls_self_signed_cert.%s-root.cert_pem}" % p1.cluster_name,
+            "k8s-apisever-public-key": "${tls_locally_signed_cert.%s-master.cert_pem}" % p1.cluster_name,
+            "k8s-apisever-private-key": "${tls_private_key.%s-master.private_key_pem}" % p1.cluster_name,
+            "k8s-master-kubeconfig": kubeconfig(p1.cluster_name + "-master", "local", "service-account-context"),
+          },
           disk: [{
             image: gce.os_image,
           }],
@@ -169,15 +170,16 @@ function(cfg)
           metadata: {
             "startup-script": startup_config.startup_script,
             "k8s-role": "node",
-            "k8s-deploy-bucket": names.release_bucket,
-            "k8s-config": config_metadata_template % [names.master_ip, "node"],
-            "k8s-node-kubeconfig": kubeconfig(p1.cluster_name + "-node", "local", "service-account-context"),
             "k8s-master-ip": "${google_compute_instance.%(master_instance)s.network_interface.0.address}" % names,
           } + if p2.provider == "kubeadm" then {
             "k8s-kubeadm-token": "${var.kubeadm_token}",
             "k8s-kubeadm-version": "%(version)s" % p2.kubeadm,
             "k8s-kubernetes-version": "%(kubernetes_version)s" % p2
-          } else { },
+          } else {
+            "k8s-deploy-bucket": names.release_bucket,
+            "k8s-config": config_metadata_template % [names.master_ip, "node"],
+            "k8s-node-kubeconfig": kubeconfig(p1.cluster_name + "-node", "local", "service-account-context"),
+          },
           disk: [{
             source_image: gce.os_image,
             auto_delete: true,
@@ -198,7 +200,7 @@ function(cfg)
           target_size: p1.num_nodes,
         },
       },
-
+    } + if p2.provider != "kubeadm" then {
       // Public Key Infrastructure
       null_resource: {
         kubeconfig: {
@@ -209,5 +211,5 @@ function(cfg)
           }],
         },
       },
-    } + tf.pki.cluster_tls_resources(p1.cluster_name, [names.master_instance], ["${google_compute_address.%(master_ip)s.address}" % names]),
+    } else { } + if p2.provider != "kubeadm" then tf.pki.cluster_tls_resources(p1.cluster_name, [names.master_instance], ["${google_compute_address.%(master_ip)s.address}" % names]) else { },
   }
