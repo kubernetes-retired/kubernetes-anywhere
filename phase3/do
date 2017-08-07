@@ -5,16 +5,19 @@ set -o pipefail
 set -o nounset
 set -x
 
+cd "${BASH_SOURCE%/*}"
+
+TMP_DIR=$(jq -r '.phase1.cluster_name' ../.config.json)/.tmp
+
 gen() {
-	cd "${BASH_SOURCE%/*}"
-	mkdir -p .tmp/
-	jsonnet --multi .tmp/ --tla-code-file cfg=../.config.json all.jsonnet
+	mkdir -p ${TMP_DIR}
+	jsonnet --multi ${TMP_DIR} --tla-code-file cfg=../.config.json all.jsonnet
 }
 
 deploy() {
 	gen
 	mkdir -p /tmp/kubectl/
-	HOME=/tmp/kubectl kubectl apply -f ./.tmp/
+	HOME=/tmp/kubectl kubectl apply -f ./${TMP_DIR}
 }
 
 

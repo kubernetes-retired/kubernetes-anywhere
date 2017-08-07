@@ -8,9 +8,12 @@ cd "${BASH_SOURCE%/*}"
 config="./../../.config"
 configjson="./../../.config.json"
 
+CLUSTER_NAME=$(jq -r '.phase1.cluster_name' ${configjson})
+TMP_DIR=${CLUSTER_NAME}/.tmp
+
 gen() {
-  mkdir -p .tmp/
-  jsonnet -J ../../ --multi .tmp/ all.jsonnet
+  mkdir -p ${TMP_DIR}
+  jsonnet -J ../../ --multi ${TMP_DIR}/ all.jsonnet
 }
 
 check_auth() {
@@ -102,15 +105,15 @@ deploy() {
   gen
 
   # Workaround: https://github.com/hashicorp/terraform/issues/7153
-  terraform apply -state=./.tmp/terraform.tfstate .tmp ||
-    terraform apply -state=./.tmp/terraform.tfstate .tmp
+  terraform apply -state=${CLUSTER_NAME}/terraform.tfstate ${TMP_DIR} ||
+    terraform apply -state=${CLUSTER_NAME}/terraform.tfstate ${TMP_DIR}
 }
 
 destroy() {
   if [[ "${FORCE_DESTROY:-}" == "y" ]]; then
-    terraform destroy -state=./.tmp/terraform.tfstate -force .tmp
+    terraform destroy -state=${CLUSTER_NAME}/terraform.tfstate -force ${TMP_DIR}
   else
-    terraform destroy -state=./.tmp/terraform.tfstate .tmp
+    terraform destroy -state=${CLUSTER_NAME}/terraform.tfstate ${TMP_DIR}
   fi
 }
 

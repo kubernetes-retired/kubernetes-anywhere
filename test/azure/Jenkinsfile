@@ -99,12 +99,12 @@ node {
 				archiveArtifacts artifacts: 'config.json', fingerprint: true
 
 				sh("make deploy")
-				sh("cp ./phase1/azure/.tmp/kubeconfig.json ./kubeconfig.json")
+				sh("cp ./phase1/azure/${clusterName}/kubeconfig.json ./kubeconfig.json")
 				archiveArtifacts artifacts: 'kubeconfig.json', fingerprint: true
 
 				if (testCluster=="y") {
 					stage 'Test Cluster'
-					withEnv(['KUBECONFIG=' + cwd() + '/phase1/azure/.tmp/kubeconfig.json']) {
+					withEnv(['KUBECONFIG=' + cwd() + "/phase1/azure/${clusterName}/kubeconfig.json"]) {
 						make conformtest
 					}
 				}

@@ -7,20 +7,23 @@ set -x
 
 cd "${BASH_SOURCE%/*}"
 
+CLUSTER_NAME=$(jq -r '.phase1.cluster_name' ../../.config.json)
+TMP_DIR=${CLUSTER_NAME}/.tmp
+
 generate_token() {
   perl -e 'printf "%06x.%08x%08x\n", rand(0xffffff), rand(0xffffffff), rand(0xffffffff);'
 }
 
 gen() {
   TOKEN=$(generate_token)
-  mkdir -p .tmp/
-  jsonnet -J ../../ --multi .tmp/ all.jsonnet
-  echo "kubeadm_token = \"$TOKEN\"" > .tmp/terraform.tfvars
+  mkdir -p ${TMP_DIR}
+  jsonnet -J ../../ --multi ${TMP_DIR} all.jsonnet
+  echo "kubeadm_token = \"$TOKEN\"" > ${CLUSTER_NAME}/terraform.tfvars
 }
 
 deploy() {
   gen
-  terraform apply -var-file .tmp/terraform.tfvars .tmp
+  terraform apply -var-file=${CLUSTER_NAME}/terraform.tfvars -state=${CLUSTER_NAME}/terraform.tfstate ${TMP_DIR}
 
   if [[ "${WAIT_FOR_KUBECONFIG:-}" == "y" ]]; then
     fetch_kubeconfig
@@ -50,8 +53,8 @@ fetch_kubeconfig() {
     # succeeds, then stdout is tainted by ssh initialization output, so we echo
     # a marker to indicate the start of the file, and delete all lines up to and
     # including it.
-    if gcloud compute ssh --project "$PROJECT" --zone "$ZONE" "$MASTER" --command "echo STARTFILE; sudo cat /etc/kubernetes/admin.conf" > .tmp/kubeconfig.raw; then
-      sed '0,/^STARTFILE$/d' .tmp/kubeconfig.raw > .tmp/kubeconfig.json
+    if gcloud compute ssh --project "$PROJECT" --zone "$ZONE" "$MASTER" --command "echo STARTFILE; sudo cat /etc/kubernetes/admin.conf" > ${TMP_DIR}/kubeconfig.raw; then
+      sed '0,/^STARTFILE$/d' ${TMP_DIR}/kubeconfig.raw > ${CLUSTER_NAME}/kubeconfig.json
       echo Successfully fetched kubeconfig.
       return
     else
@@ -68,7 +71,7 @@ destroy() {
   if [[ "${FORCE_DESTROY:-}" == "y" ]]; then
     FLAGS="-force"
   fi
-  terraform destroy -var-file .tmp/terraform.tfvars $FLAGS .tmp
+  terraform destroy -var-file=${CLUSTER_NAME}/terraform.tfvars -state=${CLUSTER_NAME}/terraform.tfstate $FLAGS ${TMP_DIR}
 }
 
 case "${1:-}" in

@@ -8,6 +8,7 @@ function(cfg)
     instance_group: "%(cluster_name)s-node-group" % p1,
     master_instance: "%(cluster_name)s-master" % p1,
     master_ip: "%(cluster_name)s-master-ip" % p1,
+    ssh_all: "%(cluster_name)s-ssh-all" % p1,
     master_external_firewall_rule: "%(cluster_name)s-master-https" % p1,
     master_internal_firewall_rule: "%(cluster_name)s-master-internal" % p1,
     node_firewall_rule: "%(cluster_name)s-node-all" % p1,
@@ -74,7 +75,7 @@ function(cfg)
         },
       },
       google_compute_firewall: {
-        ssh_all: {
+        [names.ssh_all]: {
           name: "%(cluster_name)s-ssh-all" % p1,
           network: gce.network,
           allow: [{
@@ -203,7 +204,7 @@ function(cfg)
         kubeconfig: {
           provisioner: [{
             "local-exec": {
-              command: "echo '%s' > .tmp/kubeconfig.json" % kubeconfig(p1.cluster_name + "-admin", p1.cluster_name, p1.cluster_name),
+              command: "echo '%s' > %s/kubeconfig.json" % [ kubeconfig(p1.cluster_name + "-admin", p1.cluster_name, p1.cluster_name), p1.cluster_name ],
             },
           }],
         },
