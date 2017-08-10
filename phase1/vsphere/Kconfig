@@ -75,6 +75,12 @@ if phase1.vSphere.useresourcepool = "yes"
 			Resource Pool where kubernetes cluster will be deployed.
 endif
 
+config phase1.vSphere.vmfolderpath
+	string "VM Folder name or Path (e.g kubernetes, VMFolder1/dev-cluster, VMFolder1/Test Group1/test-cluster)"
+	default "kubernetes"
+	help
+		VM Folder Path where Node VMs should be placed.
+
 config phase1.vSphere.vcpu
 	int "Number of vCPUs for each VM"
 	default 1
