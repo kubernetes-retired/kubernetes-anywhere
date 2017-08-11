@@ -36,7 +36,15 @@ Now hop into your deployment shell with all the tools you need to deploy a kuber
 $ make docker-dev
 ```
 
-Once in your dev shell run:
+You will be logged into your dev shell:
+
+If `kubeadm` is the phase2.provider, then login to gcloud by calling:
+
+```console
+$ gcloud auth login
+```
+
+then run:
 
 ```console
 $ make deploy
@@ -48,12 +56,7 @@ and fill complete the config wizard to deploy a kubernetes-anywhere cluster. Eve
 $ kubectl --kubeconfig phase1/gce/kubeconfig.json get nodes
 ```
 
-It may take a couple minutes for the Kubernetes API to start responding to requests. Once all the nodes in your cluster is ready, you can deploy cluster addons by running:
-
-```console
-$ ./phase3/do gen
-$ kubectl --kubeconfig phase1/gce/kubeconfig.json apply -f ./phase3/.tmp/
-```
+It may take a couple minutes for the Kubernetes API to start responding to requests.
 
 After you've had a great experience with Kubernetes, run:
 
