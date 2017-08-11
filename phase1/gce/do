@@ -40,6 +40,11 @@ fetch_kubeconfig() {
   PROJECT=$(jq -r '.phase1.gce.project' ../../.config.json)
   ZONE=$(jq -r '.phase1.gce.zone' ../../.config.json)
   MASTER=$(jq -r '.phase1.cluster_name' ../../.config.json)-master
+  SSHUSER=$(jq -r '.phase1.ssh_user' ../../.config.json)
+
+  if [[ "${SSHUSER}" != "" ]];then
+    SSHUSER="${SSHUSER}@"
+  fi
 
   for tries in {1..60}; do
     echo Trying to fetch kubeconfig from master... $tries/60
@@ -49,7 +54,7 @@ fetch_kubeconfig() {
     # succeeds, then stdout is tainted by ssh initialization output, so we echo
     # a marker to indicate the start of the file, and delete all lines up to and
     # including it.
-    if gcloud compute ssh --project "$PROJECT" --zone "$ZONE" "$MASTER" --command "echo STARTFILE; sudo cat /etc/kubernetes/admin.conf" > ${TMP_DIR}/kubeconfig.raw; then
+    if gcloud compute ssh --project "$PROJECT" --zone "$ZONE" "$SSHUSER$MASTER" --command "echo STARTFILE; sudo cat /etc/kubernetes/admin.conf" > ${TMP_DIR}/kubeconfig.raw; then
       sed '/^STARTFILE$/,$!d;/^STARTFILE$/d' ${TMP_DIR}/kubeconfig.raw > ${CLUSTER_NAME}/kubeconfig.json
       echo Successfully fetched kubeconfig.
       return
