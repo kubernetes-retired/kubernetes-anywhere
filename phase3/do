@@ -7,11 +7,12 @@ set -x
 
 cd "${BASH_SOURCE%/*}"
 
-TMP_DIR=$(jq -r '.phase1.cluster_name' ../.config.json)/.tmp
+CONFIG_FILE="${CONFIG_JSON_FILE:-../.config.json}"
+TMP_DIR=$(jq -r '.phase1.cluster_name' ${CONFIG_FILE})/.tmp
 
 gen() {
 	mkdir -p ${TMP_DIR}
-	jsonnet --multi ${TMP_DIR} --tla-code-file cfg=../.config.json all.jsonnet
+	jsonnet --multi ${TMP_DIR} --tla-code-file cfg=${CONFIG_FILE} all.jsonnet
 }
 
 deploy() {

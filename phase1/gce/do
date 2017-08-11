@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 set -o errexit
 set -o pipefail
@@ -7,8 +7,9 @@ set -x
 
 cd "${BASH_SOURCE%/*}"
 
-CLUSTER_NAME=$(jq -r '.phase1.cluster_name' ../../.config.json)
-KUBE_CONTEXT_NAME=$(jq -r '.phase2.kube_context_name' ../../.config.json)
+CONFIG_FILE="${CONFIG_JSON_FILE:-../../.config.json}"
+CLUSTER_NAME=$(jq -r '.phase1.cluster_name' ${CONFIG_FILE})
+KUBE_CONTEXT_NAME=$(jq -r '.phase2.kube_context_name' ${CONFIG_FILE})
 TMP_DIR=${CLUSTER_NAME}/.tmp
 
 generate_token() {
@@ -18,7 +19,7 @@ generate_token() {
 gen() {
   TOKEN=$(generate_token)
   mkdir -p ${TMP_DIR}
-  jsonnet -J ../../ --multi ${TMP_DIR} all.jsonnet
+  jsonnet -J ../../ --multi ${TMP_DIR} --tla-code-file cfg=${CONFIG_FILE} all.jsonnet
   echo "kubeadm_token = \"$TOKEN\"" > ${CLUSTER_NAME}/terraform.tfvars
 }
 
@@ -26,7 +27,7 @@ deploy() {
   gen
   terraform apply -var-file=${CLUSTER_NAME}/terraform.tfvars -state=${CLUSTER_NAME}/terraform.tfstate ${TMP_DIR}
 
-  PHASE2=$(jq -r '.phase2.provider' ../../.config.json)
+  PHASE2=$(jq -r '.phase2.provider' ${CONFIG_FILE})
   if [[ "${PHASE2}" == "kubeadm" ]]; then
     fetch_kubeconfig
   fi
@@ -38,10 +39,10 @@ deploy() {
 # terraform. In order to access the cluster remotely, we need to fetch the
 # proper kubeconfig from the master.
 fetch_kubeconfig() {
-  PROJECT=$(jq -r '.phase1.gce.project' ../../.config.json)
-  ZONE=$(jq -r '.phase1.gce.zone' ../../.config.json)
-  MASTER=$(jq -r '.phase1.cluster_name' ../../.config.json)-master
-  SSHUSER=$(jq -r '.phase1.ssh_user' ../../.config.json)
+  PROJECT=$(jq -r '.phase1.gce.project' ${CONFIG_FILE})
+  ZONE=$(jq -r '.phase1.gce.zone' ${CONFIG_FILE})
+  MASTER=$(jq -r '.phase1.cluster_name' ${CONFIG_FILE})-master
+  SSHUSER=$(jq -r '.phase1.ssh_user' ${CONFIG_FILE})
 
   if [[ "${SSHUSER}" != "" ]];then
     SSHUSER="${SSHUSER}@"

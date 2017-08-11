@@ -4,9 +4,11 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+CONFIG_FILE="${CONFIG_JSON_FILE:-.config.json}"
+
 total_time=0
 wait_duration=10
-num_nodes="$(( $(cat ./.config.json | jq -r '.phase1.num_nodes') + 1 ))"
+num_nodes="$(( $(cat ${CONFIG_FILE} | jq -r '.phase1.num_nodes') + 1 ))"
 
 while true; do
   total_time=$(( ${total_time} + ${wait_duration} ))
