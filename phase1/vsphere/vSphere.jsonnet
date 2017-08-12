@@ -81,7 +81,7 @@ function(config)
             allow_unverified_ssl: std.escapeStringJson(cfg.vSphere.insecure),
             datacenter: std.escapeStringJson(cfg.vSphere.datacenter),
             datastore: std.escapeStringJson(cfg.vSphere.datastore),
-            working_dir: std.escapeStringJson(cfg.cluster_name),
+            working_dir: std.escapeStringJson(cfg.vSphere.vmfolderpath),
           },
         },
       },
@@ -92,7 +92,7 @@ function(config)
       "vsphere_folder":{
         "cluster_folder": {
           datacenter: cfg.vSphere.datacenter, 
-          path: cfg.cluster_name,
+          path: cfg.vSphere.vmfolderpath,
         },
       },
       vsphere_virtual_machine: {
