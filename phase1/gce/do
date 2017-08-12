@@ -25,7 +25,8 @@ deploy() {
   gen
   terraform apply -var-file=${CLUSTER_NAME}/terraform.tfvars -state=${CLUSTER_NAME}/terraform.tfstate ${TMP_DIR}
 
-  if [[ "${WAIT_FOR_KUBECONFIG:-}" == "y" ]]; then
+  PHASE2=$(jq -r '.phase2.provider' ../../.config.json)
+  if [[ "${PHASE2}" == "kubeadm" ]]; then
     fetch_kubeconfig
   fi
 }
@@ -36,14 +37,9 @@ deploy() {
 # terraform. In order to access the cluster remotely, we need to fetch the
 # proper kubeconfig from the master.
 fetch_kubeconfig() {
-  PHASE2=$(jq -r '.phase2.provider' ../../.config.json)
   PROJECT=$(jq -r '.phase1.gce.project' ../../.config.json)
   ZONE=$(jq -r '.phase1.gce.zone' ../../.config.json)
   MASTER=$(jq -r '.phase1.cluster_name' ../../.config.json)-master
-
-  if [[ "$PHASE2" != kubeadm ]]; then
-    return
-  fi
 
   for tries in {1..60}; do
     echo Trying to fetch kubeconfig from master... $tries/60
