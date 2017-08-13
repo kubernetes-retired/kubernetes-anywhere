@@ -19,7 +19,7 @@ The input of the deployment will be a cluster configuration object, specified as
 
 The deployment consists of two phases, provisioning and bootstrap:
 
-  1. **Provisioning** consists of creating the physical or virtual resources that the cluster will run on (ips, instances, persistent disks). Provisioning will be implemented per cloud provider. There will be an implementation of GCE/AWS/Azure provisiong that utilizes [Terraform](https://www.terraform.io/). This phase takes the cluster configuration object as input.
+  1. **Provisioning** consists of creating the physical or virtual resources that the cluster will run on (ips, instances, persistent disks). Provisioning will be implemented per cloud provider. There will be an implementation of GCE/AWS/Azure provisioning that utilizes [Terraform](https://www.terraform.io/). This phase takes the cluster configuration object as input.
   2. **Bootstrapping** consists of on host installation and configuration. This process will install Docker and a single init unit for the kubelet which will run in a Docker container and will place configuration files for master component static pods. The input to bootstrap will be the cluster configuration object along with the ip address of the master and a tarball of cryptographic assets that are output by phase 1. This step will be implemented by running [Ansible](http://docs.ansible.com/) in a Docker container that bootstraps the host over a chroot and will ideally be implemented once for all deployment targets (with sufficient configuration parameters).
 
 Phase 1 should be sufficiently decoupled from phase 2 such that phase 2 could be used with minimal modification on deployment targets that don't have a phase 1 implemented for them (e.g. baremetal).
