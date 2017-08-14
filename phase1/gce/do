@@ -8,6 +8,7 @@ set -x
 cd "${BASH_SOURCE%/*}"
 
 CLUSTER_NAME=$(jq -r '.phase1.cluster_name' ../../.config.json)
+KUBE_CONTEXT_NAME=$(jq -r '.phase2.kube_context_name' ../../.config.json)
 TMP_DIR=${CLUSTER_NAME}/.tmp
 
 generate_token() {
@@ -57,6 +58,15 @@ fetch_kubeconfig() {
     if gcloud compute ssh --project "$PROJECT" --zone "$ZONE" "$SSHUSER$MASTER" --command "echo STARTFILE; sudo cat /etc/kubernetes/admin.conf" > ${TMP_DIR}/kubeconfig.raw; then
       sed '/^STARTFILE$/,$!d;/^STARTFILE$/d' ${TMP_DIR}/kubeconfig.raw > ${CLUSTER_NAME}/kubeconfig.json
       echo Successfully fetched kubeconfig.
+
+      if [[ -n "${KUBE_CONTEXT_NAME}" ]]; then
+        # kubeconfig.json fetched from master node has the user, cluster and context all hardcoded with
+        # 'kubernetes' keyword. So replace 'kubernetes' with the cluster_name.
+        # TODO: use `kubectl config rename-(context,cluster,user)` sub-commands whenever they are available
+        sed -i "s/kubernetes/${CLUSTER_NAME}/g" ${CLUSTER_NAME}/kubeconfig.json
+        sed -i "s/${CLUSTER_NAME}-admin@${CLUSTER_NAME}/${KUBE_CONTEXT_NAME}/" ${CLUSTER_NAME}/kubeconfig.json
+      fi
+
       return
     else
       sleep 5
