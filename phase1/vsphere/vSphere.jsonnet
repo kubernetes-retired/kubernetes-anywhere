@@ -142,7 +142,7 @@ function(config)
                 }
            }, {
             "local-exec": {
-              command: "echo '%s' > ./.tmp/kubeconfig.json" % kubeconfig(cfg.cluster_name + "-admin", cfg.cluster_name, cfg.cluster_name),
+              command: "echo '%s' > %s/kubeconfig.json" % [ kubeconfig(cfg.cluster_name + "-admin", cfg.cluster_name, cfg.cluster_name), cfg.cluster_name ],
             },
            }],
         },} + {

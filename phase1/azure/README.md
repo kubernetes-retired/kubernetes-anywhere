@@ -78,7 +78,7 @@ You'll need to do this outside of the `kubernetes-anywhere` deployment environme
 
 ```shell
 mkdir -p ~/.kube
-cp ./phase1/azure/.tmp/kubeconfig.json ~/.kube/config
+cp $(make -s kubeconfig-path) ~/.kube/config
 ```
 
 

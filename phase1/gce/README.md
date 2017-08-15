@@ -53,7 +53,7 @@ $ make deploy
 and fill complete the config wizard to deploy a kubernetes-anywhere cluster. Eventually, you will see a set of nodes when you run:
 
 ```console
-$ kubectl --kubeconfig phase1/gce/kubeconfig.json get nodes
+$ kubectl --kubeconfig $(make -s kubeconfig-path) get nodes
 ```
 
 It may take a couple minutes for the Kubernetes API to start responding to requests.

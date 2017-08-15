@@ -1,16 +1,6 @@
 
 menu "Phase 2: Node Bootstrapping"
 
-config phase2.installer_container
-	string "installer container"
-	default "docker.io/cnastorage/k8s-ignition:v2"
-
-config phase2.docker_registry
-	string "docker registry"
-	default "gcr.io/google-containers"
-	help
-	  The docker registry to pull cluster components from.
-
 config phase2.kubernetes_version
 	string "kubernetes version"
 	default "v1.6.5"
@@ -24,6 +14,20 @@ config phase2.provider
 	  The bootstrap provider to use.
 
 	  Valid options are (ignition, kubeadm).
+
+if phase2.provider = ignition
+
+config phase2.installer_container
+	string "installer container"
+	default "docker.io/cnastorage/k8s-ignition:v2"
+
+config phase2.docker_registry
+	string "docker registry"
+	default "gcr.io/google-containers"
+	help
+	  The docker registry to pull cluster components from.
+
+endif
 
 if phase2.provider = kubeadm
 

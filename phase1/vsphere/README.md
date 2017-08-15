@@ -267,7 +267,7 @@ Make sure to create a new resource pool and give a different cluster name.
 First set KUBECONFIG to access cluster using kubectl:
 
 ```shell
-export KUBECONFIG=phase1/vsphere/.tmp/kubeconfig.json
+export KUBECONFIG=$(make -s kubeconfig-path)
 ```
 
 You will get cluster information when you run:
@@ -285,7 +285,7 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.6.5/bin/li
 chmod u+x kubectl
 mdkir ~/.kube/
 cd  ~/.kube/
-vi config // copy content of phase1/vsphere/.tmp/kubeconfig.json and paste in this file.
+vi config // copy content of $(make -s kubeconfig-path) and paste in this file.
 export KUBECONFIG=~/.kube/config
 ./kubectl proxy
 Starting to serve on 127.0.0.1:8001
