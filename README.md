@@ -17,6 +17,7 @@ If you want to deploy a cluster to kick the tires of Kubernetes, checkout one of
 
   * [Get started on Google Compute Engine](phase1/gce/README.md)
   * [Get started on vSphere](phase1/vsphere/README.md)
+  * [Get started on OpenStack](phase1/openstack/README.md)
 
 ### Diving Deeper
 
