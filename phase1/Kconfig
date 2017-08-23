@@ -16,6 +16,12 @@ config phase1.cluster_name
 	  This is used for compute instance names as a prefix,
 	  and for naming any other cloud provider resources.
 
+config phase1.ssh_user
+	string "SSH user to login to OS for provisioning"
+	default ""
+	help
+	  The SSH user of the target OS.
+
 menuconfig phase1.cloud_provider
 	string "cloud provider: gce, azure or vsphere"
 	default "gce"
