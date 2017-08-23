@@ -283,7 +283,7 @@ Note: Make sure to download the kubectl version that matches with deployed kuber
 ```
 curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.6.5/bin/linux/amd64/kubectl
 chmod u+x kubectl
-mdkir ~/.kube/
+mkdir ~/.kube/
 cd  ~/.kube/
 vi config // copy content of $(make -s kubeconfig-path) and paste in this file.
 export KUBECONFIG=~/.kube/config
