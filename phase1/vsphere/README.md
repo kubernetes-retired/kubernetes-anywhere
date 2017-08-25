@@ -7,6 +7,7 @@
   - [Troubleshooting](#troubleshooting)
 
 ## Prerequisites
+  * If Kubernetes Cluster is deployed on vSphere Cluster, then make sure time is in sync on all esx hosts in the cluster otherwise deployment may fail due to certificate expiry check.
   * `docker-engine` for executing the `kubernetes-anywhere` deployment which can be downloaded [here](https://docs.docker.com/engine/installation/).
   * Kubernetes Anywhere is tested on vSphere deployments with vCenter, single node vSphere without vCenter is not supported.
   * Deployment requires DHCP server in the VM network.
@@ -59,7 +60,8 @@ Upload the template OS OVA to vCenter before deploying kubernetes. All kubernete
 1. Login to vSphere Client.
 2. Right-Click on ESX host on which you want to deploy template.
 3. Select ```Deploy OVF template```.
-4. Copy and paste URL for [OVA](https://storage.googleapis.com/kubernetes-anywhere-for-vsphere-cna-storage/KubernetesAnywhereTemplatePhotonOS.ova) (*Updated on March 1 2017*).
+4. Copy and paste URL for [OVA For vSphere 6.0 and above](https://storage.googleapis.com/kubernetes-anywhere-for-vsphere-cna-storage/KubernetesAnywhereTemplatePhotonOS.ova) (*Updated on March 1 2017*).
+[OVA For vSphere 5.5 with Virtual Machine Hardware Version 10](https://storage.googleapis.com/kubernetes-anywhere-for-vsphere-cna-storage/KubernetesAnywhereTemplatePhotonOSESX5.5.ova)
 5. **Check the name of the VM created**, this will be used to deploy kubernetes later. (Should default to KubernetesAnywhereTemplatePhotonOS.ova)
 
 You can also upload ova using [govc](https://github.com/vmware/govmomi/tree/master/govc).
@@ -83,8 +85,9 @@ docker pull cnastorage/kubernetes-anywhere
 #### Run docker container using `cnastorage/kubernetes-anywhere:latest` image to launch deployment environment:
 
 ```shell
-docker run -it --rm --env="PS1=[container]:\w> " --net=host cnastorage/kubernetes-anywhere:latest /bin/bash
+docker run -it -v /tmp:/tmp --rm --env="PS1=[container]:\w> " --net=host cnastorage/kubernetes-anywhere:latest /bin/bash
 ```
+**Note:** Here in the above command we are mounting local /tmp directory, so that after the deployment is finished successfully, we can copy kubeconfig.json file on local system from the deployment container.
 
 ### Start the deployment wizard:
 
@@ -93,19 +96,19 @@ docker run -it --rm --env="PS1=[container]:\w> " --net=host cnastorage/kubernete
 Lets take a look at vSphere environment before starting deployment wizard.
 
 
-![alt text](https://user-images.githubusercontent.com/22985595/27245213-0ff5654c-529f-11e7-8312-74b64707994c.jpg)
+![k8s-vsphere-deployment-01](https://user-images.githubusercontent.com/22985595/29735888-5b4117be-89b1-11e7-8590-214dc738a6a1.png)
 
 Here you see Datacenter ```PA-DC```, has ```cluster-vsan-1``` with one resource pool - ```dev-resource-pool```.
 
 Following steps will deploy 4 nodes Kubernetes Cluster on the ```dev-resource-pool``` using the template file deployed on the cluster.
 
-Lets start the deployment wizard. on the container prompt execute ```make deploy``` from ```/opt/kubernetes-anywhere``` directory
+Let's start the deployment wizard. on the container prompt execute ```make config``` from ```/opt/kubernetes-anywhere``` directory
 
 ```shell
-[container]:/opt/kubernetes-anywhere> make deploy
+[container]:/opt/kubernetes-anywhere> make config
 ```
 
-and complete the config wizard to deploy a kubernetes cluster.
+and complete the config wizard to create configuration for the kubernetes cluster.
 **You can get help for any config option by entering '?'.**
 
 * Select the number of nodes. Master + Number of nodes will be deployed.
@@ -117,10 +120,15 @@ number of nodes (phase1.num_nodes) [4] (NEW) 4
 ```
 cluster name (phase1.cluster_name) [kubernetes] (NEW) kubernetes
 ```
+* phase1.ssh_user - This field is not used for vSphere Deployment. Leave it blank and hit enter.
+
+```
+SSH user to login to OS for provisioning (phase1.ssh_user) [] (NEW) 
+```
 
 * Select the provider, in this case it would be vsphere.
 ```
-cloud provider: gce, azure or vsphere (phase1.cloud_provider) [gce] (NEW) vsphere
+cloud provider: gce, azure or vsphere (phase1.cloud_provider) [vsphere] (NEW) vsphere
 ```
 
 * Set the vCenter URL (Just the IP or domain name, without https://)
@@ -150,7 +158,7 @@ cloud provider: gce, azure or vsphere (phase1.cloud_provider) [gce] (NEW) vspher
 
 * Set the datacenter in vCenter to use. Specify the same datacenter to which the OVA was imported to.
 ```
-  Datacenter (phase1.vSphere.datacenter) [datacenter] (NEW) PA-DC
+  Datacenter (phase1.vSphere.datacenter) [datacenter] (NEW) cna-storage
 ```
 
 * Set the datastore to be use. This will be used for placing the VMs and volumes created via storage classes/dynamic provisioning.
@@ -165,17 +173,22 @@ cloud provider: gce, azure or vsphere (phase1.cloud_provider) [gce] (NEW) vspher
 
 *  If Host is selected, Specify host IP or FQDN. If Cluster is selected, Specify cluster name
 ```
-     vspherecluster (phase1.vSphere.cluster) [] (NEW) cluster-vsan-1
+    vsphere cluster name. Please make sure that all the hosts in the cluster are time-synchronized otherwise some of the nodes can remain in pending state for ever due to expired certificate (phase1.vSphere.cluster) [] (NEW) cluster-vsan-1
 ```
 
 *  Specify yes if Kubernetes Cluster needs to be deployed on the resource pool located in selected host or cluster
 ```
-    Do you want to use the resource pool created on the host or cluster? [yes, no] (phase1.vSphere.useresourcepool) [no] (NEW) yes
+    Do you want to use the existing resource pool created on the host or cluster? [yes, no] (phase1.vSphere.useresourcepool) [no] (NEW) yes
 ```
 
 *  Specify name of the resource pool.
 ```
   Name of the Resource Pool. If Resource pool is enclosed within another Resource pool, specify pool hierarchy as ParentResourcePool/ChildResourcePool (phase1.vSphere.resourcepool) (NEW) dev-resource-pool
+```
+
+* Specify the folder name or folder path where Kubernetes Node VMs should placed in the VC Inventory. Folder path will be created if not present.
+```
+  VM Folder name or Path (e.g kubernetes, VMFolder1/dev-cluster, VMFolder1/Test Group1/test-cluster). Folder path will be created if not present (phase1.vSphere.vmfolderpath) [kubernetes] (NEW) kubernetes
 ```
 
 * Number of vCPUs for each VM. Master and all nodes will have the number of vCPUs configured below.
@@ -204,7 +217,7 @@ cloud provider: gce, azure or vsphere (phase1.cloud_provider) [gce] (NEW) vspher
 ```
 
 * Ignition image to be used for phase 2.
-For Kubernetes release 1.6 and above use ```docker.io/cnastorage/k8s-ignition:v2```. For older releasees use ```docker.io/cnastorage/k8s-ignition:v1`
+For Kubernetes release 1.6 and above use `docker.io/cnastorage/k8s-ignition:v2`. For older releasees use `docker.io/cnastorage/k8s-ignition:v1`
 
 ```
 *
@@ -239,14 +252,45 @@ Run the addon manager? (phase3.run_addons) [Y/n/?] (NEW)
   Run heapster? (phase3.heapster) [Y/n/?] (NEW)
   Run kube-dns? (phase3.kube_dns) [Y/n/?] (NEW)
   Run weave-net? (phase3.weave_net) [N/y/?] (NEW) N
+
+#
+# configuration written to .config
+#
 ```
+Start the deployment using .config file
+
+
+```
+[container]:/opt/kubernetes-anywhere> make deploy
+util/config_to_json /opt/kubernetes-anywhere/.config > /opt/kubernetes-anywhere/.config.json
+make do WHAT=deploy-cluster
+make[1]: Entering directory '/opt/kubernetes-anywhere'
+.
+.
+.
+KUBECONFIG="$(pwd)/phase1/vsphere/kubernetes/kubeconfig.json" ./util/validate
+Validation: Expected 5 (workers + master) healthy nodes; found 0. (10s elapsed)
+Validation: Expected 5 (workers + master) healthy nodes; found 2. (20s elapsed)
+Validation: Expected 5 (workers + master) healthy nodes; found 5. (30s elapsed)
+Validation: Success!
+.
+.
++ kubectl apply -f kubernetes/.tmp
+deployment "kubernetes-dashboard" created
+service "kubernetes-dashboard" created
+deployment "heapster-v1.2.0" created
+service "heapster" created
+replicationcontroller "kube-dns-v19" created
+service "kube-dns" created
+daemonset "kube-proxy" created
+```
+
 
 **Notes**:
 
 * if OVA file is not located in the resource pool, where you want to deploy Kubernetes Cluster, please specify full VM Path.
 * You can build your own ```phase2.installer_container``` using Dockerfile [here](https://github.com/kubernetes/kubernetes-anywhere/blob/master/phase2/ignition/Dockerfile).
 * To change configuration, run: ``` make config .config```. Run ```make clean``` before ```make deploy```
-
 
 ### Congratulations!
 
@@ -256,19 +300,22 @@ Lets take a look at where node VM's are located on the vCenter.
 
 Node VMs are placed in the ```dev-resource-pool``` under the VM Folder ```kubernetes```.  ```kubernetes``` is the name of the cluster we specified in the configuration wizard.
 
-![alt text](https://user-images.githubusercontent.com/22985595/27245212-0ff39f50-529f-11e7-9e44-9a7ae9c7c9fe.jpg)
-![alt text](https://user-images.githubusercontent.com/22985595/27245211-0ff08d42-529f-11e7-9ab4-8cfe64cffc78.jpg)
+![k8s-vsphere-deployment-02](https://user-images.githubusercontent.com/22985595/29735890-5e941cea-89b1-11e7-864f-67a8e3343d8c.png)
 
-To deploy second cluster while keeping existing one, run another deployment container and just follow the steps above.
-Make sure to create a new resource pool and give a different cluster name.
+![k8s-vsphere-deployment-03](https://user-images.githubusercontent.com/22985595/29735891-6076f744-89b1-11e7-86ac-7e873025b4a1.png)
+
+To deploy another kubernetes cluster while keeping the existing one, run `make config` and specify different kubernetes cluster name (phase1.cluster_name) and resource pool name and follow steps mentioned above.
 
 #### Next Steps:
 
 First set KUBECONFIG to access cluster using kubectl:
 
 ```shell
-export KUBECONFIG=$(make -s kubeconfig-path)
+export KUBECONFIG="/opt/kubernetes-anywhere/phase1/vsphere/kubernetes/kubeconfig.json"
 ```
+Note: In the path `/opt/kubernetes-anywhere/phase1/vsphere/kubernetes` kubernetes is the name of the cluster that we have specifed in the config file. If you have specified different name make sure to specify the appropriate path. 
+
+We have mounted /tmp directory in the deployment container. If you want to save the config on your local machine just copy this file to the /tmp directory in the container.
 
 You will get cluster information when you run:
 ```shell
