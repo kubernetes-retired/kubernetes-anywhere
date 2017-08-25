@@ -44,6 +44,8 @@ config phase2.kube_context_name
     default ""
     help
 	  The name of the context in kubeconfig.
+	  This is optional to set and when set, the kubeconfig
+	  context is renamed to whatever is configured.
 
 endif
 

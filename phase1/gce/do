@@ -44,7 +44,7 @@ fetch_kubeconfig() {
   MASTER=$(jq -r '.phase1.cluster_name' ${CONFIG_FILE})-master
   SSHUSER=$(jq -r '.phase1.ssh_user' ${CONFIG_FILE})
 
-  if [[ "${SSHUSER}" != "" ]];then
+  if [[ -n "${SSHUSER}" ]];then
     SSHUSER="${SSHUSER}@"
   fi
 
