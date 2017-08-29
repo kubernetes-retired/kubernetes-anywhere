@@ -46,6 +46,8 @@ fetch_kubeconfig() {
 
   if [[ -n "${SSHUSER}" ]]; then
     SSHUSER="${SSHUSER}@"
+  elif [[ -n "${USER:-}" ]]; then
+    SSHUSER="${USER}@"
   fi
 
   for tries in {1..60}; do
