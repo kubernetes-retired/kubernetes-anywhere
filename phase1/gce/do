@@ -9,7 +9,7 @@ cd "${BASH_SOURCE%/*}"
 
 CONFIG_FILE="${CONFIG_JSON_FILE:-../../.config.json}"
 CLUSTER_NAME=$(jq -r '.phase1.cluster_name' ${CONFIG_FILE})
-KUBE_CONTEXT_NAME=$(jq -r '.phase2.kube_context_name' ${CONFIG_FILE})
+KUBE_CONTEXT_NAME=$(jq -r '.phase2.kube_context_name | values' ${CONFIG_FILE})
 TMP_DIR=${CLUSTER_NAME}/.tmp
 
 generate_token() {
@@ -42,9 +42,9 @@ fetch_kubeconfig() {
   PROJECT=$(jq -r '.phase1.gce.project' ${CONFIG_FILE})
   ZONE=$(jq -r '.phase1.gce.zone' ${CONFIG_FILE})
   MASTER=$(jq -r '.phase1.cluster_name' ${CONFIG_FILE})-master
-  SSHUSER=$(jq -r '.phase1.ssh_user' ${CONFIG_FILE})
+  SSHUSER=$(jq -r '.phase1.ssh_user | values' ${CONFIG_FILE})
 
-  if [[ -n "${SSHUSER}" ]];then
+  if [[ -n "${SSHUSER}" ]]; then
     SSHUSER="${SSHUSER}@"
   fi
 
