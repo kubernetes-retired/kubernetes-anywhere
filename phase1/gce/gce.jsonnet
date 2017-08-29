@@ -200,7 +200,8 @@ function(cfg)
           target_size: p1.num_nodes,
         },
       },
-    } + if p2.provider != "kubeadm" then {
+    }  + if p2.provider != "kubeadm" then tf.pki.cluster_tls_resources(p1.cluster_name, [names.master_instance], ["${google_compute_address.%(master_ip)s.address}" % names]) else { }
+       + if p2.provider != "kubeadm" then {
       // Public Key Infrastructure
       null_resource: {
         kubeconfig: {
@@ -211,5 +212,5 @@ function(cfg)
           }],
         },
       },
-    } else { } + if p2.provider != "kubeadm" then tf.pki.cluster_tls_resources(p1.cluster_name, [names.master_instance], ["${google_compute_address.%(master_ip)s.address}" % names]) else { },
+    } else { },
   }
