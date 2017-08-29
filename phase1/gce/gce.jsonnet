@@ -211,5 +211,6 @@ function(cfg)
           }],
         },
       },
-    } else { } + if p2.provider != "kubeadm" then tf.pki.cluster_tls_resources(p1.cluster_name, [names.master_instance], ["${google_compute_address.%(master_ip)s.address}" % names]) else { },
+    } + tf.pki.cluster_tls_resources(p1.cluster_name, [names.master_instance], ["${google_compute_address.%(master_ip)s.address}" % names])
+    else { },
   }
