@@ -4,7 +4,7 @@ set -o errexit
 set -o pipefail
 set -o nounset
 set -o xtrace
-
+set -o verbose
 get_metadata() {
   curl \
     -sSL --fail \
