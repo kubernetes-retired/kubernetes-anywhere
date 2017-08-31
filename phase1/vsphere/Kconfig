@@ -55,28 +55,28 @@ endif
 
 if phase1.vSphere.placement = "cluster"
 	config phase1.vSphere.cluster
-        string "vspherecluster"
+        string "vsphere cluster name. Please make sure that all the hosts in the cluster are time-synchronized otherwise some of the nodes can remain in pending state for ever due to expired certificate"
         default ""
         help
 			vSphere cluster where kubernetes cluster will be created.
 endif
 
 config phase1.vSphere.useresourcepool
-	string "Do you want to use the resource pool created on the host or cluster? [yes, no]"
+	string "Do you want to use the existing resource pool on the host or cluster? [yes, no]"
 	default "no"
 	help
-		Deploy cluster on Resource Pool? Enter yes or no
+		Deploy cluster on existing Resource Pool? Enter yes or no
 
 if phase1.vSphere.useresourcepool = "yes"
 	config phase1.vSphere.resourcepool
-        string "Name of the Resource Pool. If Resource pool is enclosed within another Resource pool, specify pool hierarchy as ParentResourcePool/ChildResourcePool"
+        string "Name of the existing Resource Pool. If Resource pool is enclosed within another Resource pool, specify pool hierarchy as ParentResourcePool/ChildResourcePool"
         default ""
         help
-			Resource Pool where kubernetes cluster will be deployed.
+			Existing Resource Pool where kubernetes cluster will be deployed.
 endif
 
 config phase1.vSphere.vmfolderpath
-	string "VM Folder name or Path (e.g kubernetes, VMFolder1/dev-cluster, VMFolder1/Test Group1/test-cluster)"
+	string "VM Folder name or Path (e.g kubernetes, VMFolder1/dev-cluster, VMFolder1/Test Group1/test-cluster). Folder path will be created if not present"
 	default "kubernetes"
 	help
 		VM Folder Path where Node VMs should be placed.

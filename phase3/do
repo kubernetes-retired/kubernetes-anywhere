@@ -18,7 +18,7 @@ gen() {
 deploy() {
 	gen
 	mkdir -p /tmp/kubectl/
-	HOME=/tmp/kubectl kubectl apply -f ./${TMP_DIR}
+	HOME=/tmp/kubectl kubectl apply -f ${TMP_DIR}
 }
 
 
