@@ -12,7 +12,7 @@ num_nodes="$(( $(cat ${CONFIG_FILE} | jq -r '.phase1.num_nodes') + 1 ))"
 
 while true; do
   total_time=$(( ${total_time} + ${wait_duration} ))
-  hcount=$(kubectl get nodes 2>/dev/null | grep 'Ready' | wc -l) || true
+  hcount=$(kubectl get nodes 2>/dev/null | grep ' Ready ' | wc -l) || true
   echo "Validation: Expected ${num_nodes} (workers + master) healthy nodes; found ${hcount}. (${total_time}s elapsed)"
 
   [[ "${hcount}" -ge "${num_nodes}" ]] && echo "Validation: Success!" && exit
