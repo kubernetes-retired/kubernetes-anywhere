@@ -37,13 +37,20 @@ config phase3.weave_net
 	bool "Run weave-net?"
 	default n
 	help
-	  Should we deploy weave-net? You likely only want this if using kubeadm for phase2.
-endif
+	  [Deprecated] Please use phase3.cni instead.
 
+		Should we deploy weave-net? You likely only want this if using kubeadm for phase2.
+
+if phase3.weave_net = false
 config phase3.cni
 	string "CNI plugin to use"
 	default ""
 	help
 	  CNI plugin to use. You likely only want this if using kubeadm for phase2.
+
+		Valid options are (flannel, weave).
+endif
+
+endif
 
 endmenu
