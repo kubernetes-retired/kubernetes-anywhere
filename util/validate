@@ -10,10 +10,17 @@ total_time=0
 wait_duration=10
 num_nodes="$(( $(cat ${CONFIG_FILE} | jq -r '.phase1.num_nodes') + 1 ))"
 
+search_string='Ready' # Matches both 'Ready' and 'NotReady' nodes.
+output_string='nodes'
+if [[ "${NODE_READINESS_CHECK:-}" == "y" ]]; then
+  search_string=' Ready ' # Only matches 'Ready' nodes.
+  output_string='healthy nodes'
+fi
+
 while true; do
   total_time=$(( ${total_time} + ${wait_duration} ))
-  hcount=$(kubectl get nodes 2>/dev/null | grep 'Ready' | wc -l) || true
-  echo "Validation: Expected ${num_nodes} (workers + master) healthy nodes; found ${hcount}. (${total_time}s elapsed)"
+  hcount=$(kubectl get nodes 2>/dev/null | grep ${search_string} | wc -l) || true
+  echo "Validation: Expected ${num_nodes} (workers + master) ${output_string}; found ${hcount}. (${total_time}s elapsed)"
 
   [[ "${hcount}" -ge "${num_nodes}" ]] && echo "Validation: Success!" && exit
 
