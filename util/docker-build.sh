@@ -29,6 +29,10 @@ unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /bin)
 rm -rf /tmp/terraform
 
 ## Install azure-xplat-cli
+if [ -n "$http_proxy" ]; then
+    npm config set strict-ssl false
+    npm config set proxy "${http_proxy}"
+fi
 npm install -g azure-cli
 
 ## Install kconfig-conf
