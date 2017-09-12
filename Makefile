@@ -57,13 +57,16 @@ kubeconfig-path: ${CONFIG_JSON_FILE}
 	fi
 	@echo $(KUBECONFIG_PATH)
 
-validate: ${CONFIG_JSON_FILE}
+validate-cluster-up: ${CONFIG_JSON_FILE}
 	KUBECONFIG="$$(pwd)/phase1/$(CLOUD_PROVIDER)/$(CLUSTER_NAME)/kubeconfig.json" ./util/validate
+
+validate-node-ready: ${CONFIG_JSON_FILE}
+	KUBECONFIG="$$(pwd)/phase1/$(CLOUD_PROVIDER)/$(CLUSTER_NAME)/kubeconfig.json" NODE_READINESS_CHECK=y ./util/validate
 
 addons: ${CONFIG_JSON_FILE}
 	KUBECONFIG="$$(pwd)/phase1/$(CLOUD_PROVIDER)/$(CLUSTER_NAME)/kubeconfig.json" ./phase3/do deploy
 
-deploy: | deploy-cluster validate addons
+deploy: | deploy-cluster  validate-cluster-up  addons  validate-node-ready
 destroy: | destroy-cluster
 
 do:
