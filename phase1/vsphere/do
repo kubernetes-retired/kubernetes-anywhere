@@ -48,6 +48,18 @@ destroy() {
   fi
 }
 
+execute_host() {
+  HOST=$1
+  COMMAND=$2
+  echo Upgrade master not implemented. >&2
+  exit 1
+}
+
+master_host() {
+  echo Upgrade master not implemented. >&2
+  exit 1
+}
+
 case "${1:-}" in
   "")
     ;;
@@ -57,7 +69,13 @@ case "${1:-}" in
   "destroy-cluster")
     destroy
     ;;
+  "execute-host")
+    execute_host "${@:2}"
+    ;;
   "gen")
     gen
+    ;;
+  "master-host")
+    master_host
     ;;
 esac

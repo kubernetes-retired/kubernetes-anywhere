@@ -1,0 +1,89 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+set -x
+
+cd "${BASH_SOURCE%/*}"
+
+CONFIG_FILE="${CONFIG_JSON_FILE:-../../.config.json}"
+KUBEADM_INIT_PARAM_FILE=/etc/kubeadm/kubadm_init_params.txt
+
+upgrade_master() {
+  KUBERNETES_VERSION=$(jq -r '.phase2.kubernetes_version' ${CONFIG_FILE})
+  UPGRADE_METHOD=$(jq -r '.phase2.kubeadm.master_upgrade.method' ${CONFIG_FILE})
+  MASTER=$(do_phase1 master-host)
+
+  update_host_kubeadm ${MASTER}
+  wait_nodes_ready
+
+  INIT_PARAM=$(execute_host ${MASTER} "sudo cat ${KUBEADM_INIT_PARAM_FILE}")
+  case "${UPGRADE_METHOD}" in
+    "init")
+      execute_host ${MASTER} "sudo kubeadm init --skip-preflight-checks --kubernetes-version ${KUBERNETES_VERSION} ${INIT_PARAM}"
+      ;;
+    "upgrade")
+      execute_host ${MASTER} "sudo kubeadm config upload from-flags ${INIT_PARAM}"
+      execute_host ${MASTER} "sudo kubeadm upgrade apply ${KUBERNETES_VERSION} -y -f"
+      ;;
+  esac
+}
+
+wait_nodes_ready() {
+  for TRIES in {1..60}; do
+    NODE_COUNT=$(kubectl get node --no-headers | wc -l)
+    READY_NODE_COUNT=$(kubectl get node --no-headers | grep -c '\sReady\s')
+    if [[ $NODE_COUNT -eq $READY_NODE_COUNT ]]; then
+      echo "All ${NODE_COUNT} nodes ready."
+      return
+    else
+      echo "${READY_NODE_COUNT}/${NODE_COUNT} nodes ready. Waiting for all nodes to become ready... ${TRIES}/60"
+      sleep 5
+    fi
+  done
+  echo "Gave up waiting for nodes to become ready." >&2
+  exit 1
+}
+
+update_host_kubeadm() {
+  HOST=$1 
+  KUBEADM_VERSION=$(jq -r '.phase2.kubeadm.version' ${CONFIG_FILE})
+  echo host is ${HOST} version is ${KUBEADM_VERSION}
+  if [[ "${KUBEADM_VERSION}" == stable ]]; then
+    execute_host ${HOST} "echo '  deb http://apt.kubernetes.io/ kubernetes-xenial main' | sudo tee /etc/apt/sources.list.d/kubernetes.list"
+    execute_host ${HOST} "sudo apt-get update"
+    execute_host ${HOST} "sudo apt-get install -y kubelet kubeadm kubectl kubernetes-cni"
+  elif [[ "${KUBEADM_VERSION}" == "gs://"* ]]; then
+    TMPDIR=/tmp/k8s-debs
+    execute_host ${HOST} "sudo mkdir ${TMPDIR}"
+    execute_host ${HOST} "sudo gsutil rsync "${KUBEADM_VERSION}" ${TMPDIR}"
+    execute_host ${HOST} "sudo dpkg -i ${TMPDIR}/{kubelet,kubeadm,kubectl,kubernetes-cni}.deb || echo Ignoring expected dpkg failure"
+    execute_host ${HOST} "sudo apt-get install -f -y"
+    execute_host ${HOST} "sudo rm -rf ${TMPDIR}"
+  else
+    echo "Don't know how to handle version: $KUBEADM_VERSION"
+    exit 1
+  fi
+  execute_host ${HOST} "sudo systemctl enable kubelet"
+  execute_host ${HOST} "sudo systemctl restart kubelet"
+}
+
+execute_host() {
+ do_phase1 execute-host "${@}"
+ if [[ $? -ne 0 ]] ; then
+    exit $?
+ fi
+}
+
+do_phase1() {
+  ( cd "../../phase1"; ./do "${@}" )
+}
+
+case "${1:-}" in
+  "")
+    ;;
+  "upgrade-master")
+    upgrade_master
+    ;;
+esac

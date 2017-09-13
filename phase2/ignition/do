@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+set -x
+
+cd "${BASH_SOURCE%/*}"
+
+CONFIG_FILE="${CONFIG_JSON_FILE:-../../.config.json}"
+
+upgrade_master() {
+  echo Upgrade master not implemented. >&2
+  exit 1
+}
+
+
+case "${1:-}" in
+  "")
+    ;;
+  "upgrade-master")
+    upgrade_master
+    ;;
+esac

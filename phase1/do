@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+set -x
+
+cd "${BASH_SOURCE%/*}"
+
+CONFIG_FILE="${CONFIG_JSON_FILE:-../.config.json}"
+CLOUD_PROVIDER=$(jq -r '.phase1.cloud_provider' ${CONFIG_FILE})
+(cd "${CLOUD_PROVIDER}"; ./do "${@}")

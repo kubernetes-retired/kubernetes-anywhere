@@ -88,6 +88,27 @@ destroy() {
   terraform destroy -var-file=${CLUSTER_NAME}/terraform.tfvars -state=${CLUSTER_NAME}/terraform.tfstate $FLAGS ${TMP_DIR}
 }
 
+execute_host() {
+  HOST=$1
+  COMMAND=$2
+  PROJECT=$(jq -r '.phase1.gce.project' ${CONFIG_FILE})
+  ZONE=$(jq -r '.phase1.gce.zone' ${CONFIG_FILE})
+  MASTER=$(jq -r '.phase1.cluster_name' ${CONFIG_FILE})-master
+  SSHUSER=$(jq -r '.phase1.ssh_user | values' ${CONFIG_FILE})
+
+  if [[ -n "${SSHUSER}" ]]; then
+    SSHUSER="${SSHUSER}@"
+  elif [[ -n "${USER:-}" ]]; then
+    SSHUSER="${USER}@"
+  fi
+
+  gcloud compute ssh --project "$PROJECT" --zone "$ZONE" "$SSHUSER$MASTER" --command "$2" >&1
+}
+
+master_host() {
+  echo $(jq -r '.phase1.cluster_name' ${CONFIG_FILE})-master
+}
+
 case "${1:-}" in
   "")
     ;;
@@ -97,7 +118,13 @@ case "${1:-}" in
   "destroy-cluster")
     destroy
     ;;
+  "execute-host")
+    execute_host "${@:2}"
+    ;;
   "gen")
     gen
+    ;;
+  "master-host")
+    master_host
     ;;
 esac

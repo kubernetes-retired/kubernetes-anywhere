@@ -47,6 +47,15 @@ config phase2.kubelet_version
 
 	  Valid options are "stable" or a Google Cloud Storage link to a build.
 
+config phase2.kubeadm.master_upgrade.method
+	string "kubeadm master upgrade method"
+	default "upgrade"
+	help
+	  The kubeadm method of master upgrade to use.
+
+	  Valid options are (upgrade,init).
+	  Formally supported options are (upgrade).
+
 config phase2.kube_context_name
     string "kube context name"
     default ""
