@@ -1,0 +1,18 @@
+{
+  "kind": "StorageClass",
+  "apiVersion": "storage.k8s.io/v1",
+  "metadata": {
+    "name": "standard",
+    "annotations": {
+      "storageclass.beta.kubernetes.io/is-default-class": "true"
+    },
+    "labels": {
+      "addonmanager.kubernetes.io/mode": "EnsureExists",
+      "kubernetes.io/cluster-service": "true"
+    },
+  },
+  "parameters": {
+    "type": "pd-standard"
+  },
+  "provisioner": "kubernetes.io/gce-pd",
+}
