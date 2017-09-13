@@ -128,7 +128,7 @@ SSH user to login to OS for provisioning (phase1.ssh_user) [] (NEW)
 
 * Select the provider, in this case it would be vsphere.
 ```
-cloud provider: gce, azure or vsphere (phase1.cloud_provider) [vsphere] (NEW) vsphere
+cloud provider: gce or vsphere (phase1.cloud_provider) [vsphere] (NEW) vsphere
 ```
 
 * Set the vCenter URL (Just the IP or domain name, without https://)

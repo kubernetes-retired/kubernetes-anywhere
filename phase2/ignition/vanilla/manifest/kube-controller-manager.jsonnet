@@ -35,8 +35,6 @@ function(cfg)
               "--root-ca-file=/srv/kubernetes/ca.pem",
               "--v=2",
             ],
-            if cfg.phase1.cloud_provider == "azure" then
-              ["--cloud-config=/etc/kubernetes/azure.json"],
             if cfg.phase1.cloud_provider == "vsphere" then
               ["--cloud-config=/etc/kubernetes/vsphere.conf"],
           ]),
