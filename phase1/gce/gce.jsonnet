@@ -192,7 +192,7 @@ function(cfg)
             boot: true,
           }],
           service_account: [
-            { scopes: ["compute-rw", "storage-ro"] },
+            { scopes: ["compute-rw", "storage-ro", "https://www.googleapis.com/auth/ndev.clouddns.readwrite"] },
           ],
         },
       },
