@@ -5,7 +5,7 @@ config phase2.kubernetes_version
 	string "kubernetes version"
 	default "v1.6.5"
 	help
-	  The version of Kubernetes to deploy.
+	  The version of Kubernetes to deploy to the control plane.
 
 config phase2.provider
 	string "bootstrap provider"
@@ -36,6 +36,14 @@ config phase2.kubeadm.version
 	default "stable"
 	help
 	  The version of kubeadm to use.
+
+	  Valid options are "stable" or a Google Cloud Storage link to a build.
+
+config phase2.kubelet_version
+	string "kubelet version"
+	default "stable"
+	help
+	  The version of kubelet to use.
 
 	  Valid options are "stable" or a Google Cloud Storage link to a build.
 
