@@ -41,7 +41,7 @@ if [[ "${KUBEADM_VERSION}" != "${KUBELET_VERSION}" ]]; then
     TMPDIR=/tmp/k8s-debs
     mkdir $TMPDIR
     gsutil cp "${KUBEADM_VERSION}/kubeadm" $TMPDIR/kubeadm
-    cat $TMPDIR/kubeadm > /usr/bin/kubeadm
+    cp $TMPDIR/kubeadm /usr/bin/kubeadm
     rm -rf $TMPDIR
   else
     echo "Don't know how to handle kubeadm version: $KUBEADM_VERSION"
