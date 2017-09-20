@@ -8,7 +8,7 @@ set -x
 cd "${BASH_SOURCE%/*}"
 
 CONFIG_FILE="${CONFIG_JSON_FILE:-../../.config.json}"
-KUBEADM_INIT_PARAM_FILE=/etc/kubeadm/kubadm_init_params.txt
+KUBEADM_INIT_PARAM_FILE=/etc/kubeadm/kubeadm_init_params.txt
 
 upgrade_master() {
   KUBERNETES_VERSION=$(jq -r '.phase2.kubernetes_version' ${CONFIG_FILE})
@@ -49,24 +49,22 @@ wait_nodes_ready() {
 update_host_kubeadm() {
   HOST=$1 
   KUBEADM_VERSION=$(jq -r '.phase2.kubeadm.version' ${CONFIG_FILE})
-  echo host is ${HOST} version is ${KUBEADM_VERSION}
+  KUBELET_VERSION=$(jq -r '.phase2.kubelet_version' ${CONFIG_FILE})
   if [[ "${KUBEADM_VERSION}" == stable ]]; then
-    execute_host ${HOST} "echo '  deb http://apt.kubernetes.io/ kubernetes-xenial main' | sudo tee /etc/apt/sources.list.d/kubernetes.list"
-    execute_host ${HOST} "sudo apt-get update"
-    execute_host ${HOST} "sudo apt-get install -y kubelet kubeadm kubectl kubernetes-cni"
+      # TODO(jessicaochen): Figure out how to translate "stable" to the corresponding GS link so we can
+      # update kubadm without disturbing the kubelet. Installing kubeadm via package will modify the kubelet configuration.
+      echo "Kubeadm version of 'stable' is not yet supported for upgrades. Please specify a Google Cloud Storage Link."
+      exit 1
   elif [[ "${KUBEADM_VERSION}" == "gs://"* ]]; then
     TMPDIR=/tmp/k8s-debs
     execute_host ${HOST} "sudo mkdir ${TMPDIR}"
-    execute_host ${HOST} "sudo gsutil rsync "${KUBEADM_VERSION}" ${TMPDIR}"
-    execute_host ${HOST} "sudo dpkg -i ${TMPDIR}/{kubelet,kubeadm,kubectl,kubernetes-cni}.deb || echo Ignoring expected dpkg failure"
-    execute_host ${HOST} "sudo apt-get install -f -y"
+    execute_host ${HOST} "sudo gsutil cp "${KUBEADM_VERSION}/kubeadm" ${TMPDIR}/kubeadm"
+    execute_host ${HOST} "sudo cp ${TMPDIR}/kubeadm /usr/bin/kubeadm"
     execute_host ${HOST} "sudo rm -rf ${TMPDIR}"
   else
-    echo "Don't know how to handle version: $KUBEADM_VERSION"
+    echo "Don't know how to handle kubeadm version: $KUBEADM_VERSION"
     exit 1
   fi
-  execute_host ${HOST} "sudo systemctl enable kubelet"
-  execute_host ${HOST} "sudo systemctl restart kubelet"
 }
 
 execute_host() {
