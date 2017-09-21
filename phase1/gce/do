@@ -102,7 +102,7 @@ execute_host() {
     SSHUSER="${USER}@"
   fi
 
-  gcloud compute ssh --project "$PROJECT" --zone "$ZONE" "$SSHUSER$MASTER" --command "$2" >&1
+  gcloud compute ssh --project "$PROJECT" --zone "$ZONE" "${SSHUSER}${MASTER}" --command "$2" >&1
 }
 
 master_host() {

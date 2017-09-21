@@ -6,7 +6,6 @@ KUBERNETES_VERSION=$(get_metadata "k8s-kubernetes-version")
 KUBELET_VERSION=$(get_metadata "k8s-kubelet-version")
 KUBEADM_DIR=/etc/kubeadm
 KUBEADM_INIT_PARAM_FILE=$KUBEADM_DIR/kubeadm_init_params.txt
-KUBELET_VERSION=$(get_metadata "k8s-kubelet-version")
 
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
