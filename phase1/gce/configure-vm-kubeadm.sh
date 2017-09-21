@@ -6,7 +6,7 @@ KUBERNETES_VERSION=$(get_metadata "k8s-kubernetes-version")
 KUBELET_VERSION=$(get_metadata "k8s-kubelet-version")
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
-if [[ "${KUBELET_VERSION}" == stable ]]; then
+if [[ "${KUBELET_VERSION}" == "stable" ]]; then
   cat <<EOF > /etc/apt/sources.list.d/kubernetes.list
   deb http://apt.kubernetes.io/ kubernetes-xenial main
 EOF
@@ -31,13 +31,7 @@ else
 fi
 
 if [[ "${KUBEADM_VERSION}" != "${KUBELET_VERSION}" ]]; then
-  if [[ "${KUBEADM_VERSION}" == stable ]]; then
-    # Cannot install packages as they will update the 
-    # kubelet configuration to a version that does not match
-    # the installed kubelet
-    echo "Kubeadm version of 'stable' is not supported with kubelet version that is not also 'stable'."
-    exit 1
-  elif [[ "${KUBEADM_VERSION}" == "gs://"* ]]; then
+  if [[ "${KUBEADM_VERSION}" == "gs://"* ]]; then
     TMPDIR=/tmp/k8s-debs
     mkdir $TMPDIR
     gsutil cp "${KUBEADM_VERSION}/kubeadm" $TMPDIR/kubeadm
@@ -66,7 +60,7 @@ case "${ROLE}" in
     kubeadm join --token "${TOKEN}" "${MASTER}:443" --skip-preflight-checks
     ;;
   *)
-    echo invalid phase2 provider.
+    echo "invalid phase2 provider".
     exit 1
     ;;
 esac
