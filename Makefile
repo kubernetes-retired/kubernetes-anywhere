@@ -23,6 +23,7 @@ CONFIG_FILE ?= .config
 CONFIG_FILE_ABS := $(realpath $(CONFIG_FILE))
 export CONFIG_JSON_FILE := $(CONFIG_FILE_ABS).json
 CLOUD_PROVIDER = $(shell jq -r '.phase1.cloud_provider' ${CONFIG_JSON_FILE} 2>/dev/null)
+BOOTSTRAP_PROVIDER = $(shell jq -r '.phase2.provider' ${CONFIG_JSON_FILE} 2>/dev/null)
 CLUSTER_NAME = $(shell jq -r '.phase1.cluster_name' ${CONFIG_JSON_FILE} 2>/dev/null)
 TMP_DIR = $(CLUSTER_NAME)/.tmp
 
@@ -46,6 +47,9 @@ echo-config: ${CONFIG_JSON_FILE}
 
 deploy-cluster destroy-cluster: ${CONFIG_JSON_FILE}
 	$(MAKE) do WHAT=$@
+
+upgrade-master: ${CONFIG_JSON_FILE}
+	( cd "phase2/$(BOOTSTRAP_PROVIDER)"; ./do $@ )
 
 # For maximum usefulness, use this target with "make -s" to silence any trace output, e.g.:
 #   $ export KUBECONFIG=$(make -s kubeconfig-path)

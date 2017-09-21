@@ -1,0 +1,73 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+set -x
+
+cd "${BASH_SOURCE%/*}"
+
+CONFIG_FILE="${CONFIG_JSON_FILE:-../../.config.json}"
+KUBEADM_INIT_PARAM_FILE=/etc/kubeadm/kubeadm_init_params.txt
+
+upgrade_master() {
+  KUBERNETES_VERSION=$(jq -r '.phase2.kubernetes_version' ${CONFIG_FILE})
+  UPGRADE_METHOD=$(jq -r '.phase2.kubeadm.master_upgrade.method' ${CONFIG_FILE})
+  MASTER=$(do_phase1 master-host)
+
+  update_host_kubeadm ${MASTER}
+  validate
+
+  INIT_PARAM=$(execute_host ${MASTER} "sudo cat ${KUBEADM_INIT_PARAM_FILE}")
+  case "${UPGRADE_METHOD}" in
+    "init")
+      execute_host ${MASTER} "sudo kubeadm init --skip-preflight-checks --kubernetes-version ${KUBERNETES_VERSION} ${INIT_PARAM}"
+      ;;
+    "upgrade")
+      execute_host ${MASTER} "sudo kubeadm config upload from-flags ${INIT_PARAM}"
+      execute_host ${MASTER} "sudo kubeadm upgrade apply ${KUBERNETES_VERSION} -y -f"
+      ;;
+  esac
+}
+
+update_host_kubeadm() {
+  HOST=$1 
+  KUBEADM_VERSION=$(jq -r '.phase2.kubeadm.version' ${CONFIG_FILE})
+  KUBELET_VERSION=$(jq -r '.phase2.kubelet_version' ${CONFIG_FILE})
+  if [[ "${KUBEADM_VERSION}" == stable ]]; then
+    STABLE_VERSION=$(curl -sSL dl.k8s.io/release/stable.txt)
+    execute_host ${HOST} "sudo curl -sSL dl.k8s.io/release/${STABLE_VERSION}/bin/linux/amd64/kubeadm | sudo tee /usr/bin/kubeadm 1> /dev/null" 
+  elif [[ "${KUBEADM_VERSION}" == "gs://"* ]]; then
+    TMPDIR=/tmp/k8s-debs
+    execute_host ${HOST} "sudo mkdir ${TMPDIR}"
+    execute_host ${HOST} "sudo gsutil cp "${KUBEADM_VERSION}/kubeadm" ${TMPDIR}/kubeadm"
+    execute_host ${HOST} "sudo cp ${TMPDIR}/kubeadm /usr/bin/kubeadm"
+    execute_host ${HOST} "sudo rm -rf ${TMPDIR}"
+  else
+    echo "Don't know how to handle kubeadm version: $KUBEADM_VERSION"
+    exit 1
+  fi
+}
+
+execute_host() {
+ do_phase1 execute-host "${@}"
+ if [[ $? -ne 0 ]] ; then
+    exit $?
+ fi
+}
+
+do_phase1() {
+  ( cd "../../phase1"; ./do "${@}" )
+}
+
+validate() {
+  ( cd "../.."; ./util/validate )
+}
+
+case "${1:-}" in
+  "")
+    ;;
+  "upgrade-master")
+    upgrade_master
+    ;;
+esac

@@ -4,6 +4,9 @@ TOKEN=$(get_metadata "k8s-kubeadm-token")
 KUBEADM_VERSION=$(get_metadata "k8s-kubeadm-version")
 KUBERNETES_VERSION=$(get_metadata "k8s-kubernetes-version")
 KUBELET_VERSION=$(get_metadata "k8s-kubelet-version")
+KUBEADM_DIR=/etc/kubeadm
+KUBEADM_INIT_PARAM_FILE=$KUBEADM_DIR/kubeadm_init_params.txt
+
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
 if [[ "${KUBELET_VERSION}" == stable ]]; then
@@ -51,15 +54,19 @@ fi
 
 case "${ROLE}" in
   "master")
-    OPTS=''
+    ADVERTISE_ADDRESS=$(get_metadata "k8s-advertise-addresses")
+    PARAMS="--token ${TOKEN} --apiserver-bind-port 443 --apiserver-advertise-address ${ADVERTISE_ADDRESS}"
+    OPTS='--skip-preflight-checks'
     if [[ -n "$KUBERNETES_VERSION" ]]; then
-      OPTS="--kubernetes-version $KUBERNETES_VERSION"
+      OPTS="${OPTS} --kubernetes-version $KUBERNETES_VERSION"
     fi
     CNI=$(get_metadata "k8s-cni-plugin")
     if [[ "${CNI}" == "flannel" ]]; then
-      OPTS="${OPTS} --pod-network-cidr 10.244.0.0/16"
+      PARAMS="${PARAMS} --pod-network-cidr 10.244.0.0/16"
     fi
-    kubeadm init --token "${TOKEN}" --apiserver-bind-port 443 --skip-preflight-checks --apiserver-advertise-address "$(get_metadata "k8s-advertise-addresses")" $OPTS
+    kubeadm init $PARAMS $OPTS
+    mkdir $KUBEADM_DIR
+    echo "${PARAMS}" | tee $KUBEADM_INIT_PARAM_FILE
     ;;
   "node")
     MASTER=$(get_metadata "k8s-master-ip")
