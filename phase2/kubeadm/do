@@ -38,9 +38,10 @@ update_host_kubeadm() {
     STABLE_VERSION=$(curl -sSL dl.k8s.io/release/stable.txt)
     execute_host ${HOST} "sudo curl -sSL dl.k8s.io/release/${STABLE_VERSION}/bin/linux/amd64/kubeadm | sudo tee /usr/bin/kubeadm 1> /dev/null" 
   elif [[ "${KUBEADM_VERSION}" == "gs://"* ]]; then
+    KUBEADM_DIR=${KUBEADM_VERSION%/}
     TMPDIR=/tmp/k8s-debs
     execute_host ${HOST} "sudo mkdir ${TMPDIR}"
-    execute_host ${HOST} "sudo gsutil cp "${KUBEADM_VERSION}/kubeadm" ${TMPDIR}/kubeadm"
+    execute_host ${HOST} "sudo gsutil cp "${KUBEADM_DIR}/kubeadm" ${TMPDIR}/kubeadm"
     execute_host ${HOST} "sudo cp ${TMPDIR}/kubeadm /usr/bin/kubeadm"
     execute_host ${HOST} "sudo rm -rf ${TMPDIR}"
   else
