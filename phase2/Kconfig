@@ -64,6 +64,12 @@ config phase2.kube_context_name
 	  This is optional to set and when set, the kubeconfig
 	  context is renamed to whatever is configured.
 
+config phase2.enable_cloud_provider
+	bool "Enable Cloud Provider(Experimental) ?"
+	default n
+	help
+	  Should we enable and initialize cloud provider for the cluster?
+
 endif
 
 endmenu

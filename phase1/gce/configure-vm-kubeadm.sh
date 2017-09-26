@@ -4,8 +4,11 @@ TOKEN=$(get_metadata "k8s-kubeadm-token")
 KUBEADM_VERSION=$(get_metadata "k8s-kubeadm-version")
 KUBERNETES_VERSION=$(get_metadata "k8s-kubernetes-version")
 KUBELET_VERSION=$(get_metadata "k8s-kubelet-version")
+ENABLE_CLOUD_PROVIDER=$(get_metadata "k8s-enable-cloud-provider")
 KUBEADM_DIR=/etc/kubeadm
 KUBEADM_CONFIG_FILE=$KUBEADM_DIR/kubeadm.yaml
+
+CLOUD_PROVIDER="gce"
 
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
@@ -53,6 +56,16 @@ if [[ "${KUBEADM_VERSION}" != "${KUBELET_VERSION}" ]]; then
   fi
 fi
 
+if [[ "${ENABLE_CLOUD_PROVIDER}" == true ]]; then
+  cat <<EOF > /etc/systemd/system/kubelet.service.d/20-cloud-provider.conf
+[Service]
+Environment="KUBELET_EXTRA_ARGS=--cloud-provider=${CLOUD_PROVIDER}"
+EOF
+
+  systemctl daemon-reload
+  systemctl restart kubelet
+fi
+
 case "${ROLE}" in
   "master")
     ADVERTISE_ADDRESS=$(get_metadata "k8s-advertise-addresses")
@@ -79,6 +92,12 @@ networking:
 kubernetesVersion: "${KUBERNETES_VERSION}"
 token: "${TOKEN}"
 EOF
+
+    if [[ "${ENABLE_CLOUD_PROVIDER}" == true ]]; then
+      cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+cloudProvider: "${CLOUD_PROVIDER}"
+EOF
+    fi
 
     kubeadm init --skip-preflight-checks --config $KUBEADM_CONFIG_FILE
     ;;
