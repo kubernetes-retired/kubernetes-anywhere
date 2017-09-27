@@ -41,10 +41,10 @@ if [[ "${KUBEADM_VERSION}" != "${KUBELET_VERSION}" ]]; then
     echo "Kubeadm version of 'stable' is not supported with kubelet version that is not also 'stable'."
     exit 1
   elif [[ "${KUBEADM_VERSION}" == "gs://"* ]]; then
-    KUBEADM_DIR=${KUBEADM_VERSION%/}
+    KUBEADM_GS_DIR=${KUBEADM_VERSION%/}
     TMPDIR=/tmp/k8s-debs
     mkdir $TMPDIR
-    gsutil cp "${KUBEADM_DIR}/kubeadm" $TMPDIR/kubeadm
+    gsutil cp "${KUBEADM_GS_DIR}/kubeadm" $TMPDIR/kubeadm
     cp $TMPDIR/kubeadm /usr/bin/kubeadm
     rm -rf $TMPDIR
   else
