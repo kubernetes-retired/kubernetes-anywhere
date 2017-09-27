@@ -41,7 +41,7 @@ config phase3.weave_net
 
 		Should we deploy weave-net? You likely only want this if using kubeadm for phase2.
 
-if phase3.weave_net = false
+if phase3.weave_net = n
 config phase3.cni
 	string "CNI plugin to use"
 	default ""
