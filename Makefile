@@ -87,7 +87,7 @@ docker-push: docker-build
 	docker push $(IMAGE_NAME):$(IMAGE_VERSION)
 
 clean:
-	( if [[ -e "${CONFIG_JSON_FILE}" ]];then rm -rf phase3/${CLOUD_PROVIDER}/.tmp/ phase1/${CLOUD_PROVIDER}/${CLUSTER_NAME}/; fi )
+	(if [[ ! -z "${CLOUD_PROVIDER}" && ! -z "${CLUSTER_NAME}" ]];then rm -rf phase3/${CLOUD_PROVIDER}/.tmp/ phase1/${CLOUD_PROVIDER}/${CLUSTER_NAME}/; fi)
 
 fmt:
 	for f in $$(find . -name '*.jsonnet'); do jsonnet fmt -i -n 2 $${f}; done;
