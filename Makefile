@@ -25,7 +25,7 @@ export CONFIG_JSON_FILE := $(CONFIG_FILE_ABS).json
 CLOUD_PROVIDER = $(shell jq -r '.phase1.cloud_provider' ${CONFIG_JSON_FILE} 2>/dev/null)
 BOOTSTRAP_PROVIDER = $(shell jq -r '.phase2.provider' ${CONFIG_JSON_FILE} 2>/dev/null)
 CLUSTER_NAME = $(shell jq -r '.phase1.cluster_name' ${CONFIG_JSON_FILE} 2>/dev/null)
-TMP_DIR = $(CLUSTER_NAME)/.tmp
+CLUSTER_DIR=clusters/${CLUSTER_NAME}
 
 default:
 	$(MAKE) deploy
@@ -54,7 +54,7 @@ upgrade-master: ${CONFIG_JSON_FILE}
 # For maximum usefulness, use this target with "make -s" to silence any trace output, e.g.:
 #   $ export KUBECONFIG=$(make -s kubeconfig-path)
 kubeconfig-path: ${CONFIG_JSON_FILE}
-	@$(eval KUBECONFIG_PATH := $(shell pwd)/phase1/$(CLOUD_PROVIDER)/$(CLUSTER_NAME)/kubeconfig.json)
+	@$(eval KUBECONFIG_PATH := $(shell pwd)/phase1/$(CLOUD_PROVIDER)/$(CLUSTER_DIR)/kubeconfig.json)
 	@if [ ! -e "$(KUBECONFIG_PATH)" ]; then \
 		echo "Cannot find kubeconfig file. Have you started a cluster with \"make deploy\" yet?" > /dev/stderr; \
 		exit 1; \
@@ -62,13 +62,13 @@ kubeconfig-path: ${CONFIG_JSON_FILE}
 	@echo $(KUBECONFIG_PATH)
 
 validate-cluster-up: ${CONFIG_JSON_FILE}
-	KUBECONFIG="$$(pwd)/phase1/$(CLOUD_PROVIDER)/$(CLUSTER_NAME)/kubeconfig.json" ./util/validate
+	KUBECONFIG="$$(pwd)/phase1/$(CLOUD_PROVIDER)/$(CLUSTER_DIR)/kubeconfig.json" ./util/validate
 
 validate-node-ready: ${CONFIG_JSON_FILE}
-	KUBECONFIG="$$(pwd)/phase1/$(CLOUD_PROVIDER)/$(CLUSTER_NAME)/kubeconfig.json" NODE_READINESS_CHECK=y ./util/validate
+	KUBECONFIG="$$(pwd)/phase1/$(CLOUD_PROVIDER)/$(CLUSTER_DIR)/kubeconfig.json" NODE_READINESS_CHECK=y ./util/validate
 
 addons: ${CONFIG_JSON_FILE}
-	KUBECONFIG="$$(pwd)/phase1/$(CLOUD_PROVIDER)/$(CLUSTER_NAME)/kubeconfig.json" ./phase3/do deploy
+	KUBECONFIG="$$(pwd)/phase1/$(CLOUD_PROVIDER)/$(CLUSTER_DIR)/kubeconfig.json" ./phase3/do deploy
 
 deploy: | deploy-cluster  validate-cluster-up  addons  validate-node-ready
 destroy: | destroy-cluster
@@ -87,7 +87,8 @@ docker-push: docker-build
 	docker push $(IMAGE_NAME):$(IMAGE_VERSION)
 
 clean:
-	(if [[ ! -z "${CLOUD_PROVIDER}" && ! -z "${CLUSTER_NAME}" ]];then rm -rf phase3/${CLOUD_PROVIDER}/.tmp/ phase1/${CLOUD_PROVIDER}/${CLUSTER_NAME}/; fi)
+	rm -rf phase1/*/clusters/*
+	rm -rf phase3/clusters/*
 
 fmt:
 	for f in $$(find . -name '*.jsonnet'); do jsonnet fmt -i -n 2 $${f}; done;

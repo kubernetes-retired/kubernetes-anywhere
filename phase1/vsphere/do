@@ -7,7 +7,8 @@ set -o nounset
 cd "${BASH_SOURCE%/*}"
 
 CLUSTER_NAME=$(jq -r '.phase1.cluster_name' ../../.config.json)
-TMP_DIR=${CLUSTER_NAME}/.tmp
+CLUSTER_DIR=clusters/${CLUSTER_NAME}
+TMP_DIR=${CLUSTER_DIR}/.tmp
 
 gen() {
   mkdir -p ${TMP_DIR}
@@ -17,7 +18,7 @@ gen() {
 
 deploy() {
   gen
-  terraform apply -state=${CLUSTER_NAME}/terraform.tfstate ${TMP_DIR}
+  terraform apply -state=${CLUSTER_DIR}/terraform.tfstate ${TMP_DIR}
   COMMAND="grep '.phase2.kubernetes_version' ../../.config | cut -d '=' -f2 | tr -d '\"'"
   KUBERNETES_VERSION=$(eval $COMMAND)
   # If the kubectl binary doesn't exist download it.
@@ -42,9 +43,9 @@ deploy() {
 
 destroy() {
   if [[ "${FORCE_DESTROY:-}" == "y" ]]; then
-    terraform destroy -state=${CLUSTER_NAME}/terraform.tfstate -force ${TMP_DIR}
+    terraform destroy -state=${CLUSTER_DIR}/terraform.tfstate -force ${TMP_DIR}
   else
-    terraform destroy -state=${CLUSTER_NAME}/terraform.tfstate ${TMP_DIR}
+    terraform destroy -state=${CLUSTER_DIR}/terraform.tfstate ${TMP_DIR}
   fi
 }
 

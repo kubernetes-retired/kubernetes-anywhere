@@ -1,4 +1,0 @@
-terraform.tfstate
-account.json
-terraform.tfstate.backup
-out/openstack.tf

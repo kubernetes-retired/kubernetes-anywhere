@@ -8,9 +8,10 @@ set -x
 cd "${BASH_SOURCE%/*}"
 
 CONFIG_FILE="${CONFIG_JSON_FILE:-../../.config.json}"
-CLUSTER_NAME=$(jq -r '.phase1.cluster_name' ${CONFIG_FILE})
 KUBE_CONTEXT_NAME=$(jq -r '.phase2.kube_context_name | values' ${CONFIG_FILE})
-TMP_DIR=${CLUSTER_NAME}/.tmp
+CLUSTER_NAME=$(jq -r '.phase1.cluster_name' ${CONFIG_FILE})
+CLUSTER_DIR=clusters/${CLUSTER_NAME}
+TMP_DIR=${CLUSTER_DIR}/.tmp
 
 generate_token() {
   perl -e 'printf "%06x.%08x%08x\n", rand(0xffffff), rand(0xffffffff), rand(0xffffffff);'
@@ -20,12 +21,12 @@ gen() {
   TOKEN=$(generate_token)
   mkdir -p ${TMP_DIR}
   jsonnet -J ../../ --multi ${TMP_DIR} --tla-code-file cfg=${CONFIG_FILE} all.jsonnet
-  echo "kubeadm_token = \"$TOKEN\"" > ${CLUSTER_NAME}/terraform.tfvars
+  echo "kubeadm_token = \"$TOKEN\"" > ${CLUSTER_DIR}/terraform.tfvars
 }
 
 deploy() {
   gen
-  terraform apply -var-file=${CLUSTER_NAME}/terraform.tfvars -state=${CLUSTER_NAME}/terraform.tfstate ${TMP_DIR}
+  terraform apply -var-file=${CLUSTER_DIR}/terraform.tfvars -state=${CLUSTER_DIR}/terraform.tfstate ${TMP_DIR}
 
   PHASE2=$(jq -r '.phase2.provider' ${CONFIG_FILE})
   if [[ "${PHASE2}" == "kubeadm" ]]; then
@@ -59,15 +60,15 @@ fetch_kubeconfig() {
     # a marker to indicate the start of the file, and delete all lines up to and
     # including it.
     if gcloud compute ssh --project "$PROJECT" --zone "$ZONE" "$SSHUSER$MASTER" --command "echo STARTFILE; sudo cat /etc/kubernetes/admin.conf" > ${TMP_DIR}/kubeconfig.raw; then
-      sed '/^STARTFILE$/,$!d;/^STARTFILE$/d' ${TMP_DIR}/kubeconfig.raw > ${CLUSTER_NAME}/kubeconfig.json
+      sed '/^STARTFILE$/,$!d;/^STARTFILE$/d' ${TMP_DIR}/kubeconfig.raw > ${CLUSTER_DIR}/kubeconfig.json
       echo Successfully fetched kubeconfig.
 
       if [[ -n "${KUBE_CONTEXT_NAME}" ]]; then
         # kubeconfig.json fetched from master node has the user, cluster and context all hardcoded with
         # 'kubernetes' keyword. So replace 'kubernetes' with the cluster_name.
         # TODO: use `kubectl config rename-(context,cluster,user)` sub-commands whenever they are available
-        sed -i "s/kubernetes/${CLUSTER_NAME}/g" ${CLUSTER_NAME}/kubeconfig.json
-        sed -i "s/${CLUSTER_NAME}-admin@${CLUSTER_NAME}/${KUBE_CONTEXT_NAME}/" ${CLUSTER_NAME}/kubeconfig.json
+        sed -i "s/kubernetes/${CLUSTER_NAME}/g" ${CLUSTER_DIR}/kubeconfig.json
+        sed -i "s/${CLUSTER_NAME}-admin@${CLUSTER_NAME}/${KUBE_CONTEXT_NAME}/" ${CLUSTER_DIR}/kubeconfig.json
       fi
 
       return
@@ -85,7 +86,7 @@ destroy() {
   if [[ "${FORCE_DESTROY:-}" == "y" ]]; then
     FLAGS="-force"
   fi
-  terraform destroy -var-file=${CLUSTER_NAME}/terraform.tfvars -state=${CLUSTER_NAME}/terraform.tfstate $FLAGS ${TMP_DIR}
+  terraform destroy -var-file=${CLUSTER_DIR}/terraform.tfvars -state=${CLUSTER_DIR}/terraform.tfstate $FLAGS ${TMP_DIR}
 }
 
 execute_host() {
