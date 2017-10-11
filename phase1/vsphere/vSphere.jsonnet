@@ -15,13 +15,12 @@ function(config)
         "https://${vsphere_virtual_machine.kubevm1.network_interface.0.ipv4_address}",
       ));
 
-  local config_metadata_template = std.toString(config {
+  local config_metadata_template = config {
       master_ip: "${vsphere_virtual_machine.kubevm1.network_interface.0.ipv4_address}",
-      role: "%s",
       phase3 +: {
         addons_config: (import "phase3/all.jsonnet")(config),
       },
-    });
+    };
   
   std.mergePatch({
     // vSphere Configuration
@@ -135,7 +134,7 @@ function(config)
                 "remote-exec": {
                   inline: [
                     "hostnamectl set-hostname %s" % std.join("", [cfg.cluster_name, "-master"]),
-                    "mkdir -p /etc/kubernetes/; echo '%s' > /etc/kubernetes/k8s_config.json " % (config_metadata_template % "master"),                    
+                    "mkdir -p /etc/kubernetes/; echo '%s' > /etc/kubernetes/k8s_config.json " % std.toString((config_metadata_template {role: "master"})),
                     "echo '%s' >  /etc/kubernetes/vsphere.conf" % "${data.template_file.cloudprovider.rendered}",            
                     "echo '%s' > /etc/configure-vm.sh; bash /etc/configure-vm.sh" % "${data.template_file.configure_master.rendered}",
                   ]
@@ -157,7 +156,7 @@ function(config)
                 "remote-exec": {
                   inline: [
                     "hostnamectl set-hostname %s" % std.join("", [cfg.cluster_name, "-node", vm-1]),
-                    "mkdir -p /etc/kubernetes/; echo '%s' > /etc/kubernetes/k8s_config.json " % (config_metadata_template % "node"),                    
+                    "mkdir -p /etc/kubernetes/; echo '%s' > /etc/kubernetes/k8s_config.json " % std.toString((config_metadata_template {role: "node"})),
                     "echo '%s' > /etc/configure-vm.sh; bash /etc/configure-vm.sh" % "${data.template_file.configure_node.rendered}",
                     "echo '%s' >  /etc/kubernetes/vsphere.conf" % "${data.template_file.cloudprovider.rendered}",            
                   ]
