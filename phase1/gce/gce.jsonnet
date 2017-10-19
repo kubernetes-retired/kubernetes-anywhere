@@ -151,6 +151,7 @@ function(cfg)
             "k8s-kubeadm-version": "%(version)s" % p2.kubeadm,
             "k8s-kubernetes-version": "%(kubernetes_version)s" % p2,
             "k8s-kubelet-version": "%(kubelet_version)s" % p2,
+            "k8s-enable-cloud-provider": (if std.objectHas(p2, "enable_cloud_provider") && p2.enable_cloud_provider then "true" else "false"),
           } else {
             "k8s-config": config_metadata_template % [names.master_ip, "master"],
             "k8s-ca-public-key": "${tls_self_signed_cert.%s-root.cert_pem}" % p1.cluster_name,
@@ -179,6 +180,7 @@ function(cfg)
             "k8s-kubeadm-version": "%(version)s" % p2.kubeadm,
             "k8s-kubernetes-version": "%(kubernetes_version)s" % p2,
             "k8s-kubelet-version": "%(kubelet_version)s" % p2,
+            "k8s-enable-cloud-provider": (if std.objectHas(p2, "enable_cloud_provider") && p2.enable_cloud_provider then "true" else "false"),
           } else {
             "k8s-deploy-bucket": names.release_bucket,
             "k8s-config": config_metadata_template % [names.master_ip, "node"],
@@ -190,7 +192,7 @@ function(cfg)
             boot: true,
           }],
           service_account: [
-            { scopes: ["compute-rw", "storage-ro"] },
+            { scopes: ["compute-rw", "storage-ro", "https://www.googleapis.com/auth/ndev.clouddns.readwrite"] },
           ],
         },
       },

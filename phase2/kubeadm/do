@@ -8,7 +8,7 @@ set -x
 cd "${BASH_SOURCE%/*}"
 
 CONFIG_FILE="${CONFIG_JSON_FILE:-../../.config.json}"
-KUBEADM_INIT_PARAM_FILE=/etc/kubeadm/kubeadm_init_params.txt
+KUBEADM_CONFIG_FILE=/etc/kubeadm/kubeadm.yaml
 
 upgrade_master() {
   KUBERNETES_VERSION=$(jq -r '.phase2.kubernetes_version' ${CONFIG_FILE})
@@ -18,13 +18,14 @@ upgrade_master() {
   update_host_kubeadm ${MASTER}
   validate
 
-  INIT_PARAM=$(execute_host ${MASTER} "sudo cat ${KUBEADM_INIT_PARAM_FILE}")
+  execute_host ${MASTER} "sudo sed -i \"s|^kubernetesVersion: .*|kubernetesVersion: \\\"${KUBERNETES_VERSION}\\\"|\" ${KUBEADM_CONFIG_FILE}"
+
   case "${UPGRADE_METHOD}" in
     "init")
-      execute_host ${MASTER} "sudo kubeadm init --skip-preflight-checks --kubernetes-version ${KUBERNETES_VERSION} ${INIT_PARAM}"
+      execute_host ${MASTER} "sudo kubeadm init --skip-preflight-checks --config ${KUBEADM_CONFIG_FILE}"
       ;;
     "upgrade")
-      execute_host ${MASTER} "sudo kubeadm config upload from-flags ${INIT_PARAM}"
+      execute_host ${MASTER} "sudo kubeadm config upload from-file --config ${KUBEADM_CONFIG_FILE}"
       execute_host ${MASTER} "sudo kubeadm upgrade apply ${KUBERNETES_VERSION} -y -f"
       ;;
   esac

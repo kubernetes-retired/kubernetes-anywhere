@@ -41,7 +41,7 @@ config phase3.weave_net
 
 		Should we deploy weave-net? You likely only want this if using kubeadm for phase2.
 
-if phase3.weave_net = false
+if phase3.weave_net = n
 config phase3.cni
 	string "CNI plugin to use"
 	default ""
@@ -49,6 +49,15 @@ config phase3.cni
 	  CNI plugin to use. You likely only want this if using kubeadm for phase2.
 
 		Valid options are (flannel, weave).
+endif
+
+if phase1.cloud_provider = gce
+config phase3.gce_storage_class
+	depends on phase2.enable_cloud_provider
+	bool "Deploy default storage class?"
+	default n
+	help
+	  Should we deploy default storage class for GCE?
 endif
 
 endif

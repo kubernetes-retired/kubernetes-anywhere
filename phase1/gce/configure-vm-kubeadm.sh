@@ -4,8 +4,11 @@ TOKEN=$(get_metadata "k8s-kubeadm-token")
 KUBEADM_VERSION=$(get_metadata "k8s-kubeadm-version")
 KUBERNETES_VERSION=$(get_metadata "k8s-kubernetes-version")
 KUBELET_VERSION=$(get_metadata "k8s-kubelet-version")
+ENABLE_CLOUD_PROVIDER=$(get_metadata "k8s-enable-cloud-provider")
 KUBEADM_DIR=/etc/kubeadm
-KUBEADM_INIT_PARAM_FILE=$KUBEADM_DIR/kubeadm_init_params.txt
+KUBEADM_CONFIG_FILE=$KUBEADM_DIR/kubeadm.yaml
+
+CLOUD_PROVIDER="gce"
 
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
@@ -53,21 +56,50 @@ if [[ "${KUBEADM_VERSION}" != "${KUBELET_VERSION}" ]]; then
   fi
 fi
 
+if [[ "${ENABLE_CLOUD_PROVIDER}" == true ]]; then
+  cat <<EOF > /etc/systemd/system/kubelet.service.d/20-cloud-provider.conf
+[Service]
+Environment="KUBELET_EXTRA_ARGS=--cloud-provider=${CLOUD_PROVIDER}"
+EOF
+
+  systemctl daemon-reload
+  systemctl restart kubelet
+fi
+
 case "${ROLE}" in
   "master")
     ADVERTISE_ADDRESS=$(get_metadata "k8s-advertise-addresses")
-    PARAMS="--token ${TOKEN} --apiserver-bind-port 443 --apiserver-advertise-address ${ADVERTISE_ADDRESS}"
-    OPTS='--skip-preflight-checks'
-    if [[ -n "$KUBERNETES_VERSION" ]]; then
-      OPTS="${OPTS} --kubernetes-version $KUBERNETES_VERSION"
-    fi
     CNI=$(get_metadata "k8s-cni-plugin")
+    #TODO: we should probably be able to configure POD_NETWORK_CIDR from `make config` in future
+    # and use the configured value by passing it on to CNI's. We resort to the below hard-coding
+    # since the current CNI's are not enabled to be configured with the user provided pod-network-cidr.
+    POD_NETWORK_CIDR=""
     if [[ "${CNI}" == "flannel" ]]; then
-      PARAMS="${PARAMS} --pod-network-cidr 10.244.0.0/16"
+      POD_NETWORK_CIDR="10.244.0.0/16"
+    elif [[ "${CNI}" == "weave" ]]; then
+      POD_NETWORK_CIDR="10.32.0.0/12"
     fi
-    kubeadm init $PARAMS $OPTS
-    mkdir $KUBEADM_DIR
-    echo "${PARAMS}" | tee $KUBEADM_INIT_PARAM_FILE
+
+    mkdir -p $KUBEADM_DIR
+    cat <<EOF |tee $KUBEADM_CONFIG_FILE
+kind: MasterConfiguration
+apiVersion: kubeadm.k8s.io/v1alpha1
+api:
+  advertiseAddress: "${ADVERTISE_ADDRESS}"
+  bindPort: 443
+networking:
+  podSubnet: "${POD_NETWORK_CIDR}"
+kubernetesVersion: "${KUBERNETES_VERSION}"
+token: "${TOKEN}"
+EOF
+
+    if [[ "${ENABLE_CLOUD_PROVIDER}" == true ]]; then
+      cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+cloudProvider: "${CLOUD_PROVIDER}"
+EOF
+    fi
+
+    kubeadm init --skip-preflight-checks --config $KUBEADM_CONFIG_FILE
     ;;
   "node")
     MASTER=$(get_metadata "k8s-master-ip")
