@@ -1,0 +1,70 @@
+menu "Openstack configuration"
+
+config phase1.openstack.os_image
+	string "OS image for nodes"
+	help
+	  The image name used for deploying a VM.
+
+config phase1.openstack.flavor_name
+	string "flavor name"
+	default "m1.medium"
+	help
+	  The flavor name to use for the VM instance.
+
+config phase1.openstack.ssh_key_file
+	string "path to ssh private key file"
+	default "~/.ssh/id_rsa.terraform"
+	help
+	  The path to ssh private key file with which to configure
+	  the vm for auto-login. The public key file should also
+	  exist at the same path prefixed by .pub.
+
+config phase1.openstack.project_name
+	string "OpenStack project name"
+	help
+	  The OpenStack project name in which to deploy VMs.
+
+config phase1.openstack.domain_name
+	string "OpenStack domain name"
+	help
+	  The OpenStack domain name in which to deploy VMs.
+
+config phase1.openstack.auth_url
+	string "auth_url"
+	help
+	  The OpenStack keystone URL used for authentication.
+
+config phase1.openstack.username
+	string "OpenStack Keystone username"
+	help
+	  The OpenStack Keystone username used for authentication.
+
+config phase1.openstack.password
+	string "OpenStack Keystone password"
+	help
+	  The OpenStack Keystone password used for authentication.
+
+config phase1.openstack.network_name
+	string "Name of internal Neutron network"
+	help
+	  Name of the private Neutron network that would be created and VMs assigned to it.
+
+config phase1.openstack.network_cidr
+	string "CIDR of internal Neutron network"
+	help
+	  CIDR of the private Neutron network that would be created.
+
+config phase1.openstack.floatingip_pool_name
+	string "Name of external pool network"
+	help
+	  Name of the floating ip pool to use.
+	  You can retrieve this by running: `openstack ip floating pool list`
+
+config phase1.openstack.external_gateway
+	string "Network UUID of External Gateway"
+	help
+	  The network UUID of an external gateway for the router
+	  You can retrieve this by running: `openstack network show <external-network>`
+	  and picking the value against `id`.
+
+endmenu

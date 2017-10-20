@@ -1,4 +1,1 @@
-terraform.tfstate
 account.json
-terraform.tfstate.backup
-out/gce.tf

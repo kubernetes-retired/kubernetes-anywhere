@@ -25,7 +25,7 @@ config phase1.ssh_user
 	  behavior of using the current user's name.
 
 menuconfig phase1.cloud_provider
-	string "cloud provider: gce or vsphere"
+	string "cloud provider: gce, vsphere or openstack"
 	default "gce"
 	help
 	  The cloud provider you would like to deploy to.
@@ -36,6 +36,10 @@ endif
 
 if phase1.cloud_provider = "vsphere"
 	source "phase1/vsphere/Kconfig"
+endif
+
+if phase1.cloud_provider = "openstack"
+	source "phase1/openstack/Kconfig"
 endif
 
 endmenu

@@ -8,7 +8,7 @@ set -x
 cd "${BASH_SOURCE%/*}"
 
 CONFIG_FILE="${CONFIG_JSON_FILE:-../../.config.json}"
-KUBE_CONTEXT_NAME=$(jq -r '.phase2.kube_context_name | values' ${CONFIG_FILE})
+KUBE_CONTEXT_NAME=$(jq -r '.phase2.kube_context_name' ${CONFIG_FILE})
 CLUSTER_NAME=$(jq -r '.phase1.cluster_name' ${CONFIG_FILE})
 CLUSTER_DIR=clusters/${CLUSTER_NAME}
 TMP_DIR=${CLUSTER_DIR}/.tmp
@@ -40,15 +40,12 @@ deploy() {
 # terraform. In order to access the cluster remotely, we need to fetch the
 # proper kubeconfig from the master.
 fetch_kubeconfig() {
-  PROJECT=$(jq -r '.phase1.gce.project' ${CONFIG_FILE})
-  ZONE=$(jq -r '.phase1.gce.zone' ${CONFIG_FILE})
-  MASTER=$(jq -r '.phase1.cluster_name' ${CONFIG_FILE})-master
-  SSHUSER=$(jq -r '.phase1.ssh_user | values' ${CONFIG_FILE})
+  SSH_KEY_FILE=$(jq -r '.phase1.openstack.ssh_key_file' ${CONFIG_FILE})
+  MASTER=$(terraform output -json -state=${CLUSTER_DIR}/terraform.tfstate |jq -r ".[\"${CLUSTER_NAME}_master_ip\"].value")
+  SSHUSER=$(jq -r '.phase1.ssh_user' ${CONFIG_FILE})
 
-  if [[ -n "${SSHUSER}" ]]; then
+  if [[ -n "${SSHUSER}" ]];then
     SSHUSER="${SSHUSER}@"
-  elif [[ -n "${USER:-}" ]]; then
-    SSHUSER="${USER}@"
   fi
 
   for tries in {1..60}; do
@@ -59,9 +56,12 @@ fetch_kubeconfig() {
     # succeeds, then stdout is tainted by ssh initialization output, so we echo
     # a marker to indicate the start of the file, and delete all lines up to and
     # including it.
-    if gcloud compute ssh --project "$PROJECT" --zone "$ZONE" "$SSHUSER$MASTER" --command "echo STARTFILE; sudo cat /etc/kubernetes/admin.conf" > ${TMP_DIR}/kubeconfig.raw; then
+    if ssh -i ${SSH_KEY_FILE} "$SSHUSER$MASTER" -o "StrictHostKeyChecking=no" -o "PasswordAuthentication=no" "echo STARTFILE; sudo cat /etc/kubernetes/admin.conf" > ${TMP_DIR}/kubeconfig.raw; then
       sed '/^STARTFILE$/,$!d;/^STARTFILE$/d' ${TMP_DIR}/kubeconfig.raw > ${CLUSTER_DIR}/kubeconfig.json
       echo Successfully fetched kubeconfig.
+
+      # Replace internal ip by the floating ip of master
+      sed -i "s|server: https://.*:|server: https://${MASTER}:|" ${CLUSTER_DIR}/kubeconfig.json
 
       if [[ -n "${KUBE_CONTEXT_NAME}" ]]; then
         # kubeconfig.json fetched from master node has the user, cluster and context all hardcoded with
@@ -89,27 +89,6 @@ destroy() {
   terraform destroy -var-file=${CLUSTER_DIR}/terraform.tfvars -state=${CLUSTER_DIR}/terraform.tfstate $FLAGS ${TMP_DIR}
 }
 
-execute_host() {
-  HOST=$1
-  COMMAND=$2
-  PROJECT=$(jq -r '.phase1.gce.project' ${CONFIG_FILE})
-  ZONE=$(jq -r '.phase1.gce.zone' ${CONFIG_FILE})
-  MASTER=$(jq -r '.phase1.cluster_name' ${CONFIG_FILE})-master
-  SSHUSER=$(jq -r '.phase1.ssh_user | values' ${CONFIG_FILE})
-
-  if [[ -n "${SSHUSER}" ]]; then
-    SSHUSER="${SSHUSER}@"
-  elif [[ -n "${USER:-}" ]]; then
-    SSHUSER="${USER}@"
-  fi
-
-  gcloud compute ssh --project "$PROJECT" --zone "$ZONE" "${SSHUSER}${MASTER}" --command "$2" >&1
-}
-
-master_host() {
-  echo $(jq -r '.phase1.cluster_name' ${CONFIG_FILE})-master
-}
-
 case "${1:-}" in
   "")
     ;;
@@ -119,13 +98,7 @@ case "${1:-}" in
   "destroy-cluster")
     destroy
     ;;
-  "execute-host")
-    execute_host "${@:2}"
-    ;;
   "gen")
     gen
-    ;;
-  "master-host")
-    master_host
     ;;
 esac
