@@ -33,4 +33,14 @@ cloudProvider: "$CLOUD_PROVIDER"
 EOF
 fi
 
+
+if [[ "$KUBEPROXY_MODE" == "ipvs" ]]; then
+    cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+kubeProxy:
+  config:
+    featureGates: SupportIPVSProxyMode=true
+    mode: "$KUBEPROXY_MODE"
+EOF
+fi
+
 kubeadm init --skip-preflight-checks --config $KUBEADM_CONFIG_FILE
