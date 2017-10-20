@@ -47,8 +47,7 @@ config phase3.cni
 	default ""
 	help
 	  CNI plugin to use. You likely only want this if using kubeadm for phase2.
-
-		Valid options are (flannel, weave).
+          Valid options are (calico, flannel, weave).
 endif
 
 if phase1.cloud_provider = gce

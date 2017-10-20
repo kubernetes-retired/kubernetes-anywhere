@@ -1,0 +1,76 @@
+{
+    "kind": "DaemonSet", 
+    "spec": {
+        "template": {
+            "spec": {
+                "tolerations": [
+                    {
+                        "effect": "NoSchedule", 
+                        "key": "node-role.kubernetes.io/master"
+                    }, 
+                    {
+                        "operator": "Exists", 
+                        "key": "CriticalAddonsOnly"
+                    }
+                ], 
+                "hostNetwork": true, 
+                "containers": [
+                    {
+                        "command": [
+                            "/bin/sh", 
+                            "-c"
+                        ], 
+                        "name": "calico-etcd", 
+                        "env": [
+                            {
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "fieldPath": "status.podIP"
+                                    }
+                                }, 
+                                "name": "CALICO_ETCD_IP"
+                            }
+                        ], 
+                        "image": "gcr.io/google_containers/etcd:2.2.1", 
+                        "args": [
+                            "/usr/local/bin/etcd --name=calico --data-dir=/var/etcd/calico-data --advertise-client-urls=http://$CALICO_ETCD_IP:6666 --listen-client-urls=http://0.0.0.0:6666 --listen-peer-urls=http://0.0.0.0:6667"
+                        ], 
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/etcd", 
+                                "name": "var-etcd"
+                            }
+                        ]
+                    }
+                ], 
+                "volumes": [
+                    {
+                        "hostPath": {
+                            "path": "/var/etcd"
+                        }, 
+                        "name": "var-etcd"
+                    }
+                ], 
+                "nodeSelector": {
+                    "node-role.kubernetes.io/master": ""
+                }
+            }, 
+            "metadata": {
+                "labels": {
+                    "k8s-app": "calico-etcd"
+                }, 
+                "annotations": {
+                    "scheduler.alpha.kubernetes.io/critical-pod": ""
+                }
+            }
+        }
+    }, 
+    "apiVersion": "extensions/v1beta1", 
+    "metadata": {
+        "labels": {
+            "k8s-app": "calico-etcd"
+        }, 
+        "namespace": "kube-system", 
+        "name": "calico-etcd"
+    }
+}
