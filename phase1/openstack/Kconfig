@@ -44,6 +44,13 @@ config phase1.openstack.password
 	help
 	  The OpenStack Keystone password used for authentication.
 
+config phase1.openstack.insecure
+       string "Trust self-signed SSL certificates"
+       default "false"
+       help
+         This option trusts self-signed SSL certificates when
+         connecting to the keystone URL.
+
 config phase1.openstack.network_name
 	string "Name of internal Neutron network"
 	help

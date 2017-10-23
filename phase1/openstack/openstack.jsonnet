@@ -48,6 +48,7 @@ function(cfg)
         domain_name: openstack.domain_name,
         password: openstack.password,
         auth_url: openstack.auth_url,
+        insecure: openstack.insecure,
       },
     },
 
