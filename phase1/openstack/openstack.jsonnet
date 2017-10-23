@@ -49,6 +49,7 @@ function(cfg)
         password: openstack.password,
         auth_url: openstack.auth_url,
         insecure: openstack.insecure,
+        cacert_file: "${file(\"%s\")}" % openstack.os_cacert,
       },
     },
 

@@ -51,6 +51,12 @@ config phase1.openstack.insecure
          This option trusts self-signed SSL certificates when
          connecting to the keystone URL.
 
+config phase1.openstack.os_cacert
+       string "path to custom CA certificate"
+       default ""
+       help
+         This option specifies a custom CA certificate file path.
+
 config phase1.openstack.network_name
 	string "Name of internal Neutron network"
 	help
