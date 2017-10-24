@@ -18,7 +18,7 @@
                 "containers": [
                     {
                         "name": "weave",
-                        "image": "weaveworks/weave-kube:1.9.4",
+                        "image": "weaveworks/weave-kube:2.0.5",
                         "command": [
                             "/home/weave/launch.sh"
                         ],
@@ -57,6 +57,10 @@
                             {
                                 "name": "lib-modules",
                                 "mountPath": "/lib/modules"
+                            },
+                            {
+                                "name": "xtables-lock",
+                                "mountPath": "/run/xtables.lock"
                             }
                         ],
                         "resources": {
@@ -67,7 +71,7 @@
                     },
                     {
                         "name": "weave-npc",
-                        "image": "weaveworks/weave-npc:1.9.4",
+                        "image": "weaveworks/weave-npc:2.0.5",
                         "resources": {
                             "requests": {
                                 "cpu": "10m"
@@ -75,7 +79,13 @@
                         },
                         "securityContext": {
                             "privileged": true
-                        }
+                        },
+                        "volumeMounts": [
+                            {
+                                "name": "xtables-lock",
+                                "mountPath": "/run/xtables.lock"
+                            }
+                        ]
                     }
                 ],
                 "restartPolicy": "Always",
@@ -124,6 +134,12 @@
                         "name": "lib-modules",
                         "hostPath": {
                             "path": "/lib/modules"
+                        }
+                    },
+                    {
+                        "name": "xtables-lock",
+                        "hostPath": {
+                            "path": "/run/xtables.lock"
                         }
                     }
                 ]
