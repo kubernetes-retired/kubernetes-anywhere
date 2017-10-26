@@ -11,16 +11,18 @@ $ git clone https://github.com/kubernetes/kubernetes-anywhere.git
 $ cd kubernetes-anywhere
 ```
 
+Create an SSH key pair in the kubernetes-anywhere directory. Run:
+
+```console
+$ ssh-keygen -t rsa -f id_rsa
+```
+
+During configuration step, when asked for SSH key pair, set to /opt/kubernetes-anywhere/id_rsa.
+
 Hop into deployment shell which includes all the tools you need to deploy a kubernetes-anywhere cluster. Run:
 
 ```console
 $ make docker-dev
-```
-
-If you don't already have an SSH key pair, you can generate one like below. SSH key pair is needed as a config during subsequent steps:
-
-```console
-$ ssh-keygen -t rsa
 ```
 
 then run:
