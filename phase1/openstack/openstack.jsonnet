@@ -2,6 +2,7 @@ function(cfg)
   local tf = import "phase1/tf.jsonnet";
   local p1 = cfg.phase1;
   local p2 = cfg.phase2;
+  local p3 = cfg.phase3;
   local openstack = p1.openstack;
   local names = {
     node_instance: "%(cluster_name)s_node" % p1,
@@ -22,12 +23,20 @@ function(cfg)
     startup_script:
       std.escapeStringDollars(importstr "configure-vm.sh") + (
       if p2.provider == "kubeadm" then
-        std.escapeStringDollars(importstr "configure-vm-kubeadm.sh")
+        std.escapeStringDollars(importstr "../../phase2/kubeadm/configure-vm-kubeadm.sh")
       else
         error "Unsupported phase2 provider in config"
     ),
-    master_startup_script: self.startup_script + std.escapeStringDollars(importstr "configure-vm-kubeadm-master.sh"),
-    node_startup_script: self.startup_script + std.escapeStringDollars(importstr "configure-vm-kubeadm-node.sh"),
+    master_startup_script:
+      self.startup_script + (
+      if p2.provider == "kubeadm" then
+        std.escapeStringDollars(importstr "../../phase2/kubeadm/configure-vm-kubeadm-master.sh")
+    ),
+    node_startup_script:
+      self.startup_script + (
+      if p2.provider == "kubeadm" then
+        std.escapeStringDollars(importstr "../../phase2/kubeadm/configure-vm-kubeadm-node.sh")
+    ),
   };
 
   {
@@ -54,9 +63,13 @@ function(cfg)
     data: {
       local common_vars = {
         k8s_kubeadm_version: "%(version)s" % p2.kubeadm,
-        k8s_kubernetes_version: "%(kubernetes_version)s" % p2,
-        k8s_advertise_addresses: "${openstack_compute_floatingip_v2.%(master_ip)s.address}" % names,
+        k8s_kubeadm_kubernetes_version: "%(kubernetes_version)s" % p2,
+        k8s_kubeadm_advertise_addresses: "${openstack_compute_floatingip_v2.%(master_ip)s.address}" % names,
         k8s_kubeadm_token: "${var.kubeadm_token}",
+        k8s_kubeadm_cni_plugin: if std.objectHas(p3, "cni") then p3.cni else "",
+        k8s_kubeadm_kubelet_version: "%(kubelet_version)s" % p2,
+        k8s_kubeadm_enable_cloud_provider: (if std.objectHas(p2, "enable_cloud_provider") && p2.enable_cloud_provider then "true" else "false"),
+        k8s_kubeadm_master_ip: "",
       },
       "template_file": {
         "master": {
@@ -66,7 +79,7 @@ function(cfg)
         "node": {
           template: startup_config.node_startup_script,
           vars: common_vars {
-            k8s_master_ip: "${openstack_compute_instance_v2.%(master_instance)s.network.0.fixed_ip_v4}" % names,
+            k8s_kubeadm_master_ip: "${openstack_compute_instance_v2.%(master_instance)s.network.0.fixed_ip_v4}" % names,
           },
         },
       },
