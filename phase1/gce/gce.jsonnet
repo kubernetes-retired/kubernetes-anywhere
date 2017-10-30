@@ -31,9 +31,9 @@ function(cfg)
     startup_script:
       std.escapeStringDollars(importstr "configure-vm.sh") + (
       if p2.provider == "ignition" then
-        std.escapeStringDollars(importstr "configure-vm-ignition.sh")
+        std.escapeStringDollars(importstr "../../phase2/ignition/configure-vm-ignition.sh")
       else if p2.provider == "kubeadm" then
-        std.escapeStringDollars(importstr "configure-vm-kubeadm.sh")
+        std.escapeStringDollars(importstr "../../phase2/kubeadm/configure-vm-kubeadm.sh")
       else
         error "Unsupported phase2 provider in config"
     ),
