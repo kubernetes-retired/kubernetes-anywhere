@@ -69,6 +69,17 @@ function(cfg)
             k8s_master_ip: "${openstack_compute_instance_v2.%(master_instance)s.network.0.fixed_ip_v4}" % names,
           },
         },
+       	//Populates openstack config file
+        cloudprovider: {
+          template: "${file(\"openstack.conf\")}",
+          vars: {
+            user_name: std.escapeStringJson(cfg.openstack.user_name),
+            password: std.escapeStringJson(cfg.openstack.password),
+            auth_url: std.escapeStringJson(cfg.openstack.auth_url),
+            tenant_id: std.escapeStringJson(cfg.openstack.project_name),
+            domain_name: std.escapeStringJson(cfg.openstack.domain_name),
+          },
+        },
       },
     },
 
