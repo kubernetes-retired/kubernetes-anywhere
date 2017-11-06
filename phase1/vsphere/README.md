@@ -120,15 +120,15 @@ number of nodes (phase1.num_nodes) [4] (NEW) 4
 ```
 cluster name (phase1.cluster_name) [kubernetes] (NEW) kubernetes
 ```
-* phase1.ssh_user - This field is not used for vSphere Deployment. Leave it blank and hit enter.
 
+* phase1.ssh_user - This field is not used for vSphere Deployment. Leave it blank and hit enter.
 ```
-SSH user to login to OS for provisioning (phase1.ssh_user) [] (NEW) 
+SSH user to login to OS for provisioning (phase1.ssh_user) [] (NEW)
 ```
 
 * Select the provider, in this case it would be vsphere.
 ```
-cloud provider: gce or vsphere (phase1.cloud_provider) [vsphere] (NEW) vsphere
+cloud provider: gce, azure or vsphere (phase1.cloud_provider) [vsphere] (NEW) vsphere
 ```
 
 * Set the vCenter URL (Just the IP or domain name, without https://)
@@ -223,22 +223,25 @@ For Kubernetes release 1.6 and above use `docker.io/cnastorage/k8s-ignition:v2`.
 *
 * Phase 2: Node Bootstrapping
 *
+```
+* Set the release of Kubernetes to be used. The release should be the exact string used to tag a release.
+```
+kubernetes version (phase2.kubernetes_version) [v1.6.5] (NEW)
+```
+
+* Set bootstrap provider to ignition
+```
+bootstrap provider (phase2.provider) [ignition] (NEW) ignition
+```
+
+* Set the installer container
+```
 installer container (phase2.installer_container) [docker.io/cnastorage/k8s-ignition:v2] (NEW) docker.io/cnastorage/k8s-ignition:v2
 ```
 
 * Registry to be used by Kubernetes
 ```
 docker registry (phase2.docker_registry) [gcr.io/google-containers] (NEW)
-```
-
-* Set the release of Kubernetes to be used. The release should be the exact string used to tag a release.
-```
-kubernetes version (phase2.kubernetes_version) [v1.6.5] (NEW) v1.6.5
-```
-
-* Set bootstrap provider to ignition
-```
-bootstrap provider (phase2.provider) [ignition] (NEW) ignition
 ```
 
 * Select the addons. Defaults to yes. **Make sure to choose 'N' for weave-net addon.**
@@ -313,7 +316,7 @@ First set KUBECONFIG to access cluster using kubectl:
 ```shell
 export KUBECONFIG="/opt/kubernetes-anywhere/phase1/vsphere/kubernetes/kubeconfig.json"
 ```
-Note: In the path `/opt/kubernetes-anywhere/phase1/vsphere/kubernetes` kubernetes is the name of the cluster that we have specifed in the config file. If you have specified different name make sure to specify the appropriate path. 
+Note: In the path `/opt/kubernetes-anywhere/phase1/vsphere/kubernetes` kubernetes is the name of the cluster that we have specifed in the config file. If you have specified different name make sure to specify the appropriate path.
 
 We have mounted /tmp directory in the deployment container. If you want to save the config on your local machine just copy this file to the /tmp directory in the container.
 
