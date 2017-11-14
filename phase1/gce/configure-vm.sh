@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 set -o errexit
 set -o pipefail
@@ -9,10 +9,19 @@ get_metadata() {
   curl \
     -sSL --fail \
     -H "Metadata-Flavor: Google" \
-    "metadata/computeMetadata/v1/instance/attributes/${1}"
+    "metadata/computeMetadata/v1/instance/attributes/${1}" 2>/dev/null || true
 }
 
-ROLE=$(get_metadata "k8s-role")
+KUBEADM_TOKEN=$(get_metadata "k8s-kubeadm-token")
+KUBEADM_VERSION=$(get_metadata "k8s-kubeadm-version")
+KUBEADM_KUBERNETES_VERSION=$(get_metadata "k8s-kubeadm-kubernetes-version")
+KUBEADM_KUBELET_VERSION=$(get_metadata "k8s-kubeadm-kubelet-version")
+KUBEADM_ENABLE_CLOUD_PROVIDER=$(get_metadata "k8s-kubeadm-enable-cloud-provider")
+KUBEADM_ADVERTISE_ADDRESSES=$(get_metadata "k8s-kubeadm-advertise-addresses")
+KUBEADM_CNI_PLUGIN=$(get_metadata "k8s-kubeadm-cni-plugin")
+KUBEADM_MASTER_IP=$(get_metadata "k8s-kubeadm-master-ip")
+
+CLOUD_PROVIDER="gce"
 
 apt-get update
 apt-get install -y apt-transport-https

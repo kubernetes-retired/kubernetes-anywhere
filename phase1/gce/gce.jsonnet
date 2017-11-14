@@ -31,11 +31,21 @@ function(cfg)
     startup_script:
       std.escapeStringDollars(importstr "configure-vm.sh") + (
       if p2.provider == "ignition" then
-        std.escapeStringDollars(importstr "configure-vm-ignition.sh")
+        std.escapeStringDollars(importstr "../../phase2/ignition/configure-vm-ignition.sh")
       else if p2.provider == "kubeadm" then
-        std.escapeStringDollars(importstr "configure-vm-kubeadm.sh")
+        std.escapeStringDollars(importstr "../../phase2/kubeadm/configure-vm-kubeadm.sh")
       else
         error "Unsupported phase2 provider in config"
+    ),
+    master_startup_script:
+      self.startup_script + (
+      if p2.provider == "kubeadm" then
+        std.escapeStringDollars(importstr "../../phase2/kubeadm/configure-vm-kubeadm-master.sh")
+    ),
+    node_startup_script:
+      self.startup_script + (
+      if p2.provider == "kubeadm" then
+        std.escapeStringDollars(importstr "../../phase2/kubeadm/configure-vm-kubeadm-node.sh")
     ),
   };
   local config_metadata_template = std.toString(cfg {
@@ -141,17 +151,16 @@ function(cfg)
               nat_ip: "${google_compute_address.%(master_ip)s.address}" % names,
             },
           }],
-          metadata_startup_script: startup_config.startup_script,
+          metadata_startup_script: startup_config.master_startup_script,
           metadata: {
-            "k8s-role": "master",
-            "k8s-advertise-addresses": "${google_compute_address.%(master_ip)s.address}" % names,
-            "k8s-cni-plugin": if std.objectHas(p3, "cni") then p3.cni else "",
+            "k8s-kubeadm-advertise-addresses": "${google_compute_address.%(master_ip)s.address}" % names,
+            "k8s-kubeadm-cni-plugin": if std.objectHas(p3, "cni") then p3.cni else "",
           } + if p2.provider == "kubeadm" then {
             "k8s-kubeadm-token": "${var.kubeadm_token}",
             "k8s-kubeadm-version": "%(version)s" % p2.kubeadm,
-            "k8s-kubernetes-version": "%(kubernetes_version)s" % p2,
-            "k8s-kubelet-version": "%(kubelet_version)s" % p2,
-            "k8s-enable-cloud-provider": (if std.objectHas(p2, "enable_cloud_provider") && p2.enable_cloud_provider then "true" else "false"),
+            "k8s-kubeadm-kubernetes-version": "%(kubernetes_version)s" % p2,
+            "k8s-kubeadm-kubelet-version": "%(kubelet_version)s" % p2,
+            "k8s-kubeadm-enable-cloud-provider": (if std.objectHas(p2, "enable_cloud_provider") && p2.enable_cloud_provider then "true" else "false"),
           } else {
             "k8s-config": config_metadata_template % [names.master_ip, "master"],
             "k8s-ca-public-key": "${tls_self_signed_cert.%s-root.cert_pem}" % p1.cluster_name,
@@ -172,15 +181,14 @@ function(cfg)
           name: names.instance_template,
           tags: ["%(cluster_name)s-node" % p1],
           metadata: {
-            "startup-script": startup_config.startup_script,
-            "k8s-role": "node",
-            "k8s-master-ip": "${google_compute_instance.%(master_instance)s.network_interface.0.address}" % names,
+            "startup-script": startup_config.node_startup_script,
+            "k8s-kubeadm-master-ip": "${google_compute_instance.%(master_instance)s.network_interface.0.address}" % names,
           } + if p2.provider == "kubeadm" then {
             "k8s-kubeadm-token": "${var.kubeadm_token}",
             "k8s-kubeadm-version": "%(version)s" % p2.kubeadm,
-            "k8s-kubernetes-version": "%(kubernetes_version)s" % p2,
-            "k8s-kubelet-version": "%(kubelet_version)s" % p2,
-            "k8s-enable-cloud-provider": (if std.objectHas(p2, "enable_cloud_provider") && p2.enable_cloud_provider then "true" else "false"),
+            "k8s-kubeadm-kubernetes-version": "%(kubernetes_version)s" % p2,
+            "k8s-kubeadm-kubelet-version": "%(kubelet_version)s" % p2,
+            "k8s-kubeadm-enable-cloud-provider": (if std.objectHas(p2, "enable_cloud_provider") && p2.enable_cloud_provider then "true" else "false"),
           } else {
             "k8s-deploy-bucket": names.release_bucket,
             "k8s-config": config_metadata_template % [names.master_ip, "node"],
