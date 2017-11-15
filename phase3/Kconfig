@@ -7,13 +7,23 @@ config phase3.run_addons
 	help
 	  Should we deploy the addon manager?
 
-if phase3.run_addons
+if phase3.run_addons && phase2.provider != kubeadm
 
 config phase3.kube_proxy
 	bool "Run kube-proxy?"
 	default y
 	help
 	  Should we deploy the kube-proxy to nodes?
+
+config phase3.kube_dns
+	bool "Run kube-dns?"
+	default y
+	help
+	  Should we deploy kube-dns?
+
+endif 
+
+if phase3.run_addons 
 
 config phase3.dashboard
 	bool "Run the dashboard?"
@@ -26,12 +36,6 @@ config phase3.heapster
 	default y
 	help
 	  Should we deploy heapster?
-
-config phase3.kube_dns
-	bool "Run kube-dns?"
-	default y
-	help
-	  Should we deploy kube-dns?
 
 config phase3.weave_net
 	bool "Run weave-net?"
