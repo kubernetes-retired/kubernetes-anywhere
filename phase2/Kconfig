@@ -3,7 +3,7 @@ menu "Phase 2: Node Bootstrapping"
 
 config phase2.kubernetes_version
 	string "kubernetes version"
-	default "v1.6.5"
+	default "v1.8.4"
 	help
 	  The version of Kubernetes to deploy to the control plane.
 
