@@ -1,6 +1,49 @@
 
 # This is not meant to run on its own, but extends phase1/<CLOUD_PROVIDER>/configure-vm.sh
 
+# $1 - VER_A
+# $2 - VER_B
+# echo 0 - Either VER_A or VER_B does not match the regular expression
+# echo 1 - VER_A -lt VER_B
+# echo 2 - VER_A -eq VER_B
+# echo 3 - VER_A -gt VER_B
+semver_compare(){
+  local RE='.*v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*).*'
+
+  if [[ "$1" =~ $RE ]] && [[ "$2" =~ $RE ]]; then
+    : #$1 & $2 are REs
+  else
+    echo 0
+  fi
+
+  MAJOR_A=$(echo $1 | sed -r -e "s#$RE#\1#")
+  MAJOR_B=$(echo $2 | sed -r -e "s#$RE#\1#")
+  MINOR_A=$(echo $1 | sed -r -e "s#$RE#\2#")
+  MINOR_B=$(echo $2 | sed -r -e "s#$RE#\2#")
+  PATCH_A=$(echo $1 | sed -r -e "s#$RE#\3#")
+  PATCH_B=$(echo $2 | sed -r -e "s#$RE#\3#")
+
+  if [[ $MAJOR_A -lt $MAJOR_B ]]; then
+    echo 1
+  elif [[ $MAJOR_A -gt $MAJOR_B ]]; then
+    echo 3
+  else
+    if [[ $MINOR_A -lt $MINOR_B ]]; then
+      echo 1
+    elif [[ $MINOR_A -gt $MINOR_B ]]; then
+      echo 3
+    else
+      if [[ $PATCH_A -lt $PATCH_B ]]; then
+        echo 1
+      elif [[ $PATCH_A -gt $PATCH_B ]]; then
+        echo 3
+      else
+        echo 2
+      fi
+    fi
+  fi
+}
+
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
 if [[ "$KUBEADM_KUBELET_VERSION" == stable ]]; then
