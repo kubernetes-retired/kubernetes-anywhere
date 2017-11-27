@@ -58,7 +58,7 @@ config phase2.kubeadm.master_upgrade.method
 
 config phase2.kube_context_name
     string "kube context name"
-    default ""
+    default phase1.cluster_name
     help
 	  The name of the context in kubeconfig.
 	  This is optional to set and when set, the kubeconfig
