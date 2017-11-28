@@ -157,6 +157,7 @@ function(cfg)
             "k8s-kubeadm-cni-plugin": if std.objectHas(p3, "cni") then p3.cni else "",
           } + if p2.provider == "kubeadm" then {
             "k8s-kubeadm-token": "${var.kubeadm_token}",
+            "k8s-kubeproxy-mode": "%(proxy_mode)s" % p2,
             "k8s-kubeadm-version": "%(version)s" % p2.kubeadm,
             "k8s-kubeadm-kubernetes-version": "%(kubernetes_version)s" % p2,
             "k8s-kubeadm-kubelet-version": "%(kubelet_version)s" % p2,

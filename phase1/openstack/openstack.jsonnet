@@ -66,6 +66,7 @@ function(cfg)
         k8s_kubeadm_kubernetes_version: "%(kubernetes_version)s" % p2,
         k8s_kubeadm_advertise_addresses: "${openstack_compute_floatingip_v2.%(master_ip)s.address}" % names,
         k8s_kubeadm_token: "${var.kubeadm_token}",
+        k8s_kubeproxy_mode: "%(proxy_mode)s" % p2,
         k8s_kubeadm_cni_plugin: if std.objectHas(p3, "cni") then p3.cni else "",
         k8s_kubeadm_kubelet_version: "%(kubelet_version)s" % p2,
         k8s_kubeadm_enable_cloud_provider: (if std.objectHas(p2, "enable_cloud_provider") && p2.enable_cloud_provider then "true" else "false"),

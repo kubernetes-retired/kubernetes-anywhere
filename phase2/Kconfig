@@ -21,6 +21,14 @@ config phase2.provider
 
 	  Valid options are (ignition, kubeadm).
 
+config phase2.proxy_mode
+	string "kube-proxy mode: iptables or ipvs"
+	default "iptables"
+	help
+	  The kube-proxy mode to use.
+
+	  Valid options are (iptables, ipvs).
+
 if phase2.provider = ignition
 
 config phase2.installer_container
