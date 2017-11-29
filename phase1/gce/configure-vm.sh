@@ -21,6 +21,7 @@ KUBEADM_ADVERTISE_ADDRESSES=$(get_metadata "k8s-kubeadm-advertise-addresses")
 KUBEADM_CNI_PLUGIN=$(get_metadata "k8s-kubeadm-cni-plugin")
 KUBEADM_MASTER_IP=$(get_metadata "k8s-kubeadm-master-ip")
 KUBEPROXY_MODE=$(get_metadata "k8s-kubeproxy-mode")
+KUBEADM_FEATURE_GATES=$(get_metadata "k8s-kubeadm-feature-gates")
 
 CLOUD_PROVIDER="gce"
 

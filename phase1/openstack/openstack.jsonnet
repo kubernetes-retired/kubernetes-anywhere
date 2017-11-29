@@ -71,6 +71,7 @@ function(cfg)
         k8s_kubeadm_kubelet_version: "%(kubelet_version)s" % p2,
         k8s_kubeadm_enable_cloud_provider: (if std.objectHas(p2, "enable_cloud_provider") && p2.enable_cloud_provider then "true" else "false"),
         k8s_kubeadm_master_ip: "",
+        k8s_kubeadm_feature_gates: if std.objectHas(p2.kubeadm, "feature_gates") then "%(feature_gates)s" % p2.kubeadm else "",
       },
       "template_file": {
         "master": {

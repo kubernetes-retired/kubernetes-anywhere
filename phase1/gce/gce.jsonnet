@@ -157,11 +157,12 @@ function(cfg)
             "k8s-kubeadm-cni-plugin": if std.objectHas(p3, "cni") then p3.cni else "",
           } + if p2.provider == "kubeadm" then {
             "k8s-kubeadm-token": "${var.kubeadm_token}",
-            "k8s-kubeproxy-mode": "%(proxy_mode)s" % p2,
+            "k8s-kubeproxy-mode": if std.objectHas(p2, "proxy_mode") then "%(proxy_mode)s" % p2 else "",
             "k8s-kubeadm-version": "%(version)s" % p2.kubeadm,
             "k8s-kubeadm-kubernetes-version": "%(kubernetes_version)s" % p2,
             "k8s-kubeadm-kubelet-version": "%(kubelet_version)s" % p2,
             "k8s-kubeadm-enable-cloud-provider": (if std.objectHas(p2, "enable_cloud_provider") && p2.enable_cloud_provider then "true" else "false"),
+            "k8s-kubeadm-feature-gates": if std.objectHas(p2.kubeadm, "feature_gates") then "%(feature_gates)s" % p2.kubeadm else "",
           } else {
             "k8s-config": config_metadata_template % [names.master_ip, "master"],
             "k8s-ca-public-key": "${tls_self_signed_cert.%s-root.cert_pem}" % p1.cluster_name,

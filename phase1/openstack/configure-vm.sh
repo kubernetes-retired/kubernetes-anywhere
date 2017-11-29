@@ -14,6 +14,7 @@ KUBEADM_ADVERTISE_ADDRESSES="${k8s_kubeadm_advertise_addresses}"
 KUBEADM_CNI_PLUGIN="${k8s_kubeadm_cni_plugin}"
 KUBEADM_MASTER_IP="${k8s_kubeadm_master_ip}"
 KUBEPROXY_MODE="${k8s_kubeproxy_mode}"
+KUBEADM_FEATURE_GATES=${k8s_kubeadm_feature_gates}
 
 CLOUD_PROVIDER="openstack"
 

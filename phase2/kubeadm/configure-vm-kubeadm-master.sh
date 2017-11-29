@@ -33,13 +33,28 @@ cloudProvider: "$CLOUD_PROVIDER"
 EOF
 fi
 
-
 if [[ "$KUBEPROXY_MODE" == "ipvs" ]]; then
     cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
 kubeProxy:
   config:
     featureGates: SupportIPVSProxyMode=true
     mode: "$KUBEPROXY_MODE"
+EOF
+fi
+
+# if exist $KUBEADM_FEATURE_GATES is an string in format "key1=values1,key2=value2,.."
+# it should be added in the config in an YAML format for the field featureGates - eg:
+# featureGates:
+#   key1: value1
+#   key2: value2
+#   etc ...
+#NOTE: it is important to avoid the substituion and expression format for a variable. Therefore the usage of evaluated (echo + sed)
+KUBEADM_FEATURE_GATES=`echo "$KUBEADM_FEATURE_GATES" | sed -e 's/^[[:space:]]*//'`
+if [[ ! -z $KUBEADM_FEATURE_GATES ]]; then
+  foptions=`echo $KUBEADM_FEATURE_GATES | sed -e 's/=/: /g;s/,/\\\n  /g'`
+  cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+featureGates:
+  `echo -e "$foptions"`
 EOF
 fi
 
