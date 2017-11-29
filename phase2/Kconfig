@@ -3,7 +3,7 @@ menu "Phase 2: Node Bootstrapping"
 
 config phase2.kubernetes_version
 	string "kubernetes version"
-	default "v1.6.5"
+	default "v1.8.4"
 	help
 	  The version of Kubernetes to deploy to the control plane.
 
@@ -15,6 +15,7 @@ config phase2.docker_registry
 
 config phase2.provider
 	string "bootstrap provider"
+	default "kubeadm" if phase1.cloud_provider = "gce" || phase1.cloud_provider = "openstack"
 	default "ignition"
 	help
 	  The bootstrap provider to use.
@@ -66,7 +67,7 @@ config phase2.kubeadm.master_upgrade.method
 
 config phase2.kube_context_name
     string "kube context name"
-    default ""
+    default phase1.cluster_name
     help
 	  The name of the context in kubeconfig.
 	  This is optional to set and when set, the kubeconfig
