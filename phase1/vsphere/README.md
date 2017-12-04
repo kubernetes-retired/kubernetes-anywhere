@@ -47,8 +47,8 @@
 
 **Note**:
 
-* The recommended version is v1.6.5
-* The deployment is tested with kubernetes 1.6.5, 1.5.7
+* Kubernetes recommended version is v1.6.5
+* The deployment is tested with kubernetes v1.6.5, v1.5.7
 * vSphere Cloud Provider is tested on v1.6.5, v1.5.7
 
 ### Upload VM image to be used to vSphere:
@@ -98,7 +98,7 @@ Lets take a look at vSphere environment before starting deployment wizard.
 
 ![k8s-vsphere-deployment-01](https://user-images.githubusercontent.com/22985595/29735888-5b4117be-89b1-11e7-8590-214dc738a6a1.png)
 
-Here you see Datacenter ```PA-DC```, has ```cluster-vsan-1``` with one resource pool - ```dev-resource-pool```.
+Here you see Datacenter ```cna-storage```, has ```cluster-vsan-1``` with one resource pool - ```dev-resource-pool```.
 
 Following steps will deploy 4 nodes Kubernetes Cluster on the ```dev-resource-pool``` using the template file deployed on the cluster.
 
