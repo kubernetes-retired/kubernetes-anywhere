@@ -79,6 +79,16 @@ config phase2.enable_cloud_provider
 	help
 	  Should we enable and initialize cloud provider for the cluster?
 
+config phase2.kubeadm.feature_gates
+	string "kubeadm feature gates"
+	default ""
+	help
+	  Enable or disable specific features of kubeadm.
+
+	  Valid options are a set of key-value pairs in format : "<key-1>=<values-1>,<key-2>=<value-2>,.."
+	  as of today values must be booleans : true or false
+	  see "--feature-gates" option of kubeadm for description of keys.
+
 endif
 
 endmenu
