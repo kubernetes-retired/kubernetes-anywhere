@@ -26,7 +26,7 @@
         "containers": [
           {
             "name": "kubernetes-dashboard",
-            "image": "gcr.io/google_containers/kubernetes-dashboard-amd64:v1.5.1",
+            "image": "k8s.gcr.io/kubernetes-dashboard-amd64:v1.5.1",
             "imagePullPolicy": "Always",
             "ports": [
               {
