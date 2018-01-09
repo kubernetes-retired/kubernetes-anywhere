@@ -89,8 +89,8 @@ kubernetes in GCE on a Linux distro that has the apt package manager.
     GCP_PROJECT_ID=<gcp-project-id>
     gcloud docker -a
 
-    docker pull gcr.io/google_containers/etcd-amd64:3.0.14-kubeadm
-    docker tag gcr.io/google_containers/etcd-amd64:3.0.14-kubeadm gcr.io/${GCP_PROJECT_ID}/etcd-amd64:3.0.14-kubeadm
+    docker pull k8s.gcr.io/etcd-amd64:3.0.14-kubeadm
+    docker tag k8s.gcr.io/etcd-amd64:3.0.14-kubeadm gcr.io/${GCP_PROJECT_ID}/etcd-amd64:3.0.14-kubeadm
     docker push gcr.io/${GCP_PROJECT_ID}/etcd-amd64:3.0.14-kubeadm
 
     docker pull gcr.io/google-containers/pause-amd64:3.0
@@ -101,8 +101,8 @@ kubernetes in GCE on a Linux distro that has the apt package manager.
     docker tag gcr.io/google-containers/kube-discovery-amd64:1.0 gcr.io/${GCP_PROJECT_ID}/kube-discovery-amd64:1.0
     docker push gcr.io/${GCP_PROJECT_ID}/kube-discovery-amd64:1.0
 
-    docker pull gcr.io/google_containers/k8s-dns-sidecar-amd64:1.11.0
-    docker tag gcr.io/google_containers/k8s-dns-sidecar-amd64:1.11.0 gcr.io/${GCP_PROJECT_ID}/k8s-dns-sidecar-amd64:1.11.0
+    docker pull k8s.gcr.io/k8s-dns-sidecar-amd64:1.11.0
+    docker tag k8s.gcr.io/k8s-dns-sidecar-amd64:1.11.0 gcr.io/${GCP_PROJECT_ID}/k8s-dns-sidecar-amd64:1.11.0
     docker push gcr.io/${GCP_PROJECT_ID}/k8s-dns-sidecar-amd64:1.11.0
 
     docker pull gcr.io/google-containers/k8s-dns-dnsmasq-amd64:1.11.0
@@ -141,7 +141,7 @@ kubernetes in GCE on a Linux distro that has the apt package manager.
     build_and_push() {
       local component="$1"
       bazel run "//build:${component}"
-      docker tag "gcr.io/google_containers/${component}:${component}" "${KUBE_REPO_PREFIX}/${component}-amd64:${KUBE_VERSION}"
+      docker tag "k8s.gcr.io/${component}:${component}" "${KUBE_REPO_PREFIX}/${component}-amd64:${KUBE_VERSION}"
       docker push "${KUBE_REPO_PREFIX}/${component}-amd64:${KUBE_VERSION}"
     }
 

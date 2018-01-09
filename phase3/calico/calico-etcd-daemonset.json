@@ -31,7 +31,7 @@
                                 "name": "CALICO_ETCD_IP"
                             }
                         ], 
-                        "image": "gcr.io/google_containers/etcd:2.2.1", 
+                        "image": "k8s.gcr.io/etcd:2.2.1", 
                         "args": [
                             "/usr/local/bin/etcd --name=calico --data-dir=/var/etcd/calico-data --advertise-client-urls=http://$CALICO_ETCD_IP:6666 --listen-client-urls=http://0.0.0.0:6666 --listen-peer-urls=http://0.0.0.0:6667"
                         ], 
