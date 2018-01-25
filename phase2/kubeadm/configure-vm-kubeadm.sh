@@ -60,6 +60,9 @@ elif [[ "$KUBEADM_KUBELET_VERSION" == "gs://"* ]]; then
   gsutil rsync "$KUBEADM_KUBELET_VERSION" $TMPDIR
   # kubeadm is installed with the kubelet so that the
   # kubelet has the configuration at a matching version
+  # TODO: Remove the following mkdir when bazelbuild/bazel
+  # issue #4651 gets resolved.
+  mkdir -p /opt/cni/bin
   dpkg -i $TMPDIR/{kubelet,kubeadm,kubectl,kubernetes-cni}.deb || echo Ignoring expected dpkg failure
   apt-get install -f -y
   systemctl enable kubelet
