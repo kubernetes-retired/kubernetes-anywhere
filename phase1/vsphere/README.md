@@ -213,7 +213,7 @@ cloud provider: gce, azure or vsphere (phase1.cloud_provider) [vsphere] (NEW) vs
 
 * Configure the POD network using flannel
 ```
-  Flannel Network (phase1.vSphere.flannel_net) [172.1.0.0/16] (NEW)
+  Flannel Network (phase1.vSphere.flannel_net) [172.16.0.0/16] (NEW)
 ```
 
 * Ignition image to be used for phase 2.
