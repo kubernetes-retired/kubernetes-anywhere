@@ -93,24 +93,24 @@ kubernetes in GCE on a Linux distro that has the apt package manager.
     docker tag k8s.gcr.io/etcd-amd64:3.0.14-kubeadm gcr.io/${GCP_PROJECT_ID}/etcd-amd64:3.0.14-kubeadm
     docker push gcr.io/${GCP_PROJECT_ID}/etcd-amd64:3.0.14-kubeadm
 
-    docker pull gcr.io/google-containers/pause-amd64:3.0
-    docker tag gcr.io/google-containers/pause-amd64:3.0 gcr.io/${GCP_PROJECT_ID}/pause-amd64:3.0
+    docker pull k8s.gcr.io/pause-amd64:3.0
+    docker tag k8s.gcr.io/pause-amd64:3.0 gcr.io/${GCP_PROJECT_ID}/pause-amd64:3.0
     docker push gcr.io/${GCP_PROJECT_ID}/pause-amd64:3.0
 
-    docker pull gcr.io/google-containers/kube-discovery-amd64:1.0
-    docker tag gcr.io/google-containers/kube-discovery-amd64:1.0 gcr.io/${GCP_PROJECT_ID}/kube-discovery-amd64:1.0
+    docker pull k8s.gcr.io/kube-discovery-amd64:1.0
+    docker tag k8s.gcr.io/kube-discovery-amd64:1.0 gcr.io/${GCP_PROJECT_ID}/kube-discovery-amd64:1.0
     docker push gcr.io/${GCP_PROJECT_ID}/kube-discovery-amd64:1.0
 
     docker pull k8s.gcr.io/k8s-dns-sidecar-amd64:1.11.0
     docker tag k8s.gcr.io/k8s-dns-sidecar-amd64:1.11.0 gcr.io/${GCP_PROJECT_ID}/k8s-dns-sidecar-amd64:1.11.0
     docker push gcr.io/${GCP_PROJECT_ID}/k8s-dns-sidecar-amd64:1.11.0
 
-    docker pull gcr.io/google-containers/k8s-dns-dnsmasq-amd64:1.11.0
-    docker tag gcr.io/google-containers/k8s-dns-dnsmasq-amd64:1.11.0 gcr.io/${GCP_PROJECT_ID}/k8s-dns-dnsmasq-amd64:1.11.0
+    docker pull k8s.gcr.io/k8s-dns-dnsmasq-amd64:1.11.0
+    docker tag k8s.gcr.io/k8s-dns-dnsmasq-amd64:1.11.0 gcr.io/${GCP_PROJECT_ID}/k8s-dns-dnsmasq-amd64:1.11.0
     docker push gcr.io/${GCP_PROJECT_ID}/k8s-dns-dnsmasq-amd64:1.11.0
 
-    docker pull gcr.io/google-containers/k8s-dns-kube-dns-amd64:1.11.0
-    docker tag gcr.io/google-containers/k8s-dns-kube-dns-amd64:1.11.0 gcr.io/${GCP_PROJECT_ID}/k8s-dns-kube-dns-amd64:1.11.0
+    docker pull k8s.gcr.io/k8s-dns-kube-dns-amd64:1.11.0
+    docker tag k8s.gcr.io/k8s-dns-kube-dns-amd64:1.11.0 gcr.io/${GCP_PROJECT_ID}/k8s-dns-kube-dns-amd64:1.11.0
     docker push gcr.io/${GCP_PROJECT_ID}/k8s-dns-kube-dns-amd64:1.11.0
     ```
 
