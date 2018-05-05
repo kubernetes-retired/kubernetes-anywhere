@@ -107,7 +107,7 @@ config phase1.vSphere.template
 
 config phase1.vSphere.flannel_net
 	string "Flannel Network"
-	default "172.1.0.0/16"
+	default "172.16.0.0/16"
 	help
 		 IP range used for flannel overlay network.
 
