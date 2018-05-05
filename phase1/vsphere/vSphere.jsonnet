@@ -1,9 +1,9 @@
 function(config)
   local tf = import "phase1/tf.jsonnet";
   local cfg = config.phase1;
-  local vms = std.makeArray(cfg.num_nodes + 1,function(node) node+1); 
+  local vms = std.makeArray(cfg.num_nodes + 1,function(node) node+1);
   local master_dependency_list = ["vsphere_virtual_machine.kubevm%d" % vm for vm in vms];
-  local node_name_to_ip = [("${vsphere_virtual_machine.kubevm%d.network_interface.0.ipv4_address} %s"  % [vm, (if vm == 1 then std.join("", [cfg.cluster_name, "-master"]) else std.join("", [cfg.cluster_name, "-node", vm-1]) )])  for vm in vms];
+  local node_name_to_ip = [("${vsphere_virtual_machine.kubevm%d.network_interface.0.ipv4_address} %s"  % [vm, (if vm == 1 then std.join("", [cfg.cluster_name, "-master"]) else std.join("", [cfg.cluster_name, "-node", std.toString(vm-1)]) )])  for vm in vms];
   local vm_username = "root";
   local vm_password = "kubernetes";
 
@@ -21,7 +21,7 @@ function(config)
         addons_config: (import "phase3/all.jsonnet")(config),
       },
     };
-  
+
   std.mergePatch({
     // vSphere Configuration
     provider: {
@@ -32,7 +32,7 @@ function(config)
         allow_unverified_ssl: cfg.vSphere.insecure,
       },
     },
-    
+
      data: {
       template_file: {
         configure_master: {
@@ -49,7 +49,7 @@ function(config)
             flannel_net: cfg.vSphere.flannel_net,
             installer_container: config.phase2.installer_container,
             docker_registry: config.phase2.docker_registry,
-            kubernetes_version: config.phase2.kubernetes_version, 
+            kubernetes_version: config.phase2.kubernetes_version,
           },
         },
         configure_node: {
@@ -86,17 +86,17 @@ function(config)
       },
      },
 
-    
+
     resource: {
       "vsphere_folder":{
         "cluster_folder": {
-          datacenter: cfg.vSphere.datacenter, 
+          datacenter: cfg.vSphere.datacenter,
           path: cfg.vSphere.vmfolderpath,
         },
       },
       vsphere_virtual_machine: {
         ["kubevm" + vm]: {
-            name: if vm == 1 then std.join("", [cfg.cluster_name, "-master"]) else std.join("", [cfg.cluster_name, "-node", vm-1]),
+            name: if vm == 1 then std.join("", [cfg.cluster_name, "-master"]) else std.join("", [cfg.cluster_name, "-node", std.toString(vm-1)]),
             vcpu: cfg.vSphere.vcpu,
             memory: cfg.vSphere.memory,
             enable_disk_uuid: true,
@@ -115,7 +115,7 @@ function(config)
             },
 
             disk: {
-              template: cfg.vSphere.template, 
+              template: cfg.vSphere.template,
               bootable: true,
               type: "thin",
               datastore: cfg.vSphere.datastore,
@@ -135,7 +135,7 @@ function(config)
                   inline: [
                     "hostnamectl set-hostname %s" % std.join("", [cfg.cluster_name, "-master"]),
                     "mkdir -p /etc/kubernetes/; echo '%s' > /etc/kubernetes/k8s_config.json " % std.toString((config_metadata_template {role: "master"})),
-                    "echo '%s' >  /etc/kubernetes/vsphere.conf" % "${data.template_file.cloudprovider.rendered}",            
+                    "echo '%s' >  /etc/kubernetes/vsphere.conf" % "${data.template_file.cloudprovider.rendered}",
                     "echo '%s' > /etc/configure-vm.sh; bash /etc/configure-vm.sh" % "${data.template_file.configure_master.rendered}",
                   ]
                 }
@@ -155,14 +155,14 @@ function(config)
             provisioner: [{
                 "remote-exec": {
                   inline: [
-                    "hostnamectl set-hostname %s" % std.join("", [cfg.cluster_name, "-node", vm-1]),
+                    "hostnamectl set-hostname %s" % std.join("", [cfg.cluster_name, "-node", std.toString(vm-1)]),
                     "mkdir -p /etc/kubernetes/; echo '%s' > /etc/kubernetes/k8s_config.json " % std.toString((config_metadata_template {role: "node"})),
                     "echo '%s' > /etc/configure-vm.sh; bash /etc/configure-vm.sh" % "${data.template_file.configure_node.rendered}",
-                    "echo '%s' >  /etc/kubernetes/vsphere.conf" % "${data.template_file.cloudprovider.rendered}",            
+                    "echo '%s' >  /etc/kubernetes/vsphere.conf" % "${data.template_file.cloudprovider.rendered}",
                   ]
                 }
            }],
         } for vm in vms if vm > 1 },
-    },    
+    },
   }, tf.pki.cluster_tls(cfg.cluster_name, ["%(cluster_name)s-master" % cfg], ["${vsphere_virtual_machine.kubevm1.network_interface.0.ipv4_address}"]))
 
