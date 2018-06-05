@@ -241,7 +241,7 @@ installer container (phase2.installer_container) [docker.io/cnastorage/k8s-ignit
 
 * Registry to be used by Kubernetes
 ```
-docker registry (phase2.docker_registry) [gcr.io/google-containers] (NEW)
+docker registry (phase2.docker_registry) [k8s.gcr.io] (NEW)
 ```
 
 * Select the addons. Defaults to yes. **Make sure to choose 'N' for weave-net addon.**
