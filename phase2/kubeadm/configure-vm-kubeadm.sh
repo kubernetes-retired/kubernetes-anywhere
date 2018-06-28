@@ -63,7 +63,7 @@ elif [[ "$KUBEADM_KUBELET_VERSION" == "gs://"* ]]; then
   # TODO: Remove the following mkdir when bazelbuild/bazel
   # issue #4651 gets resolved.
   mkdir -p /opt/cni/bin
-  dpkg -i $TMPDIR/{kubelet,kubeadm,kubectl,kubernetes-cni}.deb || echo Ignoring expected dpkg failure
+  dpkg -i $TMPDIR/{kubelet,kubeadm,kubectl,kubernetes-cni,cri-tools}.deb || echo Ignoring expected dpkg failure
   apt-get install -f -y
   systemctl enable kubelet
   systemctl start kubelet
