@@ -53,7 +53,7 @@ EOF
   apt-get update
   # kubeadm is installed with the kubelet so that the
   # kubelet has the configuration at a matching version
-  apt-get install -y kubelet kubeadm kubectl kubernetes-cni
+  apt-get install -y cri-tools kubelet kubeadm kubectl kubernetes-cni
 elif [[ "$KUBEADM_KUBELET_VERSION" == "gs://"* ]]; then
   TMPDIR=/tmp/k8s-debs
   mkdir $TMPDIR
@@ -63,7 +63,7 @@ elif [[ "$KUBEADM_KUBELET_VERSION" == "gs://"* ]]; then
   # TODO: Remove the following mkdir when bazelbuild/bazel
   # issue #4651 gets resolved.
   mkdir -p /opt/cni/bin
-  dpkg -i $TMPDIR/{kubelet,kubeadm,kubectl,kubernetes-cni,cri-tools}.deb || echo Ignoring expected dpkg failure
+  dpkg -i $TMPDIR/{cri-tools,kubelet,kubeadm,kubectl,kubernetes-cni}.deb || echo Ignoring expected dpkg failure
   apt-get install -f -y
   systemctl enable kubelet
   systemctl start kubelet
