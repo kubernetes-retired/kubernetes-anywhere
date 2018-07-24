@@ -15,26 +15,57 @@ elif [[ "$KUBEADM_CNI_PLUGIN" == "weave" ]]; then
 fi
 
 mkdir -p $KUBEADM_DIR
+
+# break down the version string
+KUBEADM_KUBERNETES_VERSION_MAJOR=`cut -d'.' -f 1 <<< $KUBEADM_KUBERNETES_VERSION | cut -d'v' -f 2`
+KUBEADM_KUBERNETES_VERSION_MINOR=`cut -d'.' -f 2 <<< $KUBEADM_KUBERNETES_VERSION`
+KUBEADM_KUBERNETES_VERSION_PATCH=`cut -d'.' -f 3 <<< $KUBEADM_KUBERNETES_VERSION`
+
+# set defaults
 cat <<EOF |tee $KUBEADM_CONFIG_FILE
 kind: MasterConfiguration
-apiVersion: kubeadm.k8s.io/v1alpha1
+kubernetesVersion: "$KUBEADM_KUBERNETES_VERSION"
 api:
   advertiseAddress: "$KUBEADM_ADVERTISE_ADDRESSES"
   bindPort: 443
 networking:
   podSubnet: "$POD_NETWORK_CIDR"
-kubernetesVersion: "$KUBEADM_KUBERNETES_VERSION"
+EOF
+
+# handle v1alpha1
+########################################################################
+if [[ "$KUBEADM_KUBERNETES_VERSION_MINOR" -lt "11" ]]; then
+
+  # add api version and token
+  cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+apiVersion: kubeadm.k8s.io/v1alpha1
 token: "$KUBEADM_TOKEN"
 EOF
 
+else # handle v1alpha2
+########################################################################
+
+  # add api version and token
+  cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+apiVersion: kubeadm.k8s.io/v1alpha2
+bootstrapTokens:
+- token: "$KUBEADM_TOKEN"
+EOF
+
+fi
+########################################################################
+
+# add cloud provider
 if [[ "$KUBEADM_ENABLE_CLOUD_PROVIDER" == true ]]; then
   cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
-cloudProvider: "$CLOUD_PROVIDER"
+apiServerExtraArgs:
+  cloud-provider: "$CLOUD_PROVIDER"
 EOF
 fi
 
+# set ipvs
 if [[ "$KUBEPROXY_MODE" == "ipvs" ]]; then
-    cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+  cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
 kubeProxy:
   config:
     featureGates:
