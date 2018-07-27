@@ -16,10 +16,23 @@ fi
 
 mkdir -p $KUBEADM_DIR
 
-# break down the version string
-KUBEADM_KUBERNETES_VERSION_MAJOR=`cut -d'.' -f 1 <<< $KUBEADM_KUBERNETES_VERSION | cut -d'v' -f 2`
-KUBEADM_KUBERNETES_VERSION_MINOR=`cut -d'.' -f 2 <<< $KUBEADM_KUBERNETES_VERSION`
-KUBEADM_KUBERNETES_VERSION_PATCH=`cut -d'.' -f 3 <<< $KUBEADM_KUBERNETES_VERSION`
+# The script has to know the MINOR version from a k8s semantic version,
+# so that it can decide which kubeadm config version to use.
+# Fetch the semantic version from the server if it's not in semantic
+# format already.
+# The raw $KUBEADM_KUBERNETES_VERSION can be passed to the config
+# as kubeadm can handle that.
+KUBEADM_KUBERNETES_SEM_VER=$KUBEADM_KUBERNETES_VERSION
+if [[ $KUBEADM_KUBERNETES_SEM_VER = *"ci/"* ]] ||
+   [[ $KUBEADM_KUBERNETES_SEM_VER = *"ci-cross/"* ]] ||
+   [[ $KUBEADM_KUBERNETES_SEM_VER = *"release/"* ]]; then
+  KUBEADM_KUBERNETES_SEM_VER=`curl -sSL https://dl.k8s.io/$KUBEADM_KUBERNETES_VERSION.txt`
+fi
+
+# break down the semantic version string
+KUBEADM_KUBERNETES_VERSION_MAJOR=`cut -d'.' -f 1 <<< $KUBEADM_KUBERNETES_SEM_VER | cut -d'v' -f 2`
+KUBEADM_KUBERNETES_VERSION_MINOR=`cut -d'.' -f 2 <<< $KUBEADM_KUBERNETES_SEM_VER`
+KUBEADM_KUBERNETES_VERSION_PATCH=`cut -d'.' -f 3 <<< $KUBEADM_KUBERNETES_SEM_VER | cut -d'-' -f 1`
 
 # set defaults
 cat <<EOF |tee $KUBEADM_CONFIG_FILE
