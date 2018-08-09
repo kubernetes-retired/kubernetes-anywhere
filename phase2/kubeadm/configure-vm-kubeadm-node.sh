@@ -7,4 +7,4 @@ if [[ $KUBEADM_VERSION == "stable" ]] || [[ $(semver_compare $KUBEADM_VERSION "v
   OPTS="--discovery-token-unsafe-skip-ca-verification"
 fi
 
-kubeadm join --token "$KUBEADM_TOKEN" "$KUBEADM_MASTER_IP:443" --skip-preflight-checks $OPTS
+kubeadm join --token "$KUBEADM_TOKEN" "$KUBEADM_MASTER_IP:443" --ignore-preflight-errors=all $OPTS

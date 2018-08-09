@@ -103,4 +103,4 @@ featureGates:
 EOF
 fi
 
-kubeadm init --skip-preflight-checks --config $KUBEADM_CONFIG_FILE
+kubeadm init --ignore-preflight-errors=all --config $KUBEADM_CONFIG_FILE

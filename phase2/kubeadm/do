@@ -22,7 +22,7 @@ upgrade_master() {
 
   case "${UPGRADE_METHOD}" in
     "init")
-      execute_host ${MASTER} "sudo kubeadm init --skip-preflight-checks --config ${KUBEADM_CONFIG_FILE}"
+      execute_host ${MASTER} "sudo kubeadm init --ignore-preflight-errors=all --config ${KUBEADM_CONFIG_FILE}"
       ;;
     "upgrade")
       execute_host ${MASTER} "sudo kubeadm config upload from-file --config ${KUBEADM_CONFIG_FILE}"
