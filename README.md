@@ -58,3 +58,7 @@ At the end of these two phases:
 Deployment of fluentd, kube-proxy will happen with DaemonSets after this process through the addon manager. Deployment of heapster, kube-dns, all other addons will happen after this process through the addon manager.
 
 There should be a reasonably portable default networking configuration. For this default: node connectivity will be configured during provisioning and pod connectivity will be configured during bootstrapping. Pod connectivity will (likely) use flannel and the kubelet cni network plugin. The pod networking configuration should be sufficiently decoupled from the rest of the bootstrapping configuration so that it can be swapped with minimal modification for other pod networking implementations.
+
+### Contributing
+
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for instructions on how to contribute.
