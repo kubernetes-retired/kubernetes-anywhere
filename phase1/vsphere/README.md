@@ -316,7 +316,7 @@ First set KUBECONFIG to access cluster using kubectl:
 ```shell
 export KUBECONFIG="/opt/kubernetes-anywhere/phase1/vsphere/kubernetes/kubeconfig.json"
 ```
-Note: In the path `/opt/kubernetes-anywhere/phase1/vsphere/kubernetes` kubernetes is the name of the cluster that we have specifed in the config file. If you have specified different name make sure to specify the appropriate path.
+Note: In the path `/opt/kubernetes-anywhere/phase1/vsphere/kubernetes` kubernetes is the name of the cluster that we have specified in the config file. If you have specified different name make sure to specify the appropriate path.
 
 We have mounted /tmp directory in the deployment container. If you want to save the config on your local machine just copy this file to the /tmp directory in the container.
 
