@@ -13,6 +13,12 @@ CLUSTER_NAME=$(jq -r '.phase1.cluster_name' ${CONFIG_FILE})
 CLUSTER_DIR=clusters/${CLUSTER_NAME}
 TMP_DIR=${CLUSTER_DIR}/.tmp
 
+# If 'account.json' is missing, try to use the file defined in 'GOOGLE_APPLICATION_CREDENTIALS'
+if [[ ! -e account.json ]] && [[ ! -z "${GOOGLE_APPLICATION_CREDENTIALS:-}" ]] &&
+   [[ -e "${GOOGLE_APPLICATION_CREDENTIALS}" ]]; then
+  ln -s "${GOOGLE_APPLICATION_CREDENTIALS}" account.json
+fi
+
 generate_token() {
   perl -e 'printf "%06x.%08x%08x\n", rand(0xffffff), rand(0xffffffff), rand(0xffffffff);'
 }
