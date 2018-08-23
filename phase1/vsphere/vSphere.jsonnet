@@ -22,6 +22,8 @@ function(config)
       },
     };
 
+  local is_insecure() = if std.objectHas(cfg.vSphere, "insecure") then cfg.vSphere.insecure else 0;
+
   std.mergePatch({
     // vSphere Configuration
     provider: {
@@ -29,7 +31,7 @@ function(config)
         user: cfg.vSphere.username,
         password: cfg.vSphere.password,
         vsphere_server: cfg.vSphere.url,
-        allow_unverified_ssl: cfg.vSphere.insecure,
+        allow_unverified_ssl: is_insecure(),
       },
     },
 
@@ -77,7 +79,7 @@ function(config)
             password: std.escapeStringJson(cfg.vSphere.password),
             vsphere_server: std.escapeStringJson(cfg.vSphere.url),
             port: std.escapeStringJson(cfg.vSphere.port),
-            allow_unverified_ssl: std.escapeStringJson(cfg.vSphere.insecure),
+            allow_unverified_ssl: std.escapeStringJson(is_insecure()),
             datacenter: std.escapeStringJson(cfg.vSphere.datacenter),
             datastore: std.escapeStringJson(cfg.vSphere.datastore),
             working_dir: std.escapeStringJson(cfg.vSphere.vmfolderpath),
