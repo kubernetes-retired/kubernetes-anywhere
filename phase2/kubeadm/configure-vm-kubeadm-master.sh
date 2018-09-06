@@ -23,9 +23,12 @@ mkdir -p $KUBEADM_DIR
 # The raw $KUBEADM_KUBERNETES_VERSION can be passed to the config
 # as kubeadm can handle that.
 KUBEADM_KUBERNETES_SEM_VER=$KUBEADM_KUBERNETES_VERSION
-if [[ $KUBEADM_KUBERNETES_SEM_VER = *"ci/"* ]] ||
-   [[ $KUBEADM_KUBERNETES_SEM_VER = *"ci-cross/"* ]] ||
-   [[ $KUBEADM_KUBERNETES_SEM_VER = *"release/"* ]]; then
+if [[ $KUBEADM_KUBERNETES_SEM_VER = "stable"* ]] ||
+   [[ $KUBEADM_KUBERNETES_SEM_VER = "latest"* ]]; then
+  KUBEADM_KUBERNETES_SEM_VER=`curl -sSL https://dl.k8s.io/release/$KUBEADM_KUBERNETES_SEM_VER.txt`
+elif [[ $KUBEADM_KUBERNETES_SEM_VER = *"ci/"* ]] ||
+     [[ $KUBEADM_KUBERNETES_SEM_VER = *"ci-cross/"* ]] ||
+     [[ $KUBEADM_KUBERNETES_SEM_VER = *"release/"* ]]; then
   KUBEADM_KUBERNETES_SEM_VER=`curl -sSL https://dl.k8s.io/$KUBEADM_KUBERNETES_VERSION.txt`
 fi
 
