@@ -1,10 +1,13 @@
 #!/bin/bash
+
+# WARNING: some of the tools in this build are VERY outdated!
+
 set -eux -o pipefail
 
 apk add --update git build-base wget curl jq autoconf automake pkgconfig ncurses-dev libtool gperf flex bison ca-certificates python openssh-client
 
 ## Install kubectl
-export KUBECTL_VERSION=1.6.0-beta.4
+export KUBECTL_VERSION=1.11.2
 wget https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -O /usr/local/bin/kubectl
 chmod +x /usr/local/bin/kubectl
 
