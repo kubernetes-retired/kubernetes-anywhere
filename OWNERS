@@ -8,6 +8,8 @@ reviewers:
   - mikedanese
   - monadic
   - pipejakob
+  - fabriziopandini
+  - neolit123
 approvers:
   - abrarshivani
   - colemickens
@@ -18,3 +20,5 @@ approvers:
   - mikedanese
   - monadic
   - pipejakob
+  - fabriziopandini
+  - neolit123
