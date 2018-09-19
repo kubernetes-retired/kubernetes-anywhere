@@ -1,6 +1,6 @@
 # Kubernetes Anywhere
 
-*{concise,reliable,cross-platform} turnup of Kubernetes clusters*
+(NOTE: This project is deprecated and used only for kubeadm e2e tests) {concise,reliable,cross-platform} turnup of Kubernetes clusters
 
 ### Goals and Motivation
 
