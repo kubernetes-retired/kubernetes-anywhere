@@ -52,8 +52,10 @@ if [[ "$KUBEADM_KUBELET_VERSION" == stable ]]; then
 EOF
   apt-get update
   # kubeadm is installed with the kubelet so that the
-  # kubelet has the configuration at a matching version
-  apt-get install -y kubelet kubeadm kubectl kubernetes-cni
+  # kubelet has the configuration at a matching version.
+  # STABLE is used so that no pre-release packages are picked up
+  STABLE=$(apt-cache madison kubelet | awk '{print $3}' | grep '^[^a-zA-Z]*$' -m 1)
+  apt-get install -y kubelet=$STABLE kubeadm=$STABLE kubectl=$STABLE kubernetes-cni
 elif [[ "$KUBEADM_KUBELET_VERSION" == "gs://"* ]]; then
   TMPDIR=/tmp/k8s-debs
   mkdir $TMPDIR
