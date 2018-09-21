@@ -45,7 +45,7 @@ $(CONFIG_JSON_FILE): $(CONFIG_FILE_ABS)
 echo-config: $(CONFIG_JSON_FILE)
 	cat $<
 
-deploy-cluster destroy-cluster: $(CONFIG_JSON_FILE)
+deploy-cluster destroy-cluster: echo-config
 	$(MAKE) do WHAT=$@
 
 upgrade-master: $(CONFIG_JSON_FILE)

@@ -69,6 +69,14 @@ fetch_kubeconfig() {
       sed '/^STARTFILE$/,$!d;/^STARTFILE$/d' ${TMP_DIR}/kubeconfig.raw > ${CLUSTER_DIR}/kubeconfig.json
       echo Successfully fetched kubeconfig.
 
+      echo "kubeconfig contents:"
+      cat ${CLUSTER_DIR}/kubeconfig.json
+
+      if [ ! -s "${CLUSTER_DIR}/kubeconfig.json" ]; then \
+        echo "ERROR: the kubeconfig file is empty!" > /dev/stderr; \
+        exit 1
+      fi
+
       if [[ -n "${KUBE_CONTEXT_NAME}" ]]; then
         # kubeconfig.json fetched from master node has the user, cluster and context all hardcoded with
         # 'kubernetes' keyword. So replace 'kubernetes' with the cluster_name.
