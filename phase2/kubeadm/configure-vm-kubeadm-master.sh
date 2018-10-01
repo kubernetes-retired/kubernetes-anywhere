@@ -37,8 +37,11 @@ KUBEADM_KUBERNETES_VERSION_MAJOR=`cut -d'.' -f 1 <<< $KUBEADM_KUBERNETES_SEM_VER
 KUBEADM_KUBERNETES_VERSION_MINOR=`cut -d'.' -f 2 <<< $KUBEADM_KUBERNETES_SEM_VER`
 KUBEADM_KUBERNETES_VERSION_PATCH=`cut -d'.' -f 3 <<< $KUBEADM_KUBERNETES_SEM_VER | cut -d'-' -f 1`
 
-# set defaults
-cat <<EOF |tee $KUBEADM_CONFIG_FILE
+# handle v1alpha1
+########################################################################
+if [[ "$KUBEADM_KUBERNETES_VERSION_MINOR" -le "11" ]]; then
+
+  cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
 kind: MasterConfiguration
 kubernetesVersion: "$KUBEADM_KUBERNETES_VERSION"
 api:
@@ -48,62 +51,100 @@ networking:
   podSubnet: "$POD_NETWORK_CIDR"
 EOF
 
-# handle v1alpha1
-########################################################################
-if [[ "$KUBEADM_KUBERNETES_VERSION_MINOR" -lt "11" ]]; then
-
-  # add api version and token
-  cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
-apiVersion: kubeadm.k8s.io/v1alpha1
-token: "$KUBEADM_TOKEN"
-EOF
-
-else # handle v1alpha2
-########################################################################
-
-  # add api version and token
-  cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
-apiVersion: kubeadm.k8s.io/v1alpha2
-bootstrapTokens:
-- token: "$KUBEADM_TOKEN"
-EOF
-
-fi
-########################################################################
-
-# add cloud provider
-if [[ "$KUBEADM_ENABLE_CLOUD_PROVIDER" == true ]]; then
-  cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+  # add cloud provider
+  if [[ "$KUBEADM_ENABLE_CLOUD_PROVIDER" == true ]]; then
+    cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
 apiServerExtraArgs:
   cloud-provider: "$CLOUD_PROVIDER"
 EOF
-fi
+  fi
 
-# set ipvs
-if [[ "$KUBEPROXY_MODE" == "ipvs" ]]; then
-  cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+  # set ipvs
+  if [[ "$KUBEPROXY_MODE" == "ipvs" ]]; then
+    cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
 kubeProxy:
   config:
     featureGates:
       SupportIPVSProxyMode: true
     mode: "$KUBEPROXY_MODE"
 EOF
-fi
+  fi
 
-# if exist $KUBEADM_FEATURE_GATES is an string in format "key1=values1,key2=value2,.."
-# it should be added in the config in an YAML format for the field featureGates - eg:
-# featureGates:
-#   key1: value1
-#   key2: value2
-#   etc ...
-#NOTE: it is important to avoid the substituion and expression format for a variable. Therefore the usage of evaluated (echo + sed)
-KUBEADM_FEATURE_GATES=`echo "$KUBEADM_FEATURE_GATES" | sed -e 's/^[[:space:]]*//'`
-if [[ ! -z $KUBEADM_FEATURE_GATES ]]; then
-  foptions=`echo $KUBEADM_FEATURE_GATES | sed -e 's/=/: /g;s/,/\\\n  /g'`
-  cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+  # add feature gates
+  KUBEADM_FEATURE_GATES=`echo "$KUBEADM_FEATURE_GATES" | sed -e 's/^[[:space:]]*//'`
+  if [[ ! -z $KUBEADM_FEATURE_GATES ]]; then
+    foptions=`echo $KUBEADM_FEATURE_GATES | sed -e 's/=/: /g;s/,/\\\n  /g'`
+    cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
 featureGates:
   `echo -e "$foptions"`
 EOF
+  fi
+
+  # handle v1alpha1 or v1alpha2
+  if [[ "$KUBEADM_KUBERNETES_VERSION_MINOR" -lt "11" ]]; then
+    cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+apiVersion: kubeadm.k8s.io/v1alpha1
+token: "$KUBEADM_TOKEN"
+EOF
+  else
+    cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+apiVersion: kubeadm.k8s.io/v1alpha2
+bootstrapTokens:
+- token: "$KUBEADM_TOKEN"
+EOF
+  fi
+
+# handle v1alpha3
+########################################################################
+else
+
+  # add api version and token
+  cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+kind: InitConfiguration
+apiVersion: kubeadm.k8s.io/v1alpha3
+bootstrapTokens:
+- token: "$KUBEADM_TOKEN"
+apiEndpoint:
+  advertiseAddress: "$KUBEADM_ADVERTISE_ADDRESSES"
+  bindPort: 443
+---
+kind: ClusterConfiguration
+apiVersion: kubeadm.k8s.io/v1alpha3
+kubernetesVersion: "$KUBEADM_KUBERNETES_VERSION"
+networking:
+  podSubnet: "$POD_NETWORK_CIDR"
+EOF
+
+  # add feature gates
+  if [[ ! -z $KUBEADM_FEATURE_GATES ]]; then
+    foptions=`echo $KUBEADM_FEATURE_GATES | sed -e 's/=/: /g;s/,/\\\n  /g'`
+    cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+featureGates:
+  `echo -e "$foptions"`
+EOF
+  fi
+
+  # add cloud provider
+  if [[ "$KUBEADM_ENABLE_CLOUD_PROVIDER" == true ]]; then
+    cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+apiServerExtraArgs:
+  cloud-provider: "$CLOUD_PROVIDER"
+EOF
+  fi
+
+  # set ipvs
+  if [[ "$KUBEPROXY_MODE" == "ipvs" ]]; then
+    cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+---
+kind: KubeProxyConfiguration
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+mode: "$KUBEPROXY_MODE"
+featureGates:
+  SupportIPVSProxyMode: true
+EOF
+  fi
+
 fi
+########################################################################
 
 kubeadm init --ignore-preflight-errors=all --config $KUBEADM_CONFIG_FILE
