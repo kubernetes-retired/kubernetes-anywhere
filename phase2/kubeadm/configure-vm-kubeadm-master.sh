@@ -96,7 +96,7 @@ EOF
 
 # handle v1alpha3
 ########################################################################
-else
+elif [[ "$KUBEADM_KUBERNETES_VERSION_MINOR" -le "12" ]]; then
 
   # add api version and token
   cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
@@ -111,6 +111,56 @@ apiEndpoint:
 kind: ClusterConfiguration
 apiVersion: kubeadm.k8s.io/v1alpha3
 kubernetesVersion: "$KUBEADM_KUBERNETES_VERSION"
+networking:
+  podSubnet: "$POD_NETWORK_CIDR"
+EOF
+
+  # add feature gates
+  if [[ ! -z $KUBEADM_FEATURE_GATES ]]; then
+    foptions=`echo $KUBEADM_FEATURE_GATES | sed -e 's/=/: /g;s/,/\\\n  /g'`
+    cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+featureGates:
+  `echo -e "$foptions"`
+EOF
+  fi
+
+  # add cloud provider
+  if [[ "$KUBEADM_ENABLE_CLOUD_PROVIDER" == true ]]; then
+    cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+apiServerExtraArgs:
+  cloud-provider: "$CLOUD_PROVIDER"
+EOF
+  fi
+
+  # set ipvs
+  if [[ "$KUBEPROXY_MODE" == "ipvs" ]]; then
+    cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+---
+kind: KubeProxyConfiguration
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+mode: "$KUBEPROXY_MODE"
+featureGates:
+  SupportIPVSProxyMode: true
+EOF
+  fi
+
+# handle v1beta1
+########################################################################
+else
+
+  # add api version and token
+  cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
+kind: InitConfiguration
+apiVersion: kubeadm.k8s.io/v1beta1
+bootstrapTokens:
+- token: "$KUBEADM_TOKEN"
+apiEndpoint:
+  bindPort: 443
+---
+kind: ClusterConfiguration
+apiVersion: kubeadm.k8s.io/v1beta1
+kubernetesVersion: "$KUBEADM_KUBERNETES_VERSION"
+controlPlaneEndpoint: "$KUBEADM_ADVERTISE_ADDRESSES"
 networking:
   podSubnet: "$POD_NETWORK_CIDR"
 EOF
