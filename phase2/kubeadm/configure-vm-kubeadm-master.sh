@@ -18,19 +18,10 @@ mkdir -p $KUBEADM_DIR
 
 # The script has to know the MINOR version from a k8s semantic version,
 # so that it can decide which kubeadm config version to use.
-# Fetch the semantic version from the server if it's not in semantic
-# format already.
+# Obtain the version from the kubeadm client.
 # The raw $KUBEADM_KUBERNETES_VERSION can be passed to the config
 # as kubeadm can handle that.
-KUBEADM_KUBERNETES_SEM_VER=$KUBEADM_KUBERNETES_VERSION
-if [[ $KUBEADM_KUBERNETES_SEM_VER = "stable"* ]] ||
-   [[ $KUBEADM_KUBERNETES_SEM_VER = "latest"* ]]; then
-  KUBEADM_KUBERNETES_SEM_VER=`curl -sSL https://dl.k8s.io/release/$KUBEADM_KUBERNETES_SEM_VER.txt`
-elif [[ $KUBEADM_KUBERNETES_SEM_VER = *"ci/"* ]] ||
-     [[ $KUBEADM_KUBERNETES_SEM_VER = *"ci-cross/"* ]] ||
-     [[ $KUBEADM_KUBERNETES_SEM_VER = *"release/"* ]]; then
-  KUBEADM_KUBERNETES_SEM_VER=`curl -sSL https://dl.k8s.io/$KUBEADM_KUBERNETES_VERSION.txt`
-fi
+KUBEADM_KUBERNETES_SEM_VER=$(kubeadm version -o short)
 
 # break down the semantic version string
 KUBEADM_KUBERNETES_VERSION_MAJOR=`cut -d'.' -f 1 <<< $KUBEADM_KUBERNETES_SEM_VER | cut -d'v' -f 2`
