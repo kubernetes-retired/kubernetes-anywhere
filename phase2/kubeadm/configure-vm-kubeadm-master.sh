@@ -145,7 +145,7 @@ kind: InitConfiguration
 apiVersion: kubeadm.k8s.io/v1beta1
 bootstrapTokens:
 - token: "$KUBEADM_TOKEN"
-apiEndpoint:
+localAPIEndpoint:
   bindPort: 443
 ---
 kind: ClusterConfiguration
@@ -168,8 +168,9 @@ EOF
   # add cloud provider
   if [[ "$KUBEADM_ENABLE_CLOUD_PROVIDER" == true ]]; then
     cat <<EOF |tee -a $KUBEADM_CONFIG_FILE
-apiServerExtraArgs:
-  cloud-provider: "$CLOUD_PROVIDER"
+apiServer:
+  extraArgs:
+    cloud-provider: "$CLOUD_PROVIDER"
 EOF
   fi
 
