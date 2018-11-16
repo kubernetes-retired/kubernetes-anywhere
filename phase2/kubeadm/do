@@ -25,7 +25,6 @@ upgrade_master() {
       execute_host ${MASTER} "sudo kubeadm init --ignore-preflight-errors=all --config ${KUBEADM_CONFIG_FILE}"
       ;;
     "upgrade")
-      execute_host ${MASTER} "sudo kubeadm config upload from-file --config ${KUBEADM_CONFIG_FILE}"
       execute_host ${MASTER} "sudo kubeadm upgrade apply ${KUBERNETES_VERSION} -y -f"
       ;;
   esac
