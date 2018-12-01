@@ -57,6 +57,7 @@ EOF
   STABLE=$(apt-cache madison kubelet | awk '{print $3}' | grep '^[^a-zA-Z]*$' -m 1)
   apt-get install -y kubelet=$STABLE kubeadm=$STABLE kubectl=$STABLE kubernetes-cni
 elif [[ "$KUBEADM_KUBELET_VERSION" == "gs://"* ]]; then
+  apt-get update
   TMPDIR=/tmp/k8s-debs
   mkdir $TMPDIR
   gsutil rsync "$KUBEADM_KUBELET_VERSION" $TMPDIR
