@@ -2,6 +2,15 @@
 
 *{concise,reliable,cross-platform} turnup of Kubernetes clusters*
 
+# WARNING: kubernetes-anywhere is deprecated and will be retired in a future release.
+
+Consider using some of these active projects instead:
+ - [kubeadm](https://github.com/kubernetes/kubeadm)
+ - [kubespray](https://github.com/kubernetes-sigs/kubespray)
+ - [kind](https://github.com/kubernetes-sigs/kind)
+ - [minikube](https://github.com/kubernetes/minikube)
+ - [kops](https://github.com/kubernetes/kops)
+
 ### Goals and Motivation
 
 Learning how to deploy Kubernetes is hard because the default deployment automation [`cluster/kube-up.sh`](https://github.com/kubernetes/kubernetes/blob/master/cluster/kube-up.sh) is opaque. We can do better, and by doing better we enable users to run Kubernetes in more places.
