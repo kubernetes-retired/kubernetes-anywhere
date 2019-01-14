@@ -40,6 +40,7 @@ EOF
 
 apt-key adv --keyserver hkp://keyserver.ubuntu.com --recv-keys F76221572C52609D
 apt-get update
-apt-get install -y docker-engine=1.12.0-0~xenial
+sudo apt-cache policy docker-engine
+sudo apt-get -y install docker-engine=1.13.1-0~ubuntu-xenial
 systemctl enable docker || true
 systemctl start docker || true
