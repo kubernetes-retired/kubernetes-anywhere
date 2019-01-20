@@ -70,6 +70,10 @@ validate-node-ready: $(CONFIG_JSON_FILE)
 addons: $(CONFIG_JSON_FILE)
 	KUBECONFIG="$$(pwd)/phase1/$(CLOUD_PROVIDER)/$(CLUSTER_DIR)/kubeconfig.json" ./phase3/do deploy
 
+# Optional step to call from e2e jobs. Installs terraform, jsonnet and kubectl
+setup:
+	( cd util/; ./setup-terraform-jsonnet-kubectl.sh )
+
 deploy: | deploy-cluster  validate-cluster-up  addons  validate-node-ready
 destroy: | destroy-cluster
 
