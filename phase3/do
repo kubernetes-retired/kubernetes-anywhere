@@ -20,10 +20,7 @@ gen() {
 deploy() {
 	gen
 	mkdir -p /tmp/kubectl/
-	export KUBECTL_VERSION=$(curl https://storage.googleapis.com/kubernetes-release/release/latest.txt)
-	wget https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl -O /tmp/kubectl/kubectl
-	chmod +x /tmp/kubectl/kubectl
-	HOME=/tmp/kubectl /tmp/kubectl/kubectl apply -f ${TMP_DIR}
+	HOME=/tmp/kubectl /usr/local/bin/kubectl apply -f ${TMP_DIR}
 }
 
 
