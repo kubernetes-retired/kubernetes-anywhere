@@ -30,7 +30,7 @@ mkdir -p /tmp/terraform/
 (cd /tmp/terraform
 wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
 wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS
-sed -i '/terraform_${TERRAFORM_VERSION}_linux_amd64.zip/!d' /tmp/terraform/terraform_${TERRAFORM_VERSION}_SHA256SUMS
-sha256sum -cs terraform_${TERRAFORM_VERSION}_SHA256SUMS
+sed -i '/linux_amd64/!d' /tmp/terraform/terraform_${TERRAFORM_VERSION}_SHA256SUMS
+sha256sum -c terraform_${TERRAFORM_VERSION}_SHA256SUMS
 unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /bin)
 rm -rf /tmp/terraform
